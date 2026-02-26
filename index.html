@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol - Easy Mode</title>
+    <title>Aira Protocol | Staking Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -11,136 +11,211 @@
             --primary: #00f2ff;
             --pink: #ff007f;
             --bg: #050a10;
+            --glass: rgba(0, 242, 255, 0.05);
             --border: rgba(0, 242, 255, 0.2);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body {
             background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif;
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .score-val { font-family: 'Orbitron'; font-size: 50px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
-        
-        .game-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 280px; }
-        .tile {
-            aspect-ratio: 1; background: rgba(0, 242, 255, 0.05); border: 2px solid var(--border);
-            border-radius: 15px; transition: 0.3s; cursor: pointer;
-        }
-        .tile.active { background: var(--primary); box-shadow: 0 0 30px var(--primary); border-color: #fff; }
-
-        /* Mukofot oynasi */
-        #reward-box {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; background: #0a1a25; border: 2px solid var(--primary); padding: 25px;
-            border-radius: 20px; z-index: 100; text-align: center;
-        }
-        .btn {
-            width: 100%; padding: 15px; margin-top: 10px; background: rgba(0,242,255,0.1);
-            border: 1px solid var(--primary); color: #fff; border-radius: 10px; font-family: 'Orbitron';
+        /* ⚠️ TEST MODE WARNING */
+        .test-warning {
+            background: rgba(255, 0, 127, 0.15);
+            color: var(--pink);
+            text-align: center;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            padding: 8px;
+            border-bottom: 1px solid var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
+        /* HEADER */
+        .header { padding: 25px 20px 15px; text-align: center; border-bottom: 1px solid var(--border); }
+        .score-val { font-family: 'Orbitron'; font-size: 45px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
+        .stake-info { font-size: 12px; color: var(--primary); margin-top: 5px; opacity: 0.8; }
+
+        /* GAME AREA */
+        .view { display: none; flex: 1; overflow-y: auto; padding: 20px; }
+        .view.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            width: 100%; max-width: 280px; padding: 15px;
+            background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
+        }
+        .node {
+            aspect-ratio: 1; background: rgba(0, 242, 255, 0.03); border: 1.5px solid var(--border);
+            border-radius: 12px; transition: 0.3s; cursor: pointer;
+        }
+        .node.active { background: var(--primary); box-shadow: 0 0 20px var(--primary); }
+
+        /* STAKING CARD */
+        .st-card {
+            background: var(--glass); border: 1px solid var(--primary);
+            border-radius: 20px; padding: 20px; width: 100%; margin-bottom: 15px; text-align: center;
+        }
+        .st-btn {
+            background: var(--primary); color: #000; border: none; padding: 12px 25px;
+            border-radius: 10px; font-family: 'Orbitron'; font-weight: 900; margin-top: 15px; cursor: pointer;
+        }
+
+        /* NEXT UPDATE MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #0a1a25; border: 2px solid var(--primary); padding: 25px;
+            border-radius: 25px; width: 85%; max-width: 320px; text-align: center;
+        }
+
+        /* NAV */
         .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 9px; }
         .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <div class="test-warning">
+        Test Rejimi: Ma'lumotlar saqlanib qolmasligi mumkin!
+    </div>
+
+    <header class="header">
         <div class="score-val" id="score">0</div>
-        <div style="font-family:'Orbitron'; color:var(--pink); font-size:12px;">EASY MODE ACTIVE</div>
-    </div>
+        <div class="stake-info">STAKING POOL: <span id="staked-val">0</span> COINS</div>
+    </header>
 
-    <div class="game-stage">
+    <div id="v-hack" class="view active">
         <div class="grid" id="board"></div>
-        <p id="hint" style="margin-top:20px; font-family:'Orbitron'; color:var(--primary);">TAYYORMIZMI?</p>
+        <p id="msg" style="margin-top:20px; font-family:'Orbitron'; color:var(--primary); font-size:12px;">HACKING TAYYOR...</p>
     </div>
 
-    <div id="reward-box">
-        <h3 style="font-family:'Orbitron'; color:var(--primary)">HACK SUCCESS!</h3>
-        <button class="btn" onclick="claim()">+250 COINS YIG'ISH</button>
+    <div id="v-stake" class="view">
+        <div class="st-card">
+            <h3 style="font-family:'Orbitron'; color:var(--primary)">AI STAKING</h3>
+            <p style="font-size:14px; opacity:0.7;">Tangalaringizni staking qiling va har soatda 5% bonus oling!</p>
+            <div style="font-size:24px; font-family:'Orbitron'; margin:10px 0;" id="st-display">0</div>
+            <button class="st-btn" onclick="startStake()">STAKE ALL</button>
+        </div>
+        <div class="st-card" style="border-color: var(--pink);">
+            <h4 style="font-family:'Orbitron'; color:var(--pink)">ROADMAP V4.0</h4>
+            <ul style="text-align:left; font-size:12px; opacity:0.8; line-height:1.8;">
+                <li>🚀 PvP Klanlar jangi</li>
+                <li>💎 NFT Savdo maydoni</li>
+                <li>🤖 Shaxsiy AI yordamchi</li>
+            </ul>
+        </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active">HACK</div>
-        <div class="nav-item" onclick="tg.showAlert('Market yopiq')">MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('NFT yopiq')">NFT</div>
+    <div class="modal" id="reward-modal">
+        <div class="modal-content">
+            <h3 style="font-family:'Orbitron'; color:var(--primary)">HACK SUCCESS!</h3>
+            <p>Mukofotingizni tanlang:</p>
+            <button class="st-btn" onclick="claim(500)">+500 COINS</button>
+            <button class="st-btn" style="background:var(--pink)" onclick="claim(1000)">+1000 (AD VIDEO)</button>
+        </div>
     </div>
+
+    <nav class="nav">
+        <div class="nav-item active" onclick="switchTab('hack', this)">HACK</div>
+        <div class="nav-item" onclick="switchTab('stake', this)">STAKING</div>
+        <div class="nav-item" onclick="toggleRoadmap()">ROADMAP</div>
+    </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    let score = parseInt(localStorage.getItem('aira_sc')) || 0;
+    let score = 0;
+    let staked = 0;
     let sequence = [];
-    let userSteps = 0;
+    let userStep = 0;
     
-    // 80% OSONLASHTIRILGAN PARAMETRLAR
-    let speed = 1500; // Juda sekin (1.5 sekund)
-    let length = 2;   // Atigi 2 ta raqamni eslab qolish kerak
+    // 80% OSONLASHTIRILGAN REJIM
+    let speed = 1500; 
+    let seqLen = 2;
 
     function init() {
         const board = document.getElementById('board');
         board.innerHTML = '';
         for(let i=0; i<9; i++) {
-            let t = document.createElement('div');
-            t.className = 'tile';
-            t.onclick = () => tap(i, t);
-            board.appendChild(t);
+            let n = document.createElement('div');
+            n.className = 'node';
+            n.onclick = () => handleTap(i, n);
+            board.appendChild(n);
         }
-        document.getElementById('score').innerText = score;
         setTimeout(play, 1000);
     }
 
     function play() {
-        sequence = [];
-        userSteps = 0;
-        document.getElementById('hint').innerText = "ESLAB QOLING...";
-        
-        for(let i=0; i<length; i++) {
-            sequence.push(Math.floor(Math.random() * 9));
-        }
+        sequence = []; userStep = 0;
+        document.getElementById('msg').innerText = "ESLAB QOLING...";
+        for(let i=0; i<seqLen; i++) sequence.push(Math.floor(Math.random() * 9));
 
         let i = 0;
         const interval = setInterval(() => {
-            const tiles = document.querySelectorAll('.tile');
-            tiles[sequence[i]].classList.add('active');
-            setTimeout(() => tiles[sequence[i]].classList.remove('active'), speed * 0.7);
+            const nodes = document.querySelectorAll('.node');
+            nodes[sequence[i]].classList.add('active');
+            setTimeout(() => nodes[sequence[i]].classList.remove('active'), speed * 0.7);
             i++;
             if(i >= sequence.length) {
                 clearInterval(interval);
-                setTimeout(() => document.getElementById('hint').innerText = "ENDI BOSING!", 500);
+                setTimeout(() => document.getElementById('msg').innerText = "BOSING!", 500);
             }
         }, speed);
     }
 
-    function tap(id, el) {
-        if(id === sequence[userSteps]) {
+    function handleTap(id, el) {
+        if(id === sequence[userStep]) {
             el.classList.add('active');
             setTimeout(() => el.classList.remove('active'), 200);
-            userSteps++;
-            if(userSteps === sequence.length) {
-                document.getElementById('reward-box').style.display = 'block';
+            userStep++;
+            if(userStep === sequence.length) {
+                document.getElementById('reward-modal').style.display = 'flex';
                 tg.HapticFeedback.notificationOccurred('success');
             }
         } else {
             tg.HapticFeedback.notificationOccurred('error');
-            document.getElementById('hint').innerText = "XATO! QAYTADAN...";
+            document.getElementById('msg').innerText = "XATO! QAYTADAN...";
             setTimeout(play, 1000);
         }
     }
 
-    function claim() {
-        score += 250;
-        localStorage.setItem('aira_sc', score);
+    function claim(val) {
+        score += val;
         document.getElementById('score').innerText = score;
-        document.getElementById('reward-box').style.display = 'none';
-        
-        // Qiyinchilik juda sekin o'sadi (deyarli sezilmaydi)
-        length = Math.min(5, length + 0.1); 
-        
+        document.getElementById('reward-modal').style.display = 'none';
         play();
+    }
+
+    function startStake() {
+        if(score > 0) {
+            staked += score;
+            score = 0;
+            document.getElementById('score').innerText = score;
+            document.getElementById('staked-val').innerText = staked;
+            document.getElementById('st-display').innerText = staked;
+            tg.showAlert("Tangalar stakingga qo'yildi!");
+        }
+    }
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('v-' + tab).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function toggleRoadmap() {
+        tg.showPopup({
+            title: 'Roadmap V4.0',
+            message: 'Keyingi yangilanishda: PvP rejim, NFT bozor va yangi dizayn kutmoqda!',
+            buttons: [{type: 'close'}]
+        });
     }
 
     init();
