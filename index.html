@@ -115,7 +115,7 @@
         .mage-sprite {
             width: 100%; height: 100%;
             object-fit: contain;
-            /* Shaxsiy original personaj: Koinot Sehrgari */
+            /* Original AI-Character Image: Astral Elf Girl */
             filter: drop-shadow(0 0 30px rgba(157, 80, 187, 0.6));
             animation: mageFloat 4s ease-in-out infinite;
         }
@@ -229,7 +229,7 @@
     <div class="char-area">
         <div class="magic-seal"></div>
         <div class="mage-container" id="tap-target">
-            <img src="https://cdna.artstation.com/p/assets/images/images/051/157/202/original/lucas-reiner-wizard-sprite.gif?1656600000" 
+            <img src="https://cdnb.artstation.com/p/assets/images/images/051/157/202/original/lucas-reiner-wizard-sprite.gif?1656600000" 
                  onerror="this.src='https://files.catbox.moe/p4m9h7.png'" 
                  class="mage-sprite" id="mage-img">
         </div>
@@ -316,6 +316,8 @@
         }
 
         const tapTarget = document.getElementById('tap-target');
+        const img = document.getElementById('mage-img');
+
         tapTarget.addEventListener('touchstart', (e) => {
             e.preventDefault();
             [...e.changedTouches].forEach(t => {
