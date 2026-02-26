@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Minimalist</title>
+    <title>Aira Protocol | Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --main-grey: #2c2c2c;
             --light-grey: #a0a0a0;
-            --bg: #121212;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg: #0d0d0d;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #ffffff;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,34 +22,39 @@
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .bal-val { font-size: 48px; font-weight: 700; color: #fff; letter-spacing: -1px; }
-        .sub-stats { font-size: 12px; color: var(--light-grey); margin-top: 5px; text-transform: uppercase; }
+        .header { padding: 25px 20px; text-align: center; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        .bal-val { font-size: 44px; font-weight: 700; color: #fff; letter-spacing: -1px; }
+        .sub-stats { font-size: 11px; color: var(--light-grey); margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
 
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; }
+        .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; }
         .view-content.active { display: flex; flex-direction: column; }
 
         .glass-card {
             background: var(--glass); border: 1px solid var(--border);
-            border-radius: 16px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 18px; margin-bottom: 12px; backdrop-filter: blur(15px);
         }
+
+        .label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--light-grey); margin-bottom: 8px; font-weight: 600; }
 
         .btn-grey {
             background: var(--main-grey); color: #fff; border: none; padding: 14px;
             border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer;
-            transition: 0.3s; font-size: 14px; text-transform: uppercase;
+            transition: 0.2s; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-grey:active { transform: scale(0.98); opacity: 0.8; }
+        .btn-grey:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-grey:active:not(:disabled) { transform: scale(0.97); }
 
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .nft-item { background: var(--glass); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid var(--border); }
-        .nft-name { font-size: 13px; margin: 8px 0; font-weight: 600; }
+        .nav { height: 75px; background: rgba(0,0,0,0.8); display: flex; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light-grey); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+        .nav-item.active { color: #fff; position: relative; }
+        .nav-item.active::after { content: ''; position: absolute; top: 0; width: 30%; height: 2px; background: #fff; }
 
-        .nav { height: 75px; background: rgba(0,0,0,0.5); display: flex; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light-grey); font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: #fff; border-top: 2px solid #fff; }
+        .news-item { border-left: 2px solid var(--main-grey); padding-left: 15px; margin-bottom: 20px; }
+        .news-title { font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .news-text { font-size: 13px; color: var(--light-grey); line-height: 1.4; }
 
-        .info-msg { font-size: 10px; color: var(--light-grey); text-align: center; margin-top: 10px; opacity: 0.6; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .nft-card { background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
     </style>
 </head>
 <body>
@@ -56,84 +62,108 @@
     <header class="header">
         <div class="bal-val" id="total-bal">0</div>
         <div class="sub-stats">
-            APS: <span id="aps-display">50</span> | STAKED: <span id="staked-display">0</span>
+            AUTO: <span id="aps-display">50</span>/s | STAKED: <span id="staked-display">0</span>
         </div>
     </header>
 
     <div id="view-core" class="view-content active">
         <div class="glass-card">
-            <div style="font-size: 14px; color: var(--light-grey); margin-bottom: 10px;">MINING POOL</div>
-            <div style="font-size: 32px; font-weight: 700; margin-bottom: 15px;" id="current-mining">0</div>
-            <button class="btn-grey" onclick="claimMining()">Yig'ib olish</button>
+            <div class="label-row"><span>MINING POOL</span> <span id="pool-val">0</span></div>
+            <button class="btn-grey" onclick="claimMining()">YIG'ISH</button>
         </div>
 
         <div class="glass-card">
-            <div style="font-size: 14px; color: var(--light-grey); margin-bottom: 10px;">STAKING (MAX LVL 5)</div>
-            <div id="stake-status" style="font-size: 18px; margin-bottom: 15px;">TAYYOR (+10%)</div>
-            <button class="btn-grey" onclick="startStake()" id="stake-btn">STAKE ALL</button>
-        </div>
-
-        <div class="glass-card">
-            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px;">
-                <span>FARM LVL: <b id="farm-lvl">1</b>/10</span>
-                <span>NARX: <b id="upgrade-cost">5000</b></span>
+            <div class="label-row">
+                <span>STAKING LVL: <b id="stake-lvl">0</b>/5</span>
+                <span>BONUS: <b id="stake-bonus">5</b>%</span>
             </div>
-            <button class="btn-grey" onclick="upgradeFarm()" id="up-btn">UPGRADE FARM</button>
+            <div id="stake-timer" style="text-align:center; margin-bottom:10px; font-size:18px; font-weight:700;">TAYYOR</div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-grey" style="flex:2;" onclick="startStake()" id="stake-btn">STAKE ALL</button>
+                <button class="btn-grey" style="flex:1; background:#444;" onclick="upgradeStake()" id="stake-up-btn">UP (10K)</button>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="label-row">
+                <span>FARM LVL: <b id="farm-lvl">1</b>/10</span>
+                <span>NARX: <b id="farm-cost">5000</b></span>
+            </div>
+            <button class="btn-grey" onclick="upgradeFarm()" id="farm-up-btn">UPGRADE FARM</button>
         </div>
     </div>
 
     <div id="view-market" class="view-content">
         <div class="nft-grid">
-            <div class="nft-item">
-                <div class="nft-name">ARIA NFT #01</div>
-                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(10000)">10K</button>
+            <div class="nft-card">
+                <div style="font-weight:700; margin-bottom:10px;">ARIA NFT #01</div>
+                <button class="btn-grey" onclick="buyNFT(10000)">10K</button>
             </div>
-            <div class="nft-item">
-                <div class="nft-name">ARIA NFT #02</div>
-                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(25000)">25K</button>
-            </div>
-            <div class="nft-item">
-                <div class="nft-name">ARIA NFT #03</div>
-                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(50000)">50K</button>
-            </div>
-            <div class="nft-item">
-                <div class="nft-name">ARIA NFT #04</div>
-                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(100000)">100K</button>
+            <div class="nft-card">
+                <div style="font-weight:700; margin-bottom:10px;">ARIA NFT #02</div>
+                <button class="btn-grey" onclick="buyNFT(25000)">25K</button>
             </div>
         </div>
-        <p class="info-msg">📢 KEYINGI YANGILANISHDA REYTING REJIMI QO'SHILADI!</p>
+        <div class="glass-card" style="margin-top:20px; text-align:center;">
+            <div style="color:var(--light-grey); font-size:12px;">KEYINGI YANGILANISH</div>
+            <div style="font-weight:700; margin-top:5px;">REYTING VA PVP JANG REJIMLARI</div>
+        </div>
+    </div>
+
+    <div id="view-news" class="view-content">
+        <div class="news-item">
+            <div class="news-title">ROADMAP 1.0 IS READY</div>
+            <div class="news-text">Loyiha asosiy bosqichga yetib keldi. Staking va Farming tizimlari to'liq optimallashtirildi.</div>
+        </div>
+        <div class="news-item">
+            <div class="news-title">STAKING UPGRADE</div>
+            <div class="news-text">Endi staking darajasini oshirish orqali daromadni 50% gacha ko'tarish mumkin.</div>
+        </div>
+        <div class="news-item">
+            <div class="news-title">MAX LIMITS</div>
+            <div class="news-text">Farming: 10 LVL (MAX)<br>Staking: 5 LVL (MAX)</div>
+        </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('market', this)">MARKET</div>
+        <div class="nav-item" onclick="switchTab('news', this)">NEWS</div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    // Ma'lumotlarni eslab qolish (LocalStorage)
+    
+    // Ma'lumotlarni yuklash
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
-    let aps = 50 + (farmLevel - 1) * 25;
-    let upgradeCost = 5000 * Math.pow(2, farmLevel - 1);
+    let stakeLevel = parseInt(localStorage.getItem('aira_stake_lvl')) || 0;
     
     let sessionCoins = 0;
     let stakedCoins = 0;
     let isStaking = false;
 
+    // Staking foizlari jadvali
+    const stakeBonuses = [5, 10, 20, 30, 40, 50];
+    const stakeUpgradeCosts = [10000, 25000, 50000, 100000, 250000];
+
+    // Mining
     setInterval(() => {
-        sessionCoins += aps;
-        document.getElementById('current-mining').innerText = Math.floor(sessionCoins);
+        let aps = 50 + (farmLevel - 1) * 25;
+        sessionCoins += (aps / 3.33); // 300ms ga moslangan
+        document.getElementById('pool-val').innerText = Math.floor(sessionCoins);
+        document.getElementById('aps-display').innerText = aps;
     }, 300);
 
     function claimMining() {
         balance += sessionCoins;
         sessionCoins = 0;
-        saveData();
+        save();
         updateUI();
-        tg.HapticFeedback.impactOccurred('medium');
+        tg.HapticFeedback.impactOccurred('light');
     }
 
+    // Staking Tizimi
     function startStake() {
         if (isStaking || balance <= 0) return;
         stakedCoins = balance;
@@ -142,33 +172,47 @@
         updateUI();
 
         let timeLeft = 10;
-        const btn = document.getElementById('stake-btn');
-        const status = document.getElementById('stake-status');
-
-        const timer = setInterval(() => {
+        const timerEl = document.getElementById('stake-timer');
+        
+        const countdown = setInterval(() => {
             timeLeft--;
-            status.innerText = timeLeft + "s KUTING...";
+            timerEl.innerText = timeLeft + "s KUTING...";
             if (timeLeft <= 0) {
-                clearInterval(timer);
-                balance += Math.floor(stakedCoins * 1.1);
+                clearInterval(countdown);
+                let bonusPercent = stakeBonuses[stakeLevel] / 100;
+                balance += Math.floor(stakedCoins * (1 + bonusPercent));
                 stakedCoins = 0;
                 isStaking = false;
-                status.innerText = "TAYYOR (+10%)";
-                saveData();
+                timerEl.innerText = "TAYYOR";
+                save();
                 updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
             }
         }, 1000);
     }
 
+    function upgradeStake() {
+        if (stakeLevel >= 5) return;
+        let cost = stakeUpgradeCosts[stakeLevel];
+        if (balance >= cost) {
+            balance -= cost;
+            stakeLevel++;
+            save();
+            updateUI();
+            tg.showAlert(`Staking darajasi ${stakeLevel}-LVL ga ko'tarildi!`);
+        } else {
+            tg.showAlert(`Mablag' yetarli emas! ${cost} kerak.`);
+        }
+    }
+
+    // Farming Tizimi
     function upgradeFarm() {
         if (farmLevel >= 10) return;
-        if (balance >= upgradeCost) {
-            balance -= upgradeCost;
+        let cost = 5000 * Math.pow(2, farmLevel - 1);
+        if (balance >= cost) {
+            balance -= cost;
             farmLevel++;
-            aps += 25;
-            upgradeCost *= 2;
-            saveData();
+            save();
             updateUI();
         } else {
             tg.showAlert("Mablag' yetarli emas!");
@@ -178,26 +222,34 @@
     function buyNFT(price) {
         if (balance >= price) {
             balance -= price;
-            saveData();
+            save();
             updateUI();
-            tg.showPopup({ title: "Sotib olindi!", message: "ARIA NFT kolleksiyangizga qo'shildi." });
-        } else {
-            tg.showAlert("Mablag' yetarli emas!");
+            tg.showPopup({ title: "Sotib olindi", message: "ARIA NFT sumkangizga qo'shildi!" });
         }
     }
 
-    function saveData() {
+    function save() {
         localStorage.setItem('aira_bal', balance);
         localStorage.setItem('aira_farm', farmLevel);
+        localStorage.setItem('aira_stake_lvl', stakeLevel);
     }
 
     function updateUI() {
         document.getElementById('total-bal').innerText = Math.floor(balance);
         document.getElementById('staked-display').innerText = Math.floor(stakedCoins);
-        document.getElementById('aps-display').innerText = aps;
+        
+        // Farm UI
         document.getElementById('farm-lvl').innerText = farmLevel;
-        document.getElementById('upgrade-cost').innerText = upgradeCost;
-        if(farmLevel >= 10) document.getElementById('up-btn').innerText = "MAX LEVEL";
+        let fCost = 5000 * Math.pow(2, farmLevel - 1);
+        document.getElementById('farm-cost').innerText = farmLevel >= 10 ? "MAX" : fCost;
+        document.getElementById('farm-up-btn').disabled = farmLevel >= 10;
+
+        // Stake UI
+        document.getElementById('stake-lvl').innerText = stakeLevel;
+        document.getElementById('stake-bonus').innerText = stakeBonuses[stakeLevel];
+        let sCost = stakeUpgradeCosts[stakeLevel];
+        document.getElementById('stake-up-btn').innerText = stakeLevel >= 5 ? "MAX" : "UP (" + (sCost/1000) + "K)";
+        document.getElementById('stake-up-btn').disabled = stakeLevel >= 5;
     }
 
     function switchTab(tab, el) {
