@@ -3,190 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol V1.0</title>
+    <title>Aira Protocol V1.0 - Farming Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff007f; --bg: #000; --card: rgba(13, 27, 42, 0.8); }
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #000; --card: rgba(13, 27, 42, 0.85); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { background: var(--dark); color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* UI Header */
-        .header { padding: 45px 20px 10px; text-align: center; z-index: 10; }
-        .brand { font-family: 'Orbitron'; font-size: 14px; color: var(--cyan); letter-spacing: 2px; }
-        .balance { font-family: 'Orbitron'; font-size: 54px; font-weight: 700; text-shadow: 0 0 15px var(--cyan); margin: 5px 0; }
-        .stats { display: flex; justify-content: center; gap: 15px; font-family: 'Orbitron'; font-size: 11px; }
+        #bg-canvas { position: fixed; top: 0; z-index: -1; pointer-events: none; }
 
-        /* Content Pages */
-        .content { flex: 1; position: relative; }
-        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; overflow-y: auto; }
-        .page.active { display: block; }
+        /* HEADER */
+        .header { padding: 50px 20px 10px; text-align: center; background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent); }
+        .brand { font-family: 'Orbitron'; font-size: 14px; color: var(--cyan); letter-spacing: 3px; text-shadow: 0 0 10px var(--cyan); }
+        .balance { font-family: 'Orbitron'; font-size: 48px; font-weight: 700; margin: 5px 0; color: #fff; text-shadow: 0 0 20px var(--cyan); }
+        .stats { display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron'; font-size: 10px; }
+        .stat-i span { color: var(--cyan); }
 
-        /* NFT Cards Styling */
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .nft-card { 
-            background: var(--card); border: 1px solid rgba(255, 0, 127, 0.3); border-radius: 15px; 
-            padding: 10px; text-align: center; position: relative; transition: 0.3s;
+        /* CONTENT */
+        .content { flex: 1; position: relative; overflow: hidden; }
+        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .page.active { display: flex; flex-direction: column; }
+
+        /* CORE */
+        .hero { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .main-btn { 
+            width: 260px; height: 260px; border-radius: 50%; border: 2px solid var(--cyan);
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle, rgba(0,242,255,0.15), transparent);
+            box-shadow: 0 0 30px rgba(0,242,255,0.2); transition: 0.05s;
         }
-        .nft-card.owned { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
-        .nft-img { width: 100%; border-radius: 10px; margin-bottom: 10px; filter: drop-shadow(0 0 5px var(--pink)); }
-        .nft-card.owned .nft-img { filter: drop-shadow(0 0 5px var(--cyan)); }
-        .nft-name { font-family: 'Orbitron'; font-size: 12px; margin-bottom: 5px; }
-        .nft-rate { font-size: 10px; color: var(--cyan); margin-bottom: 10px; display: block; }
+        .main-btn:active { transform: scale(0.95); }
 
-        .buy-nft-btn { 
-            width: 100%; padding: 8px; border-radius: 8px; border: none; 
-            background: var(--pink); color: #fff; font-family: 'Orbitron'; font-size: 10px;
+        /* MARKET & NFT CARDS */
+        .card { 
+            background: var(--card); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 14px; 
+            padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(5px);
         }
-        .buy-nft-btn.owned { background: #1a3a5d; color: var(--cyan); border: 1px solid var(--cyan); }
+        .card b { font-family: 'Orbitron'; font-size: 14px; display: block; color: var(--cyan); }
+        .card span { font-size: 11px; color: #aaa; }
+        .btn-action { 
+            background: #111; border: 1px solid var(--cyan); color: #fff; padding: 10px 15px; 
+            border-radius: 10px; font-family: 'Orbitron'; font-size: 11px; min-width: 80px;
+        }
+        .btn-action:disabled { border-color: #333; color: #555; }
+        .btn-action.max { border-color: var(--pink); color: var(--pink); }
 
-        /* Navigation */
-        .nav { height: 85px; background: #000; border-top: 1px solid rgba(0, 242, 255, 0.2); display: flex; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-tab { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 11px; transition: 0.3s; }
-        .nav-tab.active { color: var(--cyan); border-top: 3px solid var(--cyan); background: linear-gradient(to top, rgba(0, 242, 255, 0.1), transparent); }
+        /* NFT GRID */
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px; }
+        .nft-box { 
+            background: var(--card); border: 1px solid rgba(255, 0, 127, 0.2); border-radius: 12px; 
+            padding: 10px; text-align: center; position: relative;
+        }
+        .nft-box.owned { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
+        .nft-box img { width: 50px; height: 50px; margin-bottom: 8px; filter: drop-shadow(0 0 5px var(--pink)); }
+        
+        /* NAVIGATION */
+        .nav { height: 85px; background: #000; border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-t { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; cursor: pointer; }
+        .nav-t.active { color: var(--cyan); border-top: 3px solid var(--cyan); background: linear-gradient(to top, rgba(0,242,255,0.05), transparent); }
 
-        #star-canvas { position: fixed; top: 0; z-index: -1; }
+        .pop { position: absolute; color: var(--cyan); font-family: 'Orbitron'; font-weight: 700; pointer-events: none; animation: fly 0.5s ease-out forwards; z-index: 100; }
+        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-<canvas id="star-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
 <div class="header">
     <div class="brand">AIRA PROTOCOL V1.0</div>
-    <div class="balance" id="balance">0</div>
+    <div class="balance" id="money">0</div>
     <div class="stats">
-        <div style="color:var(--cyan)">TAP: +<span id="tap-val">1</span></div>
-        <div style="color:var(--pink)">AUTO-FLOW: +<span id="auto-val">0</span>/s</div>
+        <div class="stat-i">TAP: +<span id="t-val">1</span></div>
+        <div class="stat-i" style="color:var(--pink)">FLOW: +<span id="a-val">0</span>/s</div>
     </div>
 </div>
 
 <div class="content">
-    <div id="core" class="page active">
-        <div style="display:flex; justify-content:center; align-items:center; height:80%;">
-            <div id="tap-btn" style="width:260px; height:260px; border-radius:50%; border:2px solid var(--cyan); display:flex; align-items:center; justify-content:center; background:radial-gradient(circle, rgba(0,242,255,0.1), transparent);">
-                <svg width="150" height="150" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="40" fill="#1a3a5d" stroke="var(--cyan)" stroke-width="2"/>
-                    <rect x="30" y="45" width="40" height="15" rx="5" fill="#000"/>
-                    <circle cx="40" cy="52" r="4" fill="var(--cyan)"/>
-                    <circle cx="60" cy="52" r="4" fill="var(--cyan)"/>
+    <div id="core-p" class="page active">
+        <div class="hero">
+            <div class="main-btn" id="tap-zone">
+                <svg width="140" height="140" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="4"/>
+                    <path d="M30 40 Q50 30 70 40 L70 60 Q50 70 30 60 Z" fill="#112233" stroke="var(--cyan)" stroke-width="2"/>
+                    <circle cx="42" cy="48" r="3" fill="var(--cyan)"/><circle cx="58" cy="48" r="3" fill="var(--cyan)"/>
                 </svg>
             </div>
         </div>
     </div>
 
-    <div id="nft" class="page">
-        <h3 style="font-family:Orbitron; text-align:center; color:var(--pink)">NFT FARMERS</h3>
+    <div id="market-p" class="page">
+        <h3 style="font-family:Orbitron; text-align:center; color:var(--cyan); margin-bottom:15px;">SYSTEM MARKET</h3>
+        <div id="market-list"></div>
+    </div>
+
+    <div id="nft-p" class="page">
+        <h3 style="font-family:Orbitron; text-align:center; color:var(--pink); margin-bottom:15px;">NFT FARMERS (100)</h3>
         <div class="nft-grid" id="nft-list"></div>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-tab active" onclick="showPage('core', this)">CORE</div>
-    <div class="nav-tab" onclick="showPage('market', this)">MARKET</div>
-    <div class="nav-tab" onclick="showPage('nft', this)">NFT</div>
+    <div class="nav-t active" onclick="go('core', this)">CORE</div>
+    <div class="nav-t" onclick="go('market', this)">MARKET</div>
+    <div class="nav-t" onclick="go('nft', this)">NFT</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let state = {
+    let data = {
         coins: parseFloat(localStorage.getItem('aira_c')) || 0,
-        ownedNfts: JSON.parse(localStorage.getItem('aira_nfts')) || []
+        upgrades: JSON.parse(localStorage.getItem('aira_u')) || { u1:0, u2:0, u3:0 },
+        nfts: JSON.parse(localStorage.getItem('aira_n')) || []
     };
 
-    const nftMarket = [
-        { id: 'n1', name: 'Aira Mini-Bot', price: 1000, flow: 5 },
-        { id: 'n2', name: 'Cyber Harvester', price: 5000, flow: 20 },
-        { id: 'n3', name: 'Quantum Miner', price: 15000, flow: 75 },
-        { id: 'n4', name: 'Protocol Core', price: 50000, flow: 250 }
+    const marketData = [
+        { id: 'u1', name: 'Neural Link', base: 100, bonus: 2, type: 'tap' },
+        { id: 'u2', name: 'Aira Drone', base: 500, bonus: 5, type: 'auto' },
+        { id: 'u3', name: 'Quantum Core', base: 2000, bonus: 25, type: 'auto' }
     ];
 
-    function showPage(id, el) {
+    // 100 ta NFT generatsiyasi
+    const nfts = Array.from({length: 100}, (_, i) => ({
+        id: 'n' + i,
+        name: 'Unit #' + (i + 1),
+        price: Math.floor(1000 * Math.pow(1.1, i)),
+        flow: Math.floor(10 * (i + 1))
+    }));
+
+    function getStats() {
+        let t = 1, a = 0;
+        marketData.forEach(u => { t += (data.upgrades[u.id] || 0) * (u.type === 'tap' ? u.bonus : 0); a += (data.upgrades[u.id] || 0) * (u.type === 'auto' ? u.bonus : 0); });
+        data.nfts.forEach(id => { const n = nfts.find(x => x.id === id); if(n) a += n.flow; });
+        return { t, a };
+    }
+
+    function go(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-t').forEach(t => t.classList.remove('active'));
+        document.getElementById(id + '-p').classList.add('active');
         el.classList.add('active');
+        if(id === 'market') renderMarket();
         if(id === 'nft') renderNFTs();
         tg.HapticFeedback.impactOccurred('light');
     }
 
-    function renderNFTs() {
-        const list = document.getElementById('nft-list');
-        list.innerHTML = nftMarket.map(n => {
-            const isOwned = state.ownedNfts.includes(n.id);
+    function renderMarket() {
+        document.getElementById('market-list').innerHTML = marketData.map(u => {
+            const lvl = data.upgrades[u.id] || 0;
+            const cost = Math.floor(u.base * Math.pow(1.8, lvl));
+            const isMax = lvl >= 10;
             return `
-                <div class="nft-card ${isOwned ? 'owned' : ''}">
-                    <div style="height:80px; display:flex; align-items:center; justify-content:center;">
-                        <svg class="nft-img" viewBox="0 0 100 100" width="60">
-                            <rect x="20" y="20" width="60" height="60" rx="10" fill="${isOwned ? '#00f2ff22' : '#ff007f22'}" stroke="${isOwned ? '#00f2ff' : '#ff007f'}"/>
-                            <circle cx="50" cy="50" r="15" fill="${isOwned ? '#00f2ff' : '#ff007f'}"/>
-                        </svg>
-                    </div>
-                    <div class="nft-name">${n.name}</div>
-                    <span class="nft-rate">+${n.flow}/s flow</span>
-                    <button class="buy-nft-btn ${isOwned ? 'owned' : ''}" onclick="buyNFT('${n.id}', ${n.price})">
-                        ${isOwned ? 'ACTIVE' : n.price >= 1000 ? (n.price/1000)+'K' : n.price}
+                <div class="card">
+                    <div><b>${u.name}</b><span>Lvl ${lvl}/10 | +${u.bonus} ${u.type}</span></div>
+                    <button class="btn-action ${isMax?'max':''}" onclick="buyU('${u.id}', ${cost})" ${isMax || data.coins < cost ? 'disabled' : ''}>
+                        ${isMax ? 'MAX' : (cost>=1000?(cost/1000).toFixed(1)+'K':cost)}
                     </button>
-                </div>
-            `;
+                </div>`;
         }).join('');
     }
 
-    window.buyNFT = (id, price) => {
-        if(!state.ownedNfts.includes(id) && state.coins >= price) {
-            state.coins -= price;
-            state.ownedNfts.push(id);
-            localStorage.setItem('aira_nfts', JSON.stringify(state.ownedNfts));
-            updateUI();
-            renderNFTs();
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-    };
+    function renderNFTs() {
+        document.getElementById('nft-list').innerHTML = nfts.map(n => {
+            const owned = data.nfts.includes(n.id);
+            return `
+                <div class="nft-box ${owned?'owned':''}">
+                    <svg width="40" height="40" viewBox="0 0 100 100" style="margin-bottom:5px;">
+                        <rect x="20" y="20" width="60" height="60" rx="10" fill="none" stroke="${owned?'var(--cyan)':'var(--pink)'}" stroke-width="2"/>
+                        <circle cx="50" cy="50" r="10" fill="${owned?'var(--cyan)':'var(--pink)'}"/>
+                    </svg>
+                    <div style="font-size:10px; font-family:Orbitron;">${n.name}</div>
+                    <div style="font-size:9px; color:var(--cyan);">+${n.flow}/s</div>
+                    <button class="btn-action" style="width:100%; margin-top:8px; font-size:9px; padding:5px;" 
+                        onclick="buyN('${n.id}', ${n.price})" ${owned || data.coins < n.price ? 'disabled' : ''}>
+                        ${owned ? 'ACTIVE' : (n.price>=1000?(n.price/1000).toFixed(1)+'K':n.price)}
+                    </button>
+                </div>`;
+        }).join('');
+    }
+
+    window.buyU = (id, c) => { if(data.coins >= c && (data.upgrades[id]||0) < 10) { data.coins -= c; data.upgrades[id]++; save(); updateUI(); renderMarket(); tg.HapticFeedback.notificationOccurred('success'); } };
+    window.buyN = (id, c) => { if(data.coins >= c && !data.nfts.includes(id)) { data.coins -= c; data.nfts.push(id); save(); updateUI(); renderNFTs(); tg.HapticFeedback.notificationOccurred('success'); } };
 
     function updateUI() {
-        let autoRate = 0;
-        state.ownedNfts.forEach(id => {
-            const nft = nftMarket.find(n => n.id === id);
-            if(nft) autoRate += nft.flow;
-        });
-        
-        document.getElementById('balance').innerText = Math.floor(state.coins).toLocaleString();
-        document.getElementById('auto-val').innerText = autoRate;
-        localStorage.setItem('aira_c', state.coins);
+        const s = getStats();
+        document.getElementById('money').innerText = Math.floor(data.coins).toLocaleString();
+        document.getElementById('t-val').innerText = s.t;
+        document.getElementById('a-val').innerText = s.a;
     }
 
-    // Farming Loop: Har 1 soniyada NFTlar tanga olib keladi
-    setInterval(() => {
-        let autoRate = 0;
-        state.ownedNfts.forEach(id => {
-            const nft = nftMarket.find(n => n.id === id);
-            if(nft) autoRate += nft.flow;
-        });
-        state.coins += autoRate / 10; // 100ms interval uchun
-        updateUI();
-    }, 100);
+    function save() { localStorage.setItem('aira_c', data.coins); localStorage.setItem('aira_u', JSON.stringify(data.upgrades)); localStorage.setItem('aira_n', JSON.stringify(data.nfts)); }
 
-    document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        state.coins += 1; // Base tap
-        updateUI();
-        tg.HapticFeedback.impactOccurred('medium');
+    document.getElementById('tap-zone').addEventListener('touchstart', (e) => {
+        e.preventDefault(); const s = getStats(); data.coins += s.t; updateUI(); save();
+        const t = e.touches[0]; const p = document.createElement('div'); p.className = 'pop'; p.innerText = '+'+s.t;
+        p.style.left = t.clientX + 'px'; p.style.top = t.clientY + 'px'; document.body.appendChild(p);
+        setTimeout(()=>p.remove(), 500); tg.HapticFeedback.impactOccurred('medium');
     });
 
-    // Star Background logic (avvalgi koddan)
-    const canvas = document.getElementById('star-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    let stars = Array.from({length: 50}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: Math.random()*0.5 }));
-    function anim() {
-        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = '#00f2ff';
-        stars.forEach(s => { ctx.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > canvas.height) s.y = 0; });
-        requestAnimationFrame(anim);
-    }
-    anim(); updateUI();
+    setInterval(() => { data.coins += getStats().a / 10; updateUI(); }, 100);
+    
+    // Star Background
+    const cvs = document.getElementById('bg-canvas'); const ct = cvs.getContext('2d');
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    let sts = Array.from({length: 50}, () => ({ x: Math.random()*cvs.width, y: Math.random()*cvs.height, v: Math.random()*0.5 }));
+    function drw() { ct.fillStyle = '#000'; ct.fillRect(0,0,cvs.width,cvs.height); ct.fillStyle = '#00f2ff44'; sts.forEach(s => { ct.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > cvs.height) s.y = 0; }); requestAnimationFrame(drw); }
+    drw(); updateUI();
 </script>
 </body>
 </html>
