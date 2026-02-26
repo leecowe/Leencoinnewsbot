@@ -16,16 +16,14 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         body { background: var(--cell-void); color: #fff; font-family: 'Orbitron', sans-serif; height: 100vh; overflow: hidden; }
         
-        /* 3D Orqa fon */
         #bg-canvas { position: fixed; inset: 0; z-index: 1; }
 
-        /* Tap Zone - Bu hamma narsadan pastda lekin canvasdan ustun */
-        #tap-zone { position: fixed; inset: 0; z-index: 10; cursor: pointer; }
+        /* TAP ZONE - Faqat CORE bo'limida ishlaydi */
+        #tap-zone { position: fixed; inset: 0; z-index: 10; cursor: pointer; display: block; }
 
         .ui-root { position: relative; z-index: 20; height: 100vh; display: flex; flex-direction: column; pointer-events: none; }
         .ui-root * { pointer-events: auto; }
 
-        /* HUD dizayni */
         .top-hud { padding: 50px 20px 20px; display: flex; justify-content: space-between; pointer-events: none; }
         .life-sign { 
             background: rgba(255, 0, 122, 0.1); border: 1px solid var(--bio-pink);
@@ -46,9 +44,8 @@
         .bar-wrap { margin-bottom: 12px; pointer-events: auto; }
         .bar-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--bio-cyan); margin-bottom: 6px; }
         .bar-rail { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-        .bar-flow { height: 100%; transition: 0.3s ease; box-shadow: 0 0 10px inherit; }
+        .bar-flow { height: 100%; transition: 0.3s ease; }
 
-        /* Navigatsiya */
         .nav { 
             position: fixed; bottom: 0; width: 100%; display: flex; 
             background: rgba(0,0,0,0.95); padding: 20px 10px 40px; 
@@ -57,7 +54,7 @@
         .nav-btn { flex: 1; text-align: center; color: #555; font-size: 11px; font-weight: 900; background: none; border: none; cursor: pointer; }
         .nav-btn.active { color: #fff; text-shadow: 0 0 10px var(--bio-pink); }
 
-        /* Panel */
+        /* PANEL - Z-INDEX TAP ZONEDAN BALAND BO'LISHI SHART */
         .panel { 
             position: fixed; bottom: -100%; left: 0; width: 100%; height: 85vh; 
             background: #050505; border-top: 2px solid var(--bio-pink); 
@@ -69,27 +66,25 @@
         .dna-pop { position: fixed; pointer-events: none; z-index: 2000; color: #fff; font-weight: 900; font-family: 'Cinzel'; animation: popUp 0.6s ease-out forwards; }
         @keyframes popUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
 
-        .cell-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 15px; text-align: center; transition: 0.3s; }
-        .cell-card:active { transform: scale(0.95); border-color: var(--bio-pink); }
+        .cell-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; }
+        .cell-card:active { transform: scale(0.95); background: #15000a; }
+        .cell-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
-    
     <div id="tap-zone"></div>
 
     <div class="ui-root">
         <div class="top-hud">
-            <div class="life-sign" id="life-status">BIO-SIGN: STABLE</div>
+            <div class="life-sign">BIO-SIGN: STABLE</div>
             <div class="life-sign" style="border-color: var(--bio-cyan); color: var(--bio-cyan);">DNA: x<span id="mult-ui">1.0</span></div>
         </div>
-
         <div class="balance-box">
             <h1 class="ariai-count" id="ariai-bal">0.00</h1>
             <p class="stats-label">TOTAL $ARIAI SYNCED</p>
         </div>
-
         <div class="footer-hud">
             <div class="bar-wrap">
                 <div class="bar-info"><span>PLASMA</span><span id="mana-text">1000 / 1000</span></div>
@@ -105,9 +100,9 @@
     <div id="panel-genome" class="panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2 style="font-family: 'Cinzel'; color: var(--bio-pink); font-size: 24px;">GENOME</h2>
-            <div onclick="closePanel()" style="padding: 10px; color: #555; font-size: 20px; cursor: pointer;">✕</div>
+            <div onclick="closePanel()" style="padding: 10px; color: #fff; font-size: 20px; cursor: pointer;">✕</div>
         </div>
-        <div id="cell-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+        <div id="cell-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 50px;"></div>
     </div>
 
     <nav class="nav">
@@ -123,61 +118,45 @@
             bal: 0, pwr: 1.0, mana: 1000, lvl: 1, xp: 0, unlocked: 1
         };
 
-        // 3D Sahna
         let scene, camera, renderer, core;
         function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-
             const geo = new THREE.IcosahedronGeometry(2, 1);
-            const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true, transparent: true, opacity: 0.8 });
+            const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
             core = new THREE.Mesh(geo, mat);
             scene.add(core);
-
             const l1 = new THREE.PointLight(0xff007a, 2, 10);
             l1.position.set(2, 2, 5);
-            const l2 = new THREE.PointLight(0x00f2ff, 1, 10);
-            l2.position.set(-2, -2, 5);
-            scene.add(l1, l2, new THREE.AmbientLight(0x202020));
+            scene.add(l1, new THREE.AmbientLight(0x202020));
             camera.position.z = 6;
-
             function animate() {
                 requestAnimationFrame(animate);
-                core.rotation.y += 0.008;
-                core.rotation.z += 0.005;
-                let pulse = 1 + Math.sin(Date.now() * 0.002) * 0.05;
-                core.scale.lerp(new THREE.Vector3(pulse, pulse, pulse), 0.1);
+                core.rotation.y += 0.005;
                 renderer.render(scene, camera);
             }
             animate();
         }
 
-        // Tap Funksiyasi
+        // TAP LOGIC
         document.getElementById('tap-zone').onclick = (e) => {
             if (state.mana < 2) {
                 tg.HapticFeedback.notificationOccurred('error');
                 return;
             }
-
-            // Ma'lumotlarni yangilash
             state.bal += state.pwr;
             state.mana -= 2;
             state.xp += 15;
-
-            // Level up mantiqi
-            if (state.xp >= state.lvl * 1000) {
-                state.lvl++;
-                state.xp = 0;
-                state.pwr += 0.5;
+            if (state.xp >= state.lvl * 500) {
+                state.lvl++; state.xp = 0; state.pwr += 0.1;
                 tg.HapticFeedback.notificationOccurred('success');
             }
-
-            // Effektlar
-            core.scale.set(1.4, 1.4, 1.4);
             createPop(e.clientX, e.clientY);
-            tg.HapticFeedback.impactOccurred('medium');
+            core.scale.set(1.2, 1.2, 1.2);
+            setTimeout(() => core.scale.set(1, 1, 1), 100);
+            tg.HapticFeedback.impactOccurred('light');
             updateUI();
         };
 
@@ -185,20 +164,33 @@
             const pop = document.createElement('div');
             pop.className = 'dna-pop';
             pop.innerText = `+${state.pwr.toFixed(1)}`;
-            pop.style.left = x + 'px';
-            pop.style.top = y + 'px';
+            pop.style.left = x + 'px'; pop.style.top = y + 'px';
             document.body.appendChild(pop);
             setTimeout(() => pop.remove(), 600);
         }
 
         function updateUI() {
-            document.getElementById('ariai-bal').innerText = state.bal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('ariai-bal').innerText = state.bal.toFixed(2);
             document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / 1000`;
             document.getElementById('mana-bar').style.width = (state.mana / 10) + '%';
             document.getElementById('xp-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-bar').style.width = Math.min(100, (state.xp / (state.lvl * 10))) + '%';
+            document.getElementById('xp-bar').style.width = (state.xp / (state.lvl * 5)) + '%';
             document.getElementById('mult-ui').innerText = state.pwr.toFixed(1);
             localStorage.setItem('ariai_v2', JSON.stringify(state));
+        }
+
+        // TUGMALARNI BOSISH LOGIKASI
+        function buyUpgrade(id, cost) {
+            if (state.bal >= cost) {
+                state.bal -= cost;
+                state.pwr += (id * 0.2);
+                tg.HapticFeedback.notificationOccurred('success');
+                updateUI();
+                renderCells(); // Ro'yxatni yangilash
+            } else {
+                tg.showPopup({ message: "Mablag' yetarli emas!" });
+                tg.HapticFeedback.notificationOccurred('error');
+            }
         }
 
         function tab(t, btn) {
@@ -206,6 +198,7 @@
             btn.classList.add('active');
             if (t === 'genome') {
                 document.getElementById('panel-genome').classList.add('active');
+                document.getElementById('tap-zone').style.pointerEvents = 'none'; // Panel ochiqligida tapni o'chirish
                 renderCells();
             } else {
                 closePanel();
@@ -214,6 +207,7 @@
 
         function closePanel() {
             document.getElementById('panel-genome').classList.remove('active');
+            document.getElementById('tap-zone').style.pointerEvents = 'auto'; // Tapni qayta yoqish
             document.querySelectorAll('.nav-btn')[0].classList.add('active');
             document.querySelectorAll('.nav-btn')[1].classList.remove('active');
         }
@@ -221,24 +215,22 @@
         function renderCells() {
             const list = document.getElementById('cell-list');
             list.innerHTML = '';
-            for(let i=1; i<=12; i++) {
+            for(let i=1; i<=10; i++) {
+                const cost = i * 200;
                 const div = document.createElement('div');
                 div.className = 'cell-card';
+                div.onclick = () => buyUpgrade(i, cost); // Bosish funksiyasi qo'shildi
                 div.innerHTML = `
-                    <div style="font-size:9px; color:var(--bio-pink); letter-spacing:1px;">NEURAL_${i}</div>
+                    <div style="font-size:9px; color:var(--bio-pink);">NEURAL_${i}</div>
                     <div style="font-size:13px; margin:8px 0; font-weight:900;">EVOLVE</div>
-                    <div style="font-size:10px; color:var(--bio-cyan)">⚡ ${i * 500}</div>
+                    <div style="font-size:10px; color:var(--bio-cyan)">⚡ ${cost}</div>
                 `;
                 list.appendChild(div);
             }
         }
 
-        // Mana regeneratsiyasi
         setInterval(() => {
-            if (state.mana < 1000) {
-                state.mana = Math.min(1000, state.mana + 1.5);
-                updateUI();
-            }
+            if (state.mana < 1000) { state.mana = Math.min(1000, state.mana + 1); updateUI(); }
         }, 1000);
 
         window.onload = () => { init3D(); updateUI(); };
