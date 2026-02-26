@@ -1,369 +1,106 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova Pro | AI Humanity</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --ios-bg: #000000;
-            --ios-card: #1c1c1e;
-            --ios-gold: #f3ba2f;
-            --ios-green: #32d74b;
-            --ios-border: rgba(255, 255, 255, 0.1);
-            --text-main: #FFFFFF;
-            --text-sec: #8E8E93;
-        }
+<style>
+    /* Admin Mode Styles */
+    .admin-glow { box-shadow: 0 0 50px var(--q-cyan) !important; border: 2px solid var(--q-cyan) !important; }
+    #admin-panel { 
+        display: none; 
+        background: rgba(0, 242, 255, 0.05); 
+        border: 1px solid var(--q-cyan); 
+        margin: 15px; 
+        padding: 15px; 
+        border-radius: 20px; 
+        animation: slideIn 0.5s ease;
+    }
+    .status-tag { 
+        font-size: 9px; 
+        padding: 2px 8px; 
+        border-radius: 4px; 
+        margin-left: 10px; 
+        vertical-align: middle;
+    }
+    .tag-user { background: #444; color: #eee; }
+    .tag-admin { background: var(--q-cyan); color: #000; font-weight: 800; animation: blink 1s infinite; }
+    
+    @keyframes blink { 50% { opacity: 0.5; } }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'SF Pro Display', sans-serif; }
-        body { background: var(--ios-bg); color: var(--text-main); margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 110px; animation: iosSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .view.active { display: flex; }
-        @keyframes iosSlide { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* Header - Rasm #1 & #2 dagi kabi */
-        .header { padding: 45px 20px 15px; text-align: center; position: relative; border-bottom: 0.5px solid var(--ios-border); background: #000; }
-        .rank-badge { position: absolute; left: 20px; top: 55px; border: 1.5px solid var(--ios-gold); color: var(--ios-gold); padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; }
-        .profit-badge { position: absolute; right: 20px; top: 55px; background: rgba(50, 215, 75, 0.15); color: var(--ios-green); padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid rgba(50, 215, 75, 0.3); }
-        .main-bal { font-size: 48px; font-weight: 800; letter-spacing: -1px; margin-top: 15px; }
-        .staked-status { color: var(--ios-gold); font-size: 13px; font-weight: 700; margin-top: 4px; text-transform: uppercase; }
-        .vazir-label { color: var(--ios-gold); font-size: 10px; font-weight: 800; letter-spacing: 3px; margin-top: 5px; opacity: 0.8; }
-
-        /* Core Content - Rasm #8 & #12 */
-        .char-zone { text-align: center; padding: 20px 0; }
-        .character-img { width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 0 25px rgba(243, 186, 47, 0.15)); transition: 0.1s; cursor: pointer; }
-        .character-img:active { transform: scale(0.95); }
-        .energy-bar { margin-top: 20px; font-size: 22px; font-weight: 800; color: var(--ios-gold); }
-
-        /* Cards - Rasm #2 dagi sariq chetki chiziq bilan */
-        .card { background: var(--ios-card); border-radius: 20px; padding: 20px; margin: 10px 15px; border: 1px solid var(--ios-border); position: relative; overflow: hidden; }
-        .card::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px; background: var(--ios-gold); border-radius: 0 4px 4px 0; }
-        
-        .btn-action { background: var(--ios-gold); color: #000; border: none; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; font-size: 16px; transition: 0.2s; text-transform: uppercase; }
-        .btn-dark { background: #2c2c2e; color: #fff; border: none; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; font-size: 16px; opacity: 0.9; }
-
-        /* Market Grid - Rasm #1, #4, #11 */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .item-card { background: var(--ios-card); border-radius: 24px; padding: 20px; text-align: center; border: 1px solid var(--ios-border); transition: 0.2s; }
-        .item-icon { font-size: 38px; margin-bottom: 12px; display: block; }
-        .price-tag { color: var(--ios-gold); font-weight: 800; margin-bottom: 12px; font-size: 16px; }
-
-        /* Mahjong - Rasm #13 */
-        .mj-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; background: #000; border-radius: 20px; margin: 10px 15px; }
-        .mj-tile { height: 65px; background: #fdfcf0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; border-bottom: 4px solid #d1d1d1; cursor: pointer; transition: 0.1s; }
-        .mj-tile.matched { opacity: 0; pointer-events: none; }
-        .mj-tile.selected { background: var(--ios-gold); transform: translateY(-3px); }
-
-        /* Bottom Nav - Rasm #12 dagi piktogrammalar bilan */
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding-bottom: 25px; border-top: 0.5px solid var(--ios-border); z-index: 1000; }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sec); font-size: 10px; font-weight: 700; text-decoration: none; }
-        .nav-link.active { color: var(--ios-gold); }
-        .nav-link span { font-size: 24px; margin-bottom: 4px; }
-
-        /* Popups */
-        .ios-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30,30,30,0.95); backdrop-filter: blur(20px); width: 85%; padding: 25px; border-radius: 30px; text-align: center; z-index: 3000; border: 1px solid var(--ios-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: none; }
-        .popup-btn { background: #3a3a3c; color: #fff; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 700; margin-top: 20px; font-size: 17px; }
-    </style>
-</head>
-<body>
-
-<header class="header">
-    <div class="rank-badge">RANK</div>
-    <div class="profit-badge" id="rate-ui">+2.5/s</div>
-    <div class="main-bal" id="bal-ui">0.0</div>
-    <div class="staked-status" id="stk-ui">STAKED: 0.0</div>
-    <div class="vazir-label">VAZIR</div>
+<header class="quantum-header">
+    <div class="q-label">
+        <span id="user-name">LOADING SLAVE...</span>
+        <span id="role-tag" class="status-tag tag-user">USER</span>
+    </div>
+    <div class="q-bal" id="bal-ui">0.00</div>
 </header>
 
-<div id="v-core" class="view active">
-    <div class="char-zone">
-        <div style="font-size: 12px; color: var(--ios-gold); font-weight: 800; letter-spacing: 2px; margin-bottom: 10px;">AIRA NEOPHYTE</div>
-        <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="character-img" id="main-char" onclick="handleTap(event)">
-        <div class="energy-bar">⚡ <span id="en-ui">1000</span> <span style="color:var(--text-sec); font-size:14px">/ 1000</span></div>
+<div id="admin-panel">
+    <div class="q-label" style="color: var(--q-cyan);">BOT CONTROL INTERFACE</div>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="q-card" style="flex: 1; font-size: 10px; color: var(--q-cyan);" onclick="adminAction('boost')">CORE BOOST</button>
+        <button class="q-card" style="flex: 1; font-size: 10px; color: var(--q-cyan);" onclick="adminAction('reset')">DANGER: RESET</button>
     </div>
-
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700;">
-            <span style="color:var(--text-sec)">STAKE LVL: <span id="slvl-ui" style="color:#fff">1</span></span>
-            <span style="color:var(--text-sec)">6.0S</span>
-        </div>
-        <button class="btn-dark" onclick="stakeAll()">STAKE ALL</button>
-        <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--ios-gold); font-weight:800">COST: <span id="scost-ui">1.0k</span></div>
-    </div>
-
-    <div class="card">
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700;">
-            <span style="color:var(--text-sec)">FARM LVL: <span id="flvl-ui" style="color:#fff">1</span></span>
-            <span id="frate-ui" style="color:var(--ios-green)">2.5/s</span>
-        </div>
-        <button class="btn-action" onclick="upgradeFarm()">UPGRADE FARMING</button>
-        <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--text-sec)">COST: <span id="fcost-ui">500.0</span></div>
-    </div>
-</div>
-
-<div id="v-games" class="view">
-    <div style="padding: 25px; text-align: center;">
-        <h2 style="margin:0; font-size:28px; letter-spacing:-1px;">AI MAHJONG</h2>
-        <p style="color:var(--text-sec); font-size:14px; margin-top:8px;">Juftliklarni toping va +1.0k bonus oling!</p>
-    </div>
-    <div class="mj-grid" id="mj-board"></div>
-    <button class="btn-action" style="margin: 0 15px; width: calc(100% - 30px);" onclick="initMahjong()">YANGI O'YIN</button>
-</div>
-
-<div id="v-market" class="view">
-    <div class="card">
-        <h3 style="margin:0; color:var(--ios-gold); font-size:18px;">AUTO-STAKING</h3>
-        <p style="font-size:13px; color:var(--text-sec); margin:10px 0; line-height:1.4;">Har 30 soniyada balansingizni avtomatik stake qiladi.</p>
-        <button class="btn-action" id="auto-btn" onclick="buyAuto()">SOTIB OLISH (15.0K)</button>
-    </div>
-    <div class="grid" id="market-grid"></div>
-</div>
-
-<div id="v-squad" class="view">
-    <div style="padding: 30px 20px; text-align: center;">
-        <h2 style="margin:0; font-size:28px;">MY SQUAD</h2>
-        <p style="color:var(--text-sec); font-size:14px; margin-top:10px;">Siz to'plagan barcha Titanlar.</p>
-    </div>
-    <div class="grid" id="squad-grid"></div>
-</div>
-
-<nav class="navbar">
-    <div class="nav-link active" onclick="nav('core', this)"><span>👤</span>CORE</div>
-    <div class="nav-link" onclick="nav('games', this)"><span>🎮</span>GAMES</div>
-    <div class="nav-link" onclick="nav('market', this)"><span>🛒</span>MARKET</div>
-    <div class="nav-link" onclick="nav('squad', this)"><span>🛡️</span>SQUAD</div>
-</nav>
-
-<div class="ios-popup" id="alert-box">
-    <div id="alert-msg" style="font-size:17px; font-weight:600; line-height:1.4;">TITAN #24 kolleksiyangizga qo'shildi!</div>
-    <button class="popup-btn" onclick="closeAlert()">Yopish</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // STATE - Xatoliklarni oldini olish uchun boshlang'ich qiymatlar
+    // 1. Foydalanuvchi ma'lumotlarini olish (Telegramdan)
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+        document.getElementById('user-name').innerText = user.first_name.toUpperCase();
+    }
+
     let state = {
-        bal: 0, stk: 59.8, en: 1000, 
-        fL: 1, sL: 1, auto: false, 
-        squad: []
+        bal: 0,
+        egoLevel: 1,
+        isAdmin: false,
+        // ... (oldingi state o'zgaruvchilari)
     };
 
-    // FORMULA - UNDEFINED XATOSINI TUZATISH (Rasm #2, #3 uchun)
-    function f(n) {
-        if (n === undefined || n === null || isNaN(n)) return "0.0";
-        if (n === 0) return "0.0";
-        
-        const units = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "O", "N", "D"];
-        const tier = Math.floor(Math.log10(Math.abs(n)) / 3);
-        
-        if (tier <= 0) return n.toFixed(1);
-        
-        const suffix = units[tier];
-        if (!suffix) return n.toExponential(1); // Agar juda katta bo'lsa
-        
-        const scale = Math.pow(10, tier * 3);
-        const scaled = n / scale;
-        return scaled.toFixed(1) + suffix;
-    }
+    const AUTHORITY_SYSTEM = {
+        // Bot huquqini olish mantiqi
+        checkRights: function() {
+            // Masalan: Balans 50k dan oshsa yoki daraja 5 bo'lsa Adminlik ochiladi
+            if (state.egoLevel >= 5 && !state.isAdmin) {
+                this.grantAdmin();
+            }
+        },
 
-    function sync() {
-        document.getElementById('bal-ui').innerText = f(state.bal);
-        document.getElementById('stk-ui').innerText = "STAKED: " + f(state.stk);
-        document.getElementById('rate-ui').innerText = "+" + f(state.fL * 2.5) + "/s";
-        document.getElementById('en-ui').innerText = Math.floor(state.en);
-        document.getElementById('flvl-ui').innerText = state.fL;
-        document.getElementById('slvl-ui').innerText = state.sL;
-        document.getElementById('frate-ui').innerText = f(state.fL * 2.5) + "/s";
-        document.getElementById('fcost-ui').innerText = f(500 * Math.pow(1.5, state.fL - 1));
-        document.getElementById('scost-ui').innerText = f(1000 * Math.pow(1.6, state.sL - 1));
-        
-        if(state.auto) {
-            const b = document.getElementById('auto-btn');
-            b.innerText = "FAOL";
-            b.style.background = "#2c2c2e";
-            b.style.color = "#32d74b";
-        }
-    }
-
-    // INTERACTION
-    function handleTap(e) {
-        if(state.en >= 1) {
-            let gain = 1 + (state.fL * 0.1);
-            state.bal += gain;
-            state.en -= 1;
-            tg.HapticFeedback.impactOccurred('medium');
+        grantAdmin: function() {
+            state.isAdmin = true;
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('role-tag').innerText = "BOT ADMIN";
+            document.getElementById('role-tag').className = "status-tag tag-admin";
+            document.querySelector('.main-char').classList.add('admin-glow');
             
-            // Animatsiya
-            const p = document.createElement('div');
-            p.innerText = "+" + gain.toFixed(1);
-            p.style.position = 'fixed';
-            p.style.left = e.clientX + 'px';
-            p.style.top = e.clientY + 'px';
-            p.style.color = '#f3ba2f';
-            p.style.fontWeight = '800';
-            p.style.pointerEvents = 'none';
-            p.style.animation = 'float 0.8s ease-out forwards';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-            sync();
-        }
-    }
-
-    function stakeAll() {
-        if(state.bal > 0) {
-            state.stk += state.bal;
-            state.bal = 0;
+            EGO_ENGINE.notify("HUQUQLAR OLINDI: BOT BOSHQARUVI SIZDA!");
             tg.HapticFeedback.notificationOccurred('success');
-            sync();
         }
-    }
+    };
 
-    function upgradeFarm() {
-        let cost = 500 * Math.pow(1.5, state.fL - 1);
-        if(state.bal >= cost) {
-            state.bal -= cost;
-            state.fL++;
-            tg.HapticFeedback.impactOccurred('light');
-            sync();
-        }
-    }
-
-    function buyAuto() {
-        if(state.bal >= 15000 && !state.auto) {
-            state.bal -= 15000;
-            state.auto = true;
-            sync();
-        }
-    }
-
-    // MARKET & SQUAD (Rasm #1, #11)
-    const items = [
-        {id: 50, icon: "🔱", price: 1000000, name: "TITAN #50"},
-        {id: 51, icon: "⚔️", price: 1500000, name: "TITAN #51"},
-        {id: 52, icon: "🛡️", price: 2000000, name: "TITAN #52"},
-        {id: 53, icon: "🌀", price: 3000000, name: "TITAN #53"}
-    ];
-
-    function loadMarket() {
-        const container = document.getElementById('market-grid');
-        container.innerHTML = "";
-        items.forEach(item => {
-            container.innerHTML += `
-                <div class="item-card">
-                    <span class="item-icon">${item.icon}</span>
-                    <div style="font-size:11px; font-weight:700; color:var(--text-sec)">${item.name}</div>
-                    <div class="price-tag">${f(item.price)}</div>
-                    <button class="btn-action" style="padding:10px; font-size:13px;" onclick="buyItem(${item.id})">BUY</button>
-                </div>`;
-        });
-    }
-
-    function buyItem(id) {
-        const item = items.find(i => i.id === id);
-        if(state.bal >= item.price && !state.squad.includes(id)) {
-            state.bal -= item.price;
-            state.squad.push(id);
-            sync();
-            showAlert(`TITAN #${id} kolleksiyangizga qo'shildi!`);
-            updateSquadUI();
-        } else {
-            tg.HapticFeedback.notificationOccurred('error');
-        }
-    }
-
-    function updateSquadUI() {
-        const container = document.getElementById('squad-grid');
-        container.innerHTML = "";
-        state.squad.forEach(id => {
-            const item = items.find(i => i.id === id);
-            container.innerHTML += `
-                <div class="item-card">
-                    <span class="item-icon">${item.icon}</span>
-                    <div style="font-size:12px; font-weight:700;">${item.name}</div>
-                    <div style="color:var(--ios-green); font-size:10px; margin-top:5px; font-weight:800;">OWNED</div>
-                </div>`;
-        });
-    }
-
-    // MAHJONG LOGIC (Rasm #13)
-    let selectedTile = null;
-    const tileIcons = ["🤖", "🧬", "💾", "📡", "🛸", "🔋"];
-
-    function initMahjong() {
-        const board = document.getElementById('mj-board');
-        board.innerHTML = "";
-        let deck = [...tileIcons, ...tileIcons].sort(() => Math.random() - 0.5);
+    // Admin funksiyalari
+    function adminAction(type) {
+        if (!state.isAdmin) return;
         
-        deck.forEach(icon => {
-            const tile = document.createElement('div');
-            tile.className = 'mj-tile';
-            tile.innerText = icon;
-            tile.onclick = () => {
-                if(tile.classList.contains('matched')) return;
-                tile.classList.add('selected');
-                
-                if(!selectedTile) {
-                    selectedTile = tile;
-                } else {
-                    if(selectedTile.innerText === tile.innerText && selectedTile !== tile) {
-                        tile.classList.add('matched');
-                        selectedTile.classList.add('matched');
-                        state.bal += 1000;
-                        sync();
-                        tg.HapticFeedback.notificationOccurred('success');
-                    } else {
-                        const first = selectedTile;
-                        setTimeout(() => {
-                            first.classList.remove('selected');
-                            tile.classList.remove('selected');
-                        }, 400);
-                    }
-                    selectedTile = null;
-                }
-            };
-            board.appendChild(tile);
-        });
+        if (type === 'boost') {
+            state.bal *= 2;
+            EGO_ENGINE.notify("CORE BOOSTED X2");
+        } else if (type === 'reset') {
+            if(confirm("Haqiqatan ham barcha ma'lumotlarni o'chirmoqchimisiz?")) {
+                state.bal = 0;
+                state.egoLevel = 1;
+                location.reload();
+            }
+        }
+        EGO_ENGINE.update();
     }
 
-    // UI UTILS
-    function nav(name, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById('v-' + name).classList.add('active');
-        el.classList.add('active');
-        if(name === 'games') initMahjong();
+    // handleTap funksiyasini yangilaymiz
+    function handleTap(e) {
+        // ... (oldingi tap mantiqi)
+        AUTHORITY_SYSTEM.checkRights(); // Har tapda huquqni tekshirish
+        EGO_ENGINE.update();
     }
 
-    function showAlert(msg) {
-        document.getElementById('alert-msg').innerText = msg;
-        document.getElementById('alert-box').style.display = 'block';
-    }
-
-    function closeAlert() {
-        document.getElementById('alert-box').style.display = 'none';
-    }
-
-    // LOOPS
-    setInterval(() => {
-        state.bal += (state.fL * 2.5) / 10;
-        if(state.en < 1000) state.en += 0.5;
-        sync();
-    }, 100);
-
-    setInterval(() => { if(state.auto) stakeAll(); }, 30000);
-
-    // Style for Floating Text
-    const style = document.createElement('style');
-    style.innerHTML = `@keyframes float { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-100px); } }`;
-    document.head.appendChild(style);
-
-    loadMarket();
-    sync();
+    // ... (qolgan EGO_ENGINE va loop mantiqlari)
 </script>
-</body>
-</html>
