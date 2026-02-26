@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Archmage: Neural Evolution</title>
+    <title>Leenova bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
@@ -11,278 +11,258 @@
         :root {
             --accent: #ff007a;
             --secondary: #00f2ff;
-            --bg: #0a0a1a;
+            --bg: #000000;
             --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.15);
-            --neon-glow: 0 0 25px rgba(255, 0, 122, 0.4);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         
         body { 
-            background: radial-gradient(circle at center, #1a0a2e 0%, #05050a 100%); 
+            background: var(--bg); 
             color: #fff; 
             font-family: 'Outfit', sans-serif; 
             height: 100vh; 
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-
-        /* Ambient Fog and Glow */
-        .ambient-glow {
-            position: fixed; width: 150vw; height: 150vw;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.07) 0%, transparent 70%);
-            top: -30%; right: -30%; z-index: 0; animation: float 20s infinite alternate;
-            pointer-events: none;
-        }
-        .ambient-glow-2 {
-            position: fixed; width: 150vw; height: 150vw;
-            background: radial-gradient(circle, rgba(255, 0, 122, 0.07) 0%, transparent 70%);
-            bottom: -30%; left: -30%; z-index: 0; animation: float 15s infinite alternate-reverse;
-            pointer-events: none;
-        }
-        @keyframes float { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(10%, 10%) rotate(10deg); } }
 
         #bg-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-        #tap-master { position: fixed; inset: 0; z-index: 5; cursor: pointer; }
-
-        /* UI Styling */
         .ui-wrapper { 
-            position: relative; z-index: 10; height: 100vh; 
+            position: relative; z-index: 10; flex-grow: 1;
             display: flex; flex-direction: column; 
-            padding: calc(env(safe-area-inset-top) + 15px) 20px calc(env(safe-area-inset-bottom) + 20px);
-            pointer-events: none;
-        }
-        .ui-wrapper * { pointer-events: auto; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .chip {
-            background: var(--glass); border: 1px solid var(--border);
-            padding: 10px 18px; border-radius: 100px; font-size: 10px;
-            backdrop-filter: blur(15px); font-weight: 700; letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: calc(env(safe-area-inset-top) + 10px) 20px 100px;
         }
 
-        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8vh; pointer-events: none; }
+        /* Top Bar */
+        .top-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+        .status-chip {
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: rgba(255, 0, 122, 0.1);
+            border: 1.5px solid var(--accent);
+            box-shadow: 0 0 15px rgba(255, 0, 122, 0.3);
+            color: var(--accent);
+        }
+        .status-chip.blue {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+
+        /* Hero Balance */
+        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        #tap-master { position: absolute; width: 280px; height: 280px; z-index: 5; cursor: pointer; border-radius: 50%; }
+        
         .balance-main { 
-            font-family: 'Syncopate', sans-serif; font-size: 52px; font-weight: 700;
-            background: linear-gradient(to bottom, #fff 30%, var(--secondary) 100%);
+            font-family: 'Outfit', sans-serif; font-size: 64px; font-weight: 800;
+            background: linear-gradient(180deg, #fff 0%, var(--accent) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            letter-spacing: -2px; filter: drop-shadow(0 0 10px rgba(0,242,255,0.3));
+            z-index: 6; pointer-events: none;
         }
-        .income-tag { font-size: 11px; color: var(--secondary); opacity: 0.9; font-weight: 800; letter-spacing: 1px; }
+        .sub-text { font-size: 11px; letter-spacing: 3px; color: var(--secondary); opacity: 0.8; margin-top: -10px; z-index: 6; font-weight: 600; }
 
-        .hud-glass {
-            background: rgba(10, 10, 30, 0.6); border: 1px solid var(--border);
-            border-radius: 35px; padding: 25px; backdrop-filter: blur(25px);
-            margin-bottom: 90px; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        /* Stats HUD */
+        .stats-hud { margin-bottom: 20px; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--secondary); margin-bottom: 5px; }
+        .progress-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+        .progress-fill { height: 100%; width: 100%; transition: 0.3s; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            display: flex; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px); border-top: 1px solid var(--border); z-index: 100;
         }
-        .track { height: 10px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); }
-        .fill { height: 100%; border-radius: 20px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #555; text-transform: uppercase; cursor: pointer; }
+        .nav-item.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
 
-        /* Panels */
+        /* Upgrade Panel (Genome) */
         .side-panel {
-            position: fixed; bottom: -110%; left: 0; width: 100%; height: 85vh;
-            background: rgba(8, 8, 20, 0.98); border-top: 3px solid var(--secondary);
-            border-radius: 40px 40px 0 0; z-index: 1100; padding: 30px 25px;
-            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh;
+            background: #0a0a0a; border-top: 2px solid var(--accent);
+            border-radius: 30px 30px 0 0; z-index: 1000; padding: 25px;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
         }
         .side-panel.active { bottom: 0; }
-        
-        .up-card {
-            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-            padding: 20px 15px; border-radius: 30px; text-align: center;
-            transition: 0.3s;
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card {
+            background: #111; border: 1px solid var(--border);
+            padding: 15px; border-radius: 20px; text-align: center;
         }
-        .up-card:active { transform: scale(0.96); }
+        .card h4 { font-size: 9px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        .card p { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+        .buy-btn { width: 100%; background: none; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px; border-radius: 10px; font-weight: 700; font-size: 11px; }
 
-        .price-btn {
-            width: 100%; background: linear-gradient(90deg, var(--secondary), var(--accent));
-            color: #fff; padding: 12px; border-radius: 18px;
-            font-weight: 900; font-size: 12px; cursor: pointer; border: none;
-            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
-        }
-
-        .dock {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 92%; background: rgba(15, 15, 35, 0.9);
-            border: 1px solid var(--border); border-radius: 30px;
-            padding: 10px; display: flex; gap: 10px; z-index: 1000;
-            backdrop-filter: blur(20px);
-        }
-        .dock-item { flex: 1; padding: 15px; border-radius: 22px; border: none; background: transparent; color: #666; font-weight: 800; font-size: 12px; transition: 0.3s; }
-        .dock-item.active { background: var(--accent); color: #fff; box-shadow: var(--neon-glow); }
-
-        .float-val {
-            position: fixed; pointer-events: none; font-weight: 900; color: var(--secondary);
-            z-index: 2000; animation: rise 0.8s ease-out forwards; font-family: 'Syncopate'; font-size: 22px;
-            text-shadow: 0 0 15px var(--secondary);
-        }
-        @keyframes rise { 0% { opacity: 0; transform: translateY(0) scale(0.8); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
+        .float-val { position: fixed; pointer-events: none; font-weight: 800; color: #fff; z-index: 2000; animation: rise 0.8s forwards; font-size: 20px; }
+        @keyframes rise { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
-    <div class="ambient-glow-2"></div>
     <canvas id="bg-canvas"></canvas>
 
-    <div id="tap-master"></div>
-
     <div class="ui-wrapper">
-        <div class="header">
-            <div class="chip">🚀 NEURAL LINK</div>
-            <div class="chip" style="color: var(--secondary);">ONLINE</div>
+        <div class="top-status">
+            <div class="status-chip">BIO-SIGN: STABLE</div>
+            <div class="status-chip blue" id="dna-ui">DNA: X1.0</div>
         </div>
 
         <div class="hero">
+            <div id="tap-master"></div>
             <h1 class="balance-main" id="bal-ui">0.00</h1>
-            <div class="income-tag">PROFIT: +<span id="pps-ui">0.0</span>/SEC</div>
+            <div class="sub-text">TOTAL $ARIAI SYNCED</div>
         </div>
 
-        <div class="hud-glass">
-            <div style="font-size: 11px; font-weight: 800; color: var(--secondary);">ENERGY RESERVE <span id="mana-text" style="float:right">1000/1000</span></div>
-            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%; box-shadow: 0 0 15px var(--secondary);"></div></div>
+        <div class="stats-hud">
+            <div class="stat-row"><span>PLASMA</span> <span id="plasma-text">1000/1000</span></div>
+            <div class="progress-track"><div class="progress-fill" id="plasma-fill" style="background: var(--secondary);"></div></div>
             
-            <div style="font-size: 11px; font-weight: 800; color: var(--accent); margin-top: 18px;">EVOLUTION LEVEL <span id="lvl-text" style="float:right">LVL 1</span></div>
-            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%; box-shadow: 0 0 15px var(--accent);"></div></div>
+            <div class="stat-row"><span>EVOLUTION</span> <span id="lvl-text">LVL 1</span></div>
+            <div class="progress-track"><div class="progress-fill" id="xp-fill" style="background: var(--accent);"></div></div>
         </div>
     </div>
 
     <div class="side-panel" id="side-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h2 id="panel-title" style="font-family:'Syncopate'; font-size: 20px; color: var(--secondary);">SYSTEM UPGRADES</h2>
-            <button onclick="togglePanel(false)" style="background:var(--glass); border:none; color:#fff; width:35px; height:35px; border-radius:50%;">✕</button>
+        <div class="panel-header">
+            <h2 style="font-family: 'Outfit'; color: var(--accent); font-weight: 800;">GENOME</h2>
+            <button onclick="togglePanel(false)" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
         </div>
-        <div class="tab-content" id="panel-content">
-            <div class="upgrades-grid" id="grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
-        </div>
+        <div class="grid" id="upgrade-grid"></div>
     </div>
 
-    <nav class="dock">
-        <button class="dock-item active" id="nav-core" onclick="togglePanel(false)">CORE</button>
-        <button class="dock-item" id="nav-up" onclick="openTab('upgrades')">UPGRADE</button>
-        <button class="dock-item" id="nav-farm" onclick="openTab('farming')">FARMING</button>
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-core" onclick="togglePanel(false)">CORE</div>
+        <div class="nav-item" id="nav-genome" onclick="openGenome()">GENOME</div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.headerColor = "#0a0a1a";
 
-        let state = JSON.parse(localStorage.getItem('ariai_v8')) || {
-            bal: 0, pwr: 1.0, pps: 0.0, mana: 1000, maxMana: 1000, lvl: 1, xp: 0,
-            upgrades: {}, farmNodes: {}
+        let state = JSON.parse(localStorage.getItem('leenova_save')) || {
+            bal: 0, pwr: 1, dna: 1.0, plasma: 1000, maxPlasma: 1000, lvl: 1, xp: 0, upgrades: 0
         };
 
-        // 3D Engine with Starfield
-        let scene, camera, renderer, crystal, stars;
-        function init3D() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-            // Create Crystal
-            const geo = new THREE.IcosahedronGeometry(2, 1);
-            const mat = new THREE.MeshPhongMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.6 });
-            crystal = new THREE.Mesh(geo, mat);
-            scene.add(crystal);
-
-            // Create Stars
-            const starGeo = new THREE.BufferGeometry();
-            const starCount = 1200;
-            const posArray = new Float32Array(starCount * 3);
-            for(let i=0; i < starCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 20; }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            const starMat = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true });
-            stars = new THREE.Points(starGeo, starMat);
-            scene.add(stars);
-
-            const light = new THREE.PointLight(0xff007a, 2, 20);
-            light.position.set(2, 3, 4);
-            scene.add(light, new THREE.AmbientLight(0x404040, 2));
-            camera.position.z = 6;
-
-            function anim() {
-                requestAnimationFrame(anim);
-                crystal.rotation.y += 0.005;
-                stars.rotation.y += 0.0005;
-                renderer.render(scene, camera);
-            }
-            anim();
+        // UI Updates
+        function updateUI() {
+            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
+            document.getElementById('dna-ui').innerText = `DNA: X${state.dna.toFixed(1)}`;
+            document.getElementById('plasma-text').innerText = `${Math.floor(state.plasma)}/${state.maxPlasma}`;
+            document.getElementById('plasma-fill').style.width = `${(state.plasma / state.maxPlasma) * 100}%`;
+            document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
+            document.getElementById('xp-fill').style.width = `${(state.xp / (state.lvl * 500)) * 100}%`;
+            localStorage.setItem('leenova_save', JSON.stringify(state));
         }
 
-        // Gameplay
+        // Tap Logic
         document.getElementById('tap-master').addEventListener('touchstart', (e) => {
-            if (state.mana < 1) { tg.HapticFeedback.notificationOccurred('error'); return; }
+            if (state.plasma < 1) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
             const touch = e.touches[0];
-            showFx(touch.clientX, touch.clientY, state.pwr);
-            state.bal += state.pwr;
-            state.mana -= 1.2;
-            state.xp += 15;
-            if (state.xp >= state.lvl * 1000) { state.lvl++; state.xp = 0; tg.HapticFeedback.notificationOccurred('success'); }
-            tg.HapticFeedback.impactOccurred('light');
+            createFloatText(touch.clientX, touch.clientY, state.pwr * state.dna);
+
+            state.bal += state.pwr * state.dna;
+            state.plasma -= 1;
+            state.xp += 10;
+
+            if (state.xp >= state.lvl * 500) {
+                state.lvl++;
+                state.xp = 0;
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            tg.HapticFeedback.impactOccurred('medium');
             updateUI();
         });
 
-        function showFx(x, y, val) {
+        function createFloatText(x, y, val) {
             const el = document.createElement('div');
             el.className = 'float-val';
             el.innerHTML = `+${val.toFixed(1)}`;
-            el.style.left = `${x - 20}px`; el.style.top = `${y - 40}px`;
+            el.style.left = `${x}px`; el.style.top = `${y}px`;
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 800);
         }
 
-        function updateUI() {
-            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
-            document.getElementById('pps-ui').innerText = state.pps.toFixed(1);
-            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)}/1000`;
-            document.getElementById('mana-fill').style.width = `${(state.mana/10)}%`;
-            document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-fill').style.width = `${(state.xp/(state.lvl*10))}%`;
-            localStorage.setItem('ariai_v8', JSON.stringify(state));
+        // Panel Logic
+        function togglePanel(show) {
+            document.getElementById('side-panel').classList.toggle('active', show);
+            document.getElementById('nav-core').classList.toggle('active', !show);
+            document.getElementById('nav-genome').classList.add('active', show);
+            if(show) openGenome();
         }
 
-        const farmData = [ { id: 'f1', name: 'Neural Ant', pps: 0.5, price: 150 }, { id: 'f2', name: 'Data Hive', pps: 3.0, price: 1000 } ];
-        const tapData = [ { id: 't1', name: 'Power Link', pwr: 0.5, price: 100 }, { id: 't2', name: 'Cyber Glove', pwr: 2.5, price: 800 } ];
-
-        function togglePanel(show) { document.getElementById('side-panel').classList.toggle('active', show); }
-
-        function openTab(tab) {
+        function openGenome() {
             togglePanel(true);
-            const container = document.getElementById('grid-container');
-            container.innerHTML = '';
-            const data = tab === 'upgrades' ? tapData : farmData;
-            data.forEach(item => {
-                const count = (tab === 'upgrades' ? state.upgrades[item.id] : state.farmNodes[item.id]) || 0;
-                const price = Math.floor(item.price * Math.pow(1.5, count));
-                const canBuy = state.bal >= price;
-                container.innerHTML += `
-                    <div class="up-card">
-                        <h4 style="font-size:10px; color:#aaa;">${item.name}</h4>
-                        <p style="color:var(--secondary); font-weight:800;">+${tab==='upgrades'?item.pwr:item.pps}${tab==='upgrades'?' PWR':'/SEC'}</p>
-                        <button class="price-btn ${canBuy?'':'disabled'}" onclick="buy('${tab}', '${item.id}', ${tab==='upgrades'?item.pwr:item.pps}, ${price})">⚡ ${price}</button>
-                    </div>`;
-            });
+            const grid = document.getElementById('upgrade-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const cost = i * 100 * state.lvl;
+                grid.innerHTML += `
+                    <div class="card">
+                        <h4>NEURAL_${i}</h4>
+                        <p>EVOLVE</p>
+                        <button class="buy-btn" onclick="buyUpgrade(${cost}, 0.2)">⚡ ${cost}</button>
+                    </div>
+                `;
+            }
         }
 
-        window.buy = (tab, id, val, price) => {
-            if (state.bal >= price) {
-                state.bal -= price;
-                if(tab === 'upgrades') { state.pwr += val; state.upgrades[id] = (state.upgrades[id] || 0) + 1; }
-                else { state.pps += val; state.farmNodes[id] = (state.farmNodes[id] || 0) + 1; }
-                openTab(tab); updateUI(); tg.HapticFeedback.notificationOccurred('success');
+        window.buyUpgrade = (cost, addDna) => {
+            if (state.bal >= cost) {
+                state.bal -= cost;
+                state.dna += addDna;
+                tg.HapticFeedback.notificationOccurred('success');
+                openGenome();
+                updateUI();
+            } else {
+                tg.HapticFeedback.notificationOccurred('warning');
             }
         };
 
+        // Plasma Recovery
         setInterval(() => {
-            if (state.pps > 0) state.bal += (state.pps / 10);
-            if (state.mana < 1000) state.mana = Math.min(1000, state.mana + 1.5);
-            updateUI();
-        }, 100);
+            if (state.plasma < state.maxPlasma) {
+                state.plasma = Math.min(state.maxPlasma, state.plasma + 1.5);
+                updateUI();
+            }
+        }, 1000);
+
+        // 3D Background (Sodda Crystal)
+        let scene, camera, renderer, crystal;
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const geo = new THREE.IcosahedronGeometry(2, 0);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xff007a, wireframe: true, transparent: true, opacity: 0.2 });
+            crystal = new THREE.Mesh(geo, mat);
+            scene.add(crystal);
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                crystal.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
 
         window.onload = () => { init3D(); updateUI(); };
     </script>
