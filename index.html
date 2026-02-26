@@ -3,91 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leencoin: Legend Era</title>
+    <title>Leencoin: Cyber Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-cyan: #00f2ff; --magic-purple: #bc13fe; --sun-gold: #ffcc00; }
-        body { 
-            background: #000; color: #fff; text-align: center; font-family: 'Orbitron', sans-serif; 
-            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        :root {
+            --cyan: #00f2ff;
+            --purple: #bc13fe;
+            --gold: #ffcc00;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
-        /* Effektli fon */
-        body::before {
-            content: ""; position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a0033 0%, #000 70%);
-            z-index: -1;
+        body {
+            background: #020205; color: #fff; text-align: center;
+            font-family: 'Rajdhani', sans-serif; margin: 0; height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        .header { padding: 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3); background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-        .score { font-size: 55px; font-weight: 900; color: var(--sun-gold); text-shadow: 0 0 25px var(--sun-gold); margin: 0; }
-        .lvl-badge { color: var(--magic-purple); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
+        /* Dinamik Dashboard */
+        .dashboard {
+            padding: 25px; background: linear-gradient(180deg, rgba(0, 242, 255, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid var(--glass); backdrop-filter: blur(15px);
+        }
+        .score-main { font-size: 60px; font-weight: 700; color: var(--gold); text-shadow: 0 0 30px var(--gold); margin: 0; }
+        .income-stat { font-size: 14px; color: var(--cyan); letter-spacing: 2px; margin-top: 5px; }
 
-        /* Asosiy Kristal (Tanga o'rniga) */
-        .crystal-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .main-crystal {
-            width: 220px; height: 220px; position: relative;
-            background: url('https://cdn-icons-png.flaticon.com/512/6530/6530342.png') no-repeat center/contain;
-            filter: drop-shadow(0 0 30px var(--neon-cyan));
+        /* Kiber Kristal Maydoni */
+        .stage { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .main-core {
+            width: 240px; height: 240px; position: relative;
+            background: radial-gradient(circle, var(--cyan) 0%, transparent 70%);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            -webkit-tap-highlight-color: transparent;
         }
-        .main-crystal:active { transform: scale(0.8) rotate(5deg); filter: drop-shadow(0 0 60px var(--magic-purple)); }
+        .main-core img { width: 140px; filter: drop-shadow(0 0 20px var(--cyan)); }
+        .main-core:active { transform: scale(0.9) rotate(-5deg); }
 
-        /* Aura nurlari */
-        .aura { position: absolute; width: 300px; height: 300px; border: 2px solid var(--neon-cyan); border-radius: 50%; opacity: 0.2; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.2; } 100% { transform: scale(1.3); opacity: 0; } }
-
-        /* Shop & Upgrade Panel */
-        .panel { padding: 20px; background: rgba(20, 20, 20, 0.9); border-radius: 30px 30px 0 0; border-top: 2px solid var(--magic-purple); }
-        .btn-upgrade {
-            background: linear-gradient(45deg, var(--neon-cyan), var(--magic-purple));
-            color: #fff; border: none; padding: 18px; border-radius: 15px;
-            width: 100%; font-weight: 900; font-size: 16px; cursor: pointer;
-            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4); text-transform: uppercase;
+        /* Ultra Do'kon (Glassmorphism) */
+        .shop-container {
+            padding: 20px; background: rgba(10, 10, 15, 0.95);
+            border-top: 2px solid var(--purple); border-radius: 40px 40px 0 0;
+            max-height: 40%; overflow-y: auto;
         }
-        .btn-upgrade:disabled { filter: grayscale(1); opacity: 0.3; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .shop-header h2 { font-size: 18px; color: var(--purple); text-transform: uppercase; margin: 0; }
 
-        /* Mini Kartalar (10-lvl dan keyin) */
-        .epic-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .card { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--neon-cyan); 
-            padding: 10px; border-radius: 12px; font-size: 10px; cursor: pointer;
+        .item-card {
+            background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
         }
-        .card h4 { margin: 0; color: var(--sun-gold); }
+        .item-card:active { border-color: var(--cyan); background: rgba(0, 242, 255, 0.05); }
+        .item-info { text-align: left; }
+        .item-info h3 { margin: 0; font-size: 16px; color: var(--cyan); }
+        .item-info p { margin: 3px 0 0; font-size: 12px; color: #888; }
 
-        .tap-text { position: absolute; color: #fff; font-weight: 900; pointer-events: none; animation: flyUp 0.6s ease-out forwards; }
-        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        .price-btn {
+            background: linear-gradient(90deg, var(--purple), #8a2be2);
+            color: #fff; border: none; padding: 10px 20px; border-radius: 12px;
+            font-weight: 700; cursor: pointer;
+        }
+        .price-btn:disabled { opacity: 0.3; filter: grayscale(1); }
+
+        /* Particle Text */
+        .particle { position: absolute; color: #fff; font-weight: 700; pointer-events: none; animation: floatUp 0.8s forwards; }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
+        }
+
+        .core-lvl-btn {
+            width: 100%; padding: 15px; background: var(--cyan); color: #000;
+            border: none; border-radius: 15px; font-weight: 700; margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="score" id="score">0</div>
-        <div class="lvl-badge">Core Level: <span id="auto-lvl">1</span>/10</div>
-        <div style="font-size: 10px; color: #00ffaa; margin-top: 5px;">⚡ Daromad: +<span id="rate">1</span>/s</div>
+    <div class="dashboard">
+        <h1 class="score-main" id="balance">0</h1>
+        <div class="income-stat">⚡ SYSTEM PROFIT: +<span id="pps">0</span>/SEC</div>
     </div>
 
-    <div class="crystal-container">
-        <div class="aura"></div>
-        <div class="main-crystal" id="crystal"></div>
-        <div style="position: absolute; bottom: 40px; color: var(--neon-cyan); font-size: 14px;">Tap: +<span id="tap-val">1</span></div>
+    <div class="stage">
+        <div class="main-core" id="core-btn">
+            <img src="https://cdn-icons-png.flaticon.com/512/6530/6530342.png" alt="core">
+        </div>
     </div>
 
-    <div class="panel">
-        <button class="btn-upgrade" id="upgrade-btn" onclick="upgrade()">
-            FAST UPGRADE (💰 <span id="cost">10</span>)
-        </button>
+    <div class="shop-container">
+        <div id="setup-phase">
+            <button class="core-lvl-btn" id="core-up-btn" onclick="upgradeCore()">
+                UPGRADE CORE LVL (<span id="core-lvl">1</span>/10) - 💰 <span id="core-cost">50</span>
+            </button>
+        </div>
 
-        <div class="epic-grid" id="shop">
-            <div class="card" onclick="buyEpic('VIP', 500, 100)">
-                <h4>VIP CARD</h4>
-                <p>+100/s (💰500)</p>
+        <div id="elite-shop" style="display: none;">
+            <div class="shop-header">
+                <h2>Cybernetic Upgrades</h2>
+                <span style="color: var(--gold); font-size: 12px;">VIP STATUS</span>
             </div>
-            <div class="card" onclick="buyEpic('EPIC', 1000, 250)">
-                <h4>EPIC CARD</h4>
-                <p>+250/s (💰1k)</p>
+
+            <div class="item-card">
+                <div class="item-info">
+                    <h3>NEURAL MINER</h3>
+                    <p>+50 ochko har soniyada</p>
+                </div>
+                <button class="price-btn" onclick="buyElite(1, 1000, 50)">💰 1K</button>
+            </div>
+
+            <div class="item-card">
+                <div class="item-info">
+                    <h3>QUANTUM CPU</h3>
+                    <p>Tap kuchini +20 ga oshirish</p>
+                </div>
+                <button class="price-btn" onclick="buyElite(2, 5000, 20)">💰 5K</button>
             </div>
         </div>
     </div>
@@ -96,68 +128,66 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // TEST MODE: Narxlar juda arzon, daromad juda baland
-        let score = parseInt(localStorage.getItem('score')) || 0;
-        let autoLvl = parseInt(localStorage.getItem('autoLvl')) || 1;
-        let tapPower = parseInt(localStorage.getItem('tapPower')) || 1;
-        let autoRate = parseInt(localStorage.getItem('autoRate')) || 1;
+        let score = parseInt(localStorage.getItem('sc_v2')) || 0;
+        let coreLvl = parseInt(localStorage.getItem('cl_v2')) || 1;
+        let tapPwr = parseInt(localStorage.getItem('tp_v2')) || 1;
+        let autoRate = parseInt(localStorage.getItem('ar_v2')) || 0;
 
         function update() {
-            document.getElementById('score').innerText = Math.floor(score).toLocaleString();
-            document.getElementById('auto-lvl').innerText = autoLvl;
-            document.getElementById('tap-val').innerText = tapPower;
-            document.getElementById('rate').innerText = autoRate;
+            document.getElementById('balance').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('pps').innerText = autoRate;
+            document.getElementById('core-lvl').innerText = coreLvl;
             
-            let currentCost = Math.floor(10 * Math.pow(1.5, autoLvl - 1));
-            document.getElementById('cost').innerText = currentCost;
+            let cost = Math.floor(50 * Math.pow(1.6, coreLvl - 1));
+            document.getElementById('core-cost').innerText = cost;
 
-            if(autoLvl >= 10) {
-                document.getElementById('upgrade-btn').style.display = 'none';
-                document.getElementById('shop').style.display = 'grid';
+            if(coreLvl >= 10) {
+                document.getElementById('setup-phase').style.display = 'none';
+                document.getElementById('elite-shop').style.display = 'block';
             }
-            document.getElementById('upgrade-btn').disabled = score < currentCost;
             save();
         }
 
         function save() {
-            localStorage.setItem('score', score);
-            localStorage.setItem('autoLvl', autoLvl);
-            localStorage.setItem('tapPower', tapPower);
-            localStorage.setItem('autoRate', autoRate);
+            localStorage.setItem('sc_v2', score);
+            localStorage.setItem('cl_v2', coreLvl);
+            localStorage.setItem('tp_v2', tapPwr);
+            localStorage.setItem('ar_v2', autoRate);
         }
 
-        document.getElementById('crystal').onclick = (e) => {
-            score += tapPower;
-            createEffect(e);
-            tg.HapticFeedback.impactOccurred('medium');
+        document.getElementById('core-btn').onclick = (e) => {
+            score += tapPwr;
+            spawnParticle(e);
+            tg.HapticFeedback.impactOccurred('light');
             update();
         };
 
-        function createEffect(e) {
-            const t = document.createElement('div');
-            t.className = 'tap-text';
-            t.innerText = `+${tapPower}`;
-            t.style.left = e.clientX + 'px';
-            t.style.top = e.clientY + 'px';
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 600);
+        function spawnParticle(e) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerText = `+${tapPwr}`;
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
         }
 
-        function upgrade() {
-            let cost = parseInt(document.getElementById('cost').innerText);
-            if(score >= cost && autoLvl < 10) {
+        function upgradeCore() {
+            let cost = parseInt(document.getElementById('core-cost').innerText);
+            if(score >= cost && coreLvl < 10) {
                 score -= cost;
-                autoLvl++;
-                tapPower += 5; // Test uchun tez kuchayish
-                autoRate += 10;
+                coreLvl++;
+                tapPwr += 2;
+                autoRate += 5;
                 update();
             }
         }
 
-        function buyEpic(type, cost, rate) {
+        function buyElite(id, cost, val) {
             if(score >= cost) {
                 score -= cost;
-                autoRate += rate;
+                if(id === 1) autoRate += val;
+                if(id === 2) tapPwr += val;
                 tg.HapticFeedback.notificationOccurred('success');
                 update();
             }
