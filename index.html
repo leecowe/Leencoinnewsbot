@@ -12,100 +12,97 @@
         body {
             margin: 0; height: 100vh; display: flex; flex-direction: column;
             font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            /* Siz yuborgan kiber-shahar foni */
-            background: linear-gradient(rgba(2, 11, 22, 0.7), rgba(2, 11, 22, 0.8)), 
+            /* Fon: Skrinshotdagi kiber-shahar */
+            background: linear-gradient(rgba(2, 11, 22, 0.75), rgba(2, 11, 22, 0.85)), 
                         url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
             background-size: cover;
         }
 
-        /* 1. TOP HUD: Skrinshotdagi kabi professional o'lchovlar */
+        /* 1. TOP HUD: Skrinshot 14 va 15 dagi kabi dizayn */
         .hud-top {
-            padding: 25px 20px; display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 30px 20px 10px 20px;
             background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent);
         }
-        .credits-wrap { border-left: 3px solid var(--blue); padding-left: 12px; }
-        .label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
-        .amount { font-family: 'Orbitron'; font-size: 32px; text-shadow: 0 0 15px var(--blue); }
+        .credits-container { border-left: 3px solid var(--blue); padding-left: 15px; position: relative; }
+        .credits-label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
+        .credits-value { font-family: 'Orbitron'; font-size: 36px; text-shadow: 0 0 15px var(--blue); }
+        .settings-icon { position: absolute; right: 0; top: 0; font-size: 20px; color: var(--blue); opacity: 0.7; }
 
-        .mini-stats { display: flex; gap: 8px; margin-top: 10px; }
-        .chip { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 2px 10px; font-size: 11px; border-radius: 4px; font-weight: 700; }
+        .stat-chips { display: flex; gap: 10px; margin-top: 15px; }
+        .chip { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 3px 12px; font-size: 11px; border-radius: 4px; font-family: 'Orbitron'; }
 
-        /* 2. CENTER: Animatsion Core */
-        .game-main { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        
-        /* Markaziy Core (Aynan skrinshotdagi neon aylana) */
-        .core-container {
-            width: 220px; height: 220px; position: relative; cursor: pointer;
+        /* 2. CENTER: Clicker Core (Skrinshot 14/15 dagi kvadratli effekt) */
+        .game-area { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .core-wrapper { width: 220px; height: 220px; position: relative; cursor: pointer; }
+        .core-circle { 
+            position: absolute; inset: 0; border: 2px solid var(--blue); border-radius: 50%;
+            box-shadow: 0 0 40px var(--blue), inset 0 0 20px var(--blue);
+            animation: pulse 2s infinite;
         }
-        .core-glow {
-            position: absolute; inset: 0; border-radius: 50%;
-            border: 2px solid var(--blue); box-shadow: 0 0 40px var(--blue), inset 0 0 20px var(--blue);
-            animation: pulse 1.5s infinite alternate;
+        .core-inner-box {
+            position: absolute; inset: 50px; background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--blue); border-radius: 12px; transform: rotate(45deg);
+            display: flex; justify-content: center; align-items: center;
         }
-        .core-img {
-            position: absolute; inset: 50px; display: flex; justify-content: center; align-items: center;
-            background: rgba(0, 242, 255, 0.1); border-radius: 10px; transform: rotate(45deg); border: 1px solid var(--blue);
-        }
-        .core-img img { width: 60px; transform: rotate(-45deg); filter: drop-shadow(0 0 10px var(--blue)); }
+        .core-inner-box img { width: 60px; transform: rotate(-45deg); filter: drop-shadow(0 0 10px var(--blue)); }
 
         /* 3. SHOP: Skrinshotdagi "System Upgrades" qismi */
-        .shop-box {
-            background: rgba(2, 11, 22, 0.95); border-top: 2px solid var(--blue);
-            border-radius: 30px 30px 0 0; padding: 25px; max-height: 40%; overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0, 242, 255, 0.2);
+        .shop-container {
+            background: rgba(2, 11, 22, 0.98); border-top: 2px solid var(--blue);
+            border-radius: 35px 35px 0 0; padding: 25px; max-height: 40%; overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0, 242, 255, 0.25);
         }
-        .shop-header { font-family: 'Orbitron'; font-size: 14px; color: var(--blue); margin-bottom: 20px; letter-spacing: 2px; }
+        .shop-title { font-family: 'Orbitron'; font-size: 14px; color: var(--blue); margin-bottom: 20px; letter-spacing: 3px; }
 
-        .card {
+        .upgrade-card {
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.15);
-            border-radius: 15px; padding: 16px; margin-bottom: 12px;
+            border-radius: 18px; padding: 18px; margin-bottom: 12px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .card-meta h4 { margin: 0; font-size: 15px; color: #fff; letter-spacing: 1px; }
-        .lvl-tag { color: var(--blue); font-size: 11px; }
+        .upgrade-info h4 { margin: 0; font-size: 16px; color: #fff; letter-spacing: 1px; }
+        .lvl-text { color: var(--blue); font-size: 11px; margin-left: 5px; }
         
-        .p-bar-bg { width: 120px; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; position: relative; }
-        .p-bar-fill { height: 100%; background: var(--blue); box-shadow: 0 0 10px var(--blue); border-radius: 2px; transition: 0.4s; }
+        .progress-track { width: 130px; height: 5px; background: #111; margin-top: 10px; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--blue); box-shadow: 0 0 10px var(--blue); transition: 0.4s; }
 
-        .btn-buy {
-            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue);
-            color: var(--blue); padding: 10px 18px; border-radius: 8px;
+        .buy-button {
+            background: rgba(0, 242, 255, 0.05); border: 1px solid var(--blue);
+            color: var(--blue); padding: 10px 20px; border-radius: 10px;
             font-family: 'Orbitron'; font-weight: 700; cursor: pointer; transition: 0.2s;
         }
-        .btn-buy:disabled { border-color: #333; color: #333; opacity: 0.5; }
-        .btn-buy:active { transform: scale(0.9); background: var(--blue); color: #000; }
+        .buy-button:disabled { border-color: #333; color: #333; opacity: 0.4; }
+        .buy-button:active { transform: scale(0.9); background: var(--blue); color: #000; }
 
-        /* FX */
-        @keyframes pulse { from { opacity: 0.4; transform: scale(1); } to { opacity: 1; transform: scale(1.05); } }
-        .tap-fx { position: absolute; color: var(--blue); font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; font-family: 'Orbitron'; }
-        @keyframes floatUp { to { transform: translateY(-120px); opacity: 0; } }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } 100% { opacity: 0.5; transform: scale(1); } }
+        .float-text { position: absolute; color: var(--blue); font-weight: 900; animation: floatUp 0.8s forwards; font-family: 'Orbitron'; pointer-events: none; }
+        @keyframes floatUp { to { transform: translateY(-130px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div class="hud-top">
-        <div class="credits-wrap">
-            <div class="label">CREDITS AVAILABLE</div>
-            <div class="amount" id="money">0</div>
-            <div class="mini-stats">
-                <div class="chip">TAP: +<span id="t-val">1</span></div>
-                <div class="chip">AUTO: +<span id="a-val">0</span>/s</div>
+        <div class="credits-container">
+            <div class="settings-icon">⚙️</div>
+            <div class="credits-label">CREDITS AVAILABLE</div>
+            <div class="credits-value" id="balance">0</div>
+            <div class="stat-chips">
+                <div class="chip">T: +<span id="tap-stat">1</span></div>
+                <div class="chip">A: +<span id="auto-stat">0</span>/s</div>
             </div>
         </div>
-        <div style="color:var(--blue); font-size: 24px;">⚙️</div>
     </div>
 
-    <div class="game-main">
-        <div class="core-container" id="core">
-            <div class="core-glow"></div>
-            <div class="core-img">
+    <div class="game-area">
+        <div class="core-wrapper" id="core-btn">
+            <div class="core-circle"></div>
+            <div class="core-inner-box">
                 <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
             </div>
         </div>
     </div>
 
-    <div class="shop-box">
-        <div class="shop-header">SYSTEM UPGRADES</div>
+    <div class="shop-container">
+        <div class="shop-title">SYSTEM UPGRADES</div>
         <div id="shop-list"></div>
     </div>
 
@@ -113,90 +110,92 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let data = {
-            bal: parseFloat(localStorage.getItem('ln_v6_bal')) || 0,
-            lvls: JSON.parse(localStorage.getItem('ln_v6_lvls')) || { s1:0, s2:0, s3:0, s4:0 }
+        let gameState = {
+            credits: parseFloat(localStorage.getItem('ln_v7_credits')) || 0,
+            levels: JSON.parse(localStorage.getItem('ln_v7_levels')) || { s1:0, s2:0, s3:0, s4:0 }
         };
 
-        const config = [
-            { id: 's1', name: 'NEURAL LINK', base: 50, grow: 1.7, val: 2, type: 'tap' },
-            { id: 's2', name: 'CYBER MINER', base: 450, grow: 1.6, val: 10, type: 'auto' },
-            { id: 's3', name: 'QUANTUM CPU', base: 2500, grow: 1.6, val: 75, type: 'auto' },
-            { id: 's4', name: 'CORE OVERLOAD', base: 12000, grow: 1.8, val: 150, type: 'tap' }
+        const upgrades = [
+            { id: 's1', name: 'NEURAL LINK', base: 1, grow: 1, val: 5, type: 'tap' },
+            { id: 's2', name: 'CYBER MINER', base: 1, grow: 1, val: 20, type: 'auto' },
+            { id: 's3', name: 'QUANTUM CPU', base: 1, grow: 1, val: 100, type: 'auto' },
+            { id: 's4', name: 'CORE OVERLOAD', base: 1, grow: 1, val: 500, type: 'tap' }
         ];
 
         function getStats() {
-            let t = 1, a = 0;
-            config.forEach(c => {
-                let l = data.lvls[c.id] || 0;
-                if(c.type === 'tap') t += (l * c.val);
-                if(c.type === 'auto') a += (l * c.val);
+            let tap = 1, auto = 0;
+            upgrades.forEach(u => {
+                let l = gameState.levels[u.id] || 0;
+                if(u.type === 'tap') tap += (l * u.val);
+                if(u.type === 'auto') auto += (l * u.val);
             });
-            return { t, a };
+            return { tap, auto };
         }
 
-        function save() {
-            localStorage.setItem('ln_v6_bal', data.bal);
-            localStorage.setItem('ln_v6_lvls', JSON.stringify(data.lvls));
+        function saveGame() {
+            localStorage.setItem('ln_v7_credits', gameState.credits);
+            localStorage.setItem('ln_v7_levels', JSON.stringify(gameState.levels));
         }
 
-        function refresh() {
-            const s = getStats();
-            document.getElementById('money').innerText = Math.floor(data.bal).toLocaleString();
-            document.getElementById('t-val').innerText = s.t;
-            document.getElementById('a-val').innerText = s.a;
+        function renderUI() {
+            const stats = getStats();
+            document.getElementById('balance').innerText = Math.floor(gameState.credits).toLocaleString();
+            document.getElementById('tap-stat').innerText = stats.tap;
+            document.getElementById('auto-stat').innerText = stats.auto;
 
             const list = document.getElementById('shop-list');
             list.innerHTML = '';
             let showNext = true;
 
-            config.forEach(item => {
+            upgrades.forEach(item => {
                 if (!showNext) return;
-                let l = data.lvls[item.id] || 0;
-                let price = Math.floor(item.base * Math.pow(item.grow, l));
-                
+                let lvl = gameState.levels[item.id] || 0;
+                // NARX DOIM 1 OCHKO
+                let price = 1; 
+
                 list.innerHTML += `
-                    <div class="card">
-                        <div class="card-meta">
-                            <h4>${item.name} <span class="lvl-tag">LVL ${l}/10</span></h4>
-                            <div class="p-bar-bg"><div class="p-bar-fill" style="width:${l*10}%"></div></div>
+                    <div class="upgrade-card">
+                        <div class="upgrade-info">
+                            <h4>${item.name} <span class="lvl-text">LVL ${lvl}/10</span></h4>
+                            <div class="progress-track"><div class="progress-fill" style="width:${lvl*10}%"></div></div>
                         </div>
-                        ${l < 10 ? 
-                            `<button class="btn-buy" onclick="buy('${item.id}', ${price})" ${data.bal < price ? 'disabled' : ''}>${price}</button>` : 
-                            `<b style="color:var(--pink); font-size:10px;">MAXED</b>`}
+                        ${lvl < 10 ? 
+                            `<button class="buy-button" onclick="buyItem('${item.id}', ${price})" ${gameState.credits < price ? 'disabled' : ''}>${price}</button>` : 
+                            `<b style="color:var(--pink); font-size:10px; font-family:Orbitron;">MAXED</b>`}
                     </div>
                 `;
-                if(l < 10) showNext = false;
+                if(lvl < 10) showNext = false;
             });
-            save();
+            saveGame();
         }
 
-        window.buy = (id, p) => {
-            if(data.bal >= p) {
-                data.bal -= p; data.lvls[id]++;
+        window.buyItem = (id, p) => {
+            if(gameState.credits >= p) {
+                gameState.credits -= p;
+                gameState.levels[id]++;
                 tg.HapticFeedback.notificationOccurred('success');
-                refresh();
+                renderUI();
             }
         };
 
-        document.getElementById('core').onclick = (e) => {
+        document.getElementById('core-btn').onclick = (e) => {
             const s = getStats();
-            data.bal += s.t;
+            gameState.credits += s.tap;
             const fx = document.createElement('div');
-            fx.className = 'tap-fx'; fx.innerText = `+${s.t}`;
+            fx.className = 'float-text'; fx.innerText = `+${s.tap}`;
             fx.style.left = e.clientX + 'px'; fx.style.top = e.clientY + 'px';
             document.body.appendChild(fx);
             setTimeout(() => fx.remove(), 700);
             tg.HapticFeedback.impactOccurred('medium');
-            refresh();
+            renderUI();
         };
 
         setInterval(() => {
             const s = getStats();
-            if(s.a > 0) { data.bal += (s.a / 10); refresh(); }
+            if(s.auto > 0) { gameState.credits += (s.auto / 10); renderUI(); }
         }, 100);
 
-        refresh();
+        renderUI();
     </script>
 </body>
 </html>
