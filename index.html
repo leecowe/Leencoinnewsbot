@@ -6,13 +6,12 @@
     <title>Leenova bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #ff007a;
             --secondary: #00f2ff;
             --bg: #000000;
-            --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.1);
         }
 
@@ -37,76 +36,57 @@
         }
 
         /* Top Bar */
-        .top-status {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 60px;
-        }
+        .top-status { display: flex; justify-content: space-between; margin-top: 60px; }
         .status-chip {
-            padding: 8px 15px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: rgba(255, 0, 122, 0.1);
-            border: 1.5px solid var(--accent);
-            box-shadow: 0 0 15px rgba(255, 0, 122, 0.3);
-            color: var(--accent);
+            padding: 8px 15px; border-radius: 15px; font-size: 10px; font-weight: 800;
+            background: rgba(255, 0, 122, 0.1); border: 1.5px solid var(--accent);
+            color: var(--accent); box-shadow: 0 0 10px rgba(255, 0, 122, 0.2);
         }
         .status-chip.blue {
-            border-color: var(--secondary);
-            color: var(--secondary);
-            background: rgba(0, 242, 255, 0.1);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            border-color: var(--secondary); color: var(--secondary);
+            background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
         }
 
-        /* Hero Balance */
+        /* Hero */
         .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        #tap-master { position: absolute; width: 280px; height: 280px; z-index: 5; cursor: pointer; border-radius: 50%; }
+        #tap-master { position: absolute; width: 300px; height: 300px; z-index: 5; cursor: pointer; border-radius: 50%; }
         
         .balance-main { 
-            font-family: 'Outfit', sans-serif; font-size: 64px; font-weight: 800;
+            font-size: 64px; font-weight: 800;
             background: linear-gradient(180deg, #fff 0%, var(--accent) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             z-index: 6; pointer-events: none;
         }
-        .sub-text { font-size: 11px; letter-spacing: 3px; color: var(--secondary); opacity: 0.8; margin-top: -10px; z-index: 6; font-weight: 600; }
+        .sub-text { font-size: 11px; letter-spacing: 2px; color: var(--secondary); margin-top: -5px; z-index: 6; font-weight: 600; }
 
-        /* Stats HUD */
-        .stats-hud { margin-bottom: 20px; }
-        .stat-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--secondary); margin-bottom: 5px; }
-        .progress-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
-        .progress-fill { height: 100%; width: 100%; transition: 0.3s; }
+        /* HUD */
+        .stat-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--secondary); margin-bottom: 5px; }
+        .progress-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+        .progress-fill { height: 100%; transition: 0.3s; }
 
-        /* Bottom Navigation */
+        /* Nav */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 70px;
-            display: flex; background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px); border-top: 1px solid var(--border); z-index: 100;
+            display: flex; background: rgba(0,0,0,0.9); border-top: 1px solid var(--border); z-index: 100;
         }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #555; text-transform: uppercase; cursor: pointer; }
-        .nav-item.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #444; cursor: pointer; }
+        .nav-item.active { color: #fff; text-shadow: 0 0 10px var(--accent); }
 
-        /* Upgrade Panel (Genome) */
+        /* Genome */
         .side-panel {
             position: fixed; bottom: -100%; left: 0; width: 100%; height: 75vh;
-            background: #0a0a0a; border-top: 2px solid var(--accent);
+            background: #000; border-top: 2px solid var(--accent);
             border-radius: 30px 30px 0 0; z-index: 1000; padding: 25px;
-            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow-y: auto;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow-y: auto;
         }
         .side-panel.active { bottom: 0; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .card {
-            background: #111; border: 1px solid var(--border);
-            padding: 15px; border-radius: 20px; text-align: center;
-        }
-        .card h4 { font-size: 9px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-        .card p { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
-        .buy-btn { width: 100%; background: none; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px; border-radius: 10px; font-weight: 700; font-size: 11px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: #0f0f0f; border: 1px solid var(--border); padding: 20px 10px; border-radius: 15px; text-align: center; }
+        .card h4 { font-size: 10px; color: var(--accent); margin-bottom: 5px; letter-spacing: 1px; }
+        .card p { font-size: 14px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+        .buy-btn { width: 100%; background: none; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px; border-radius: 8px; font-weight: 700; font-size: 11px; }
 
-        .float-val { position: fixed; pointer-events: none; font-weight: 800; color: #fff; z-index: 2000; animation: rise 0.8s forwards; font-size: 20px; }
+        .float-val { position: fixed; pointer-events: none; font-weight: 800; color: #fff; z-index: 2000; animation: rise 0.8s forwards; font-size: 22px; text-shadow: 0 0 10px var(--accent); }
         @keyframes rise { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
@@ -128,17 +108,17 @@
 
         <div class="stats-hud">
             <div class="stat-row"><span>PLASMA</span> <span id="plasma-text">1000/1000</span></div>
-            <div class="progress-track"><div class="progress-fill" id="plasma-fill" style="background: var(--secondary);"></div></div>
+            <div class="progress-track"><div class="progress-fill" id="plasma-fill" style="background: var(--secondary); width: 100%;"></div></div>
             
             <div class="stat-row"><span>EVOLUTION</span> <span id="lvl-text">LVL 1</span></div>
-            <div class="progress-track"><div class="progress-fill" id="xp-fill" style="background: var(--accent);"></div></div>
+            <div class="progress-track"><div class="progress-fill" id="xp-fill" style="background: var(--accent); width: 0%;"></div></div>
         </div>
     </div>
 
     <div class="side-panel" id="side-panel">
-        <div class="panel-header">
-            <h2 style="font-family: 'Outfit'; color: var(--accent); font-weight: 800;">GENOME</h2>
-            <button onclick="togglePanel(false)" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="color:var(--accent); font-weight:800; font-size:24px;">GENOME</h2>
+            <button onclick="togglePanel(false)" style="background:none; border:none; color:#fff; font-size:28px;">×</button>
         </div>
         <div class="grid" id="upgrade-grid"></div>
     </div>
@@ -152,116 +132,109 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let state = JSON.parse(localStorage.getItem('leenova_save')) || {
-            bal: 0, pwr: 1, dna: 1.0, plasma: 1000, maxPlasma: 1000, lvl: 1, xp: 0, upgrades: 0
+        let state = JSON.parse(localStorage.getItem('leenova_v2')) || {
+            bal: 0, pwr: 1, dna: 1.0, plasma: 1000, maxPlasma: 1000, lvl: 1, xp: 0
         };
 
-        // UI Updates
         function updateUI() {
-            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
+            document.getElementById('bal-ui').innerText = state.bal.toLocaleString('uz-UZ', {minimumFractionDigits: 2});
             document.getElementById('dna-ui').innerText = `DNA: X${state.dna.toFixed(1)}`;
             document.getElementById('plasma-text').innerText = `${Math.floor(state.plasma)}/${state.maxPlasma}`;
             document.getElementById('plasma-fill').style.width = `${(state.plasma / state.maxPlasma) * 100}%`;
             document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-fill').style.width = `${(state.xp / (state.lvl * 500)) * 100}%`;
-            localStorage.setItem('leenova_save', JSON.stringify(state));
+            document.getElementById('xp-fill').style.width = `${(state.xp / (state.lvl * 1000)) * 100}%`;
+            localStorage.setItem('leenova_v2', JSON.stringify(state));
         }
 
-        // Tap Logic
         document.getElementById('tap-master').addEventListener('touchstart', (e) => {
-            if (state.plasma < 1) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
+            if (state.plasma < 1) { tg.HapticFeedback.notificationOccurred('error'); return; }
+            
             const touch = e.touches[0];
-            createFloatText(touch.clientX, touch.clientY, state.pwr * state.dna);
-
-            state.bal += state.pwr * state.dna;
+            const val = state.pwr * state.dna;
+            
+            state.bal += val;
             state.plasma -= 1;
-            state.xp += 10;
+            state.xp += 15;
 
-            if (state.xp >= state.lvl * 500) {
+            if (state.xp >= state.lvl * 1000) {
                 state.lvl++;
                 state.xp = 0;
                 tg.HapticFeedback.notificationOccurred('success');
             }
+
+            const float = document.createElement('div');
+            float.className = 'float-val';
+            float.innerHTML = `+${val.toFixed(1)}`;
+            float.style.left = `${touch.clientX}px`; float.style.top = `${touch.clientY}px`;
+            document.body.appendChild(float);
+            setTimeout(() => float.remove(), 800);
+
             tg.HapticFeedback.impactOccurred('medium');
             updateUI();
         });
 
-        function createFloatText(x, y, val) {
-            const el = document.createElement('div');
-            el.className = 'float-val';
-            el.innerHTML = `+${val.toFixed(1)}`;
-            el.style.left = `${x}px`; el.style.top = `${y}px`;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
-
-        // Panel Logic
         function togglePanel(show) {
             document.getElementById('side-panel').classList.toggle('active', show);
             document.getElementById('nav-core').classList.toggle('active', !show);
-            document.getElementById('nav-genome').classList.add('active', show);
-            if(show) openGenome();
+            document.getElementById('nav-genome').classList.toggle('active', show);
         }
 
         function openGenome() {
             togglePanel(true);
             const grid = document.getElementById('upgrade-grid');
             grid.innerHTML = '';
+            // Rasmdagi 500 dan boshlanuvchi narxlar
             for (let i = 1; i <= 10; i++) {
-                const cost = i * 100 * state.lvl;
+                const cost = i * 500;
                 grid.innerHTML += `
                     <div class="card">
                         <h4>NEURAL_${i}</h4>
                         <p>EVOLVE</p>
-                        <button class="buy-btn" onclick="buyUpgrade(${cost}, 0.2)">⚡ ${cost}</button>
-                    </div>
-                `;
+                        <button class="buy-btn" onclick="buy(${cost})">⚡ ${cost}</button>
+                    </div>`;
             }
         }
 
-        window.buyUpgrade = (cost, addDna) => {
+        window.buy = (cost) => {
             if (state.bal >= cost) {
                 state.bal -= cost;
-                state.dna += addDna;
+                state.dna += 0.3;
                 tg.HapticFeedback.notificationOccurred('success');
-                openGenome();
                 updateUI();
             } else {
                 tg.HapticFeedback.notificationOccurred('warning');
             }
         };
 
-        // Plasma Recovery
+        // Plasma tiklanishi
         setInterval(() => {
             if (state.plasma < state.maxPlasma) {
-                state.plasma = Math.min(state.maxPlasma, state.plasma + 1.5);
+                state.plasma = Math.min(state.maxPlasma, state.plasma + 2);
                 updateUI();
             }
         }, 1000);
 
-        // 3D Background (Sodda Crystal)
+        // 3D Crystal Background
         let scene, camera, renderer, crystal;
         function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
             const geo = new THREE.IcosahedronGeometry(2, 0);
-            const mat = new THREE.MeshBasicMaterial({ color: 0xff007a, wireframe: true, transparent: true, opacity: 0.2 });
+            const mat = new THREE.MeshBasicMaterial({ color: 0xff007a, wireframe: true, transparent: true, opacity: 0.3 });
             crystal = new THREE.Mesh(geo, mat);
             scene.add(crystal);
             camera.position.z = 5;
 
-            function animate() {
-                requestAnimationFrame(animate);
-                crystal.rotation.y += 0.01;
+            function anim() {
+                requestAnimationFrame(anim);
+                crystal.rotation.y += 0.005;
+                crystal.rotation.x += 0.002;
                 renderer.render(scene, camera);
             }
-            animate();
+            anim();
         }
 
         window.onload = () => { init3D(); updateUI(); };
