@@ -3,148 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Unified Core</title>
+    <title>Aira Protocol | Minimalist</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00f2ff;
-            --pink: #ff007f;
-            --bg: #050a10;
-            --glass: rgba(0, 242, 255, 0.07);
-            --border: rgba(0, 242, 255, 0.2);
+            --main-grey: #2c2c2c;
+            --light-grey: #a0a0a0;
+            --bg: #121212;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif;
+            background: var(--bg); color: #e0e0e0; font-family: 'Rajdhani', sans-serif;
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        .test-banner {
-            background: rgba(255, 0, 127, 0.2); color: var(--pink); text-align: center;
-            font-family: 'Orbitron'; font-size: 10px; padding: 10px; border-bottom: 1px solid var(--pink);
+        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .bal-val { font-size: 48px; font-weight: 700; color: #fff; letter-spacing: -1px; }
+        .sub-stats { font-size: 12px; color: var(--light-grey); margin-top: 5px; text-transform: uppercase; }
+
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; }
+        .view-content.active { display: flex; flex-direction: column; }
+
+        .glass-card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px);
         }
 
-        .header { padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
-        .bal-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
-
-        .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; flex-direction: column; }
-        .view-content.active { display: flex; }
-
-        .card {
-            width: 100%; background: var(--glass); border: 1px solid var(--border);
-            border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 12px;
+        .btn-grey {
+            background: var(--main-grey); color: #fff; border: none; padding: 14px;
+            border-radius: 12px; font-weight: 600; width: 100%; cursor: pointer;
+            transition: 0.3s; font-size: 14px; text-transform: uppercase;
         }
+        .btn-grey:active { transform: scale(0.98); opacity: 0.8; }
 
-        .btn-main {
-            background: var(--primary); color: #000; border: none; padding: 12px;
-            border-radius: 10px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); margin-top: 10px;
-        }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nft-item { background: var(--glass); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid var(--border); }
+        .nft-name { font-size: 13px; margin: 8px 0; font-weight: 600; }
 
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .nft-item { background: var(--glass); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; }
-        .nft-img { width: 100%; height: 80px; background: linear-gradient(45deg, #111, #222); border-radius: 5px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: var(--pink); }
+        .nav { height: 75px; background: rgba(0,0,0,0.5); display: flex; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light-grey); font-size: 11px; font-weight: 600; }
+        .nav-item.active { color: #fff; border-top: 2px solid #fff; }
 
-        .nav { height: 70px; background: #000; display: flex; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 10px; font-family: 'Orbitron'; }
-        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
-
-        .stat-row { display: flex; justify-content: space-between; font-size: 12px; font-family: 'Orbitron'; color: var(--primary); margin-top: 5px; }
+        .info-msg { font-size: 10px; color: var(--light-grey); text-align: center; margin-top: 10px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANIB QOLMAYDI!</div>
-
     <header class="header">
         <div class="bal-val" id="total-bal">0</div>
-        <div class="stat-row">
-            <span>STAKED: <b id="staked-display">0</b></span>
-            <span>AUTO: <b id="aps-display">50</b>/300ms</span>
+        <div class="sub-stats">
+            APS: <span id="aps-display">50</span> | STAKED: <span id="staked-display">0</span>
         </div>
     </header>
 
     <div id="view-core" class="view-content active">
-        <div class="card">
-            <h4 style="margin:0; font-family:'Orbitron';">MINING CORE</h4>
-            <div style="font-size:28px; font-family:'Orbitron'; margin:10px 0;" id="current-mining">0</div>
-            <button class="btn-main" onclick="claimMining()">YIG'ISH</button>
+        <div class="glass-card">
+            <div style="font-size: 14px; color: var(--light-grey); margin-bottom: 10px;">MINING POOL</div>
+            <div style="font-size: 32px; font-weight: 700; margin-bottom: 15px;" id="current-mining">0</div>
+            <button class="btn-grey" onclick="claimMining()">Yig'ib olish</button>
         </div>
 
-        <div class="card" style="border-color: var(--pink);">
-            <h4 style="margin:0; font-family:'Orbitron'; color:var(--pink);">STAKING (10s)</h4>
-            <div id="stake-timer" style="font-size:20px; margin:5px 0;">TAYYOR (+10%)</div>
-            <button class="btn-main" style="background:var(--pink); color:white;" onclick="startStake()">STAKE ALL</button>
+        <div class="glass-card">
+            <div style="font-size: 14px; color: var(--light-grey); margin-bottom: 10px;">STAKING (MAX LVL 5)</div>
+            <div id="stake-status" style="font-size: 18px; margin-bottom: 15px;">TAYYOR (+10%)</div>
+            <button class="btn-grey" onclick="startStake()" id="stake-btn">STAKE ALL</button>
         </div>
 
-        <div class="card">
-            <div class="stat-row">
-                <span>LVL: <b id="farm-lvl">1</b></span>
-                <span>COST: <b id="upgrade-cost">5000</b></span>
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px;">
+                <span>FARM LVL: <b id="farm-lvl">1</b>/10</span>
+                <span>NARX: <b id="upgrade-cost">5000</b></span>
             </div>
-            <button class="btn-main" onclick="upgradeFarm()" id="up-btn">FARM UPGRADE</button>
-            <p style="font-size:9px; color:var(--pink); margin-top:8px;">📢 Maksimal LVL 5. Tez orada yangi LVL'lar qo'shiladi!</p>
+            <button class="btn-grey" onclick="upgradeFarm()" id="up-btn">UPGRADE FARM</button>
         </div>
     </div>
 
     <div id="view-market" class="view-content">
-        <h3 style="font-family:'Orbitron'; text-align:center;">NFT MARKETPLACE</h3>
         <div class="nft-grid">
             <div class="nft-item">
-                <div class="nft-img">AIRA CARD #1</div>
-                <div style="font-size:12px;">Cyber Punk</div>
-                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(10000)">10K COINS</button>
+                <div class="nft-name">ARIA NFT #01</div>
+                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(10000)">10K</button>
             </div>
             <div class="nft-item">
-                <div class="nft-img">AIRA CARD #2</div>
-                <div style="font-size:12px;">Neon Bot</div>
-                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(25000)">25K COINS</button>
+                <div class="nft-name">ARIA NFT #02</div>
+                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(25000)">25K</button>
             </div>
             <div class="nft-item">
-                <div class="nft-img">AIRA CARD #3</div>
-                <div style="font-size:12px;">Giga Unit</div>
-                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(50000)">50K COINS</button>
+                <div class="nft-name">ARIA NFT #03</div>
+                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(50000)">50K</button>
             </div>
             <div class="nft-item">
-                <div class="nft-img">AIRA CARD #4</div>
-                <div style="font-size:12px;">Protocol X</div>
-                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(100000)">100K COINS</button>
+                <div class="nft-name">ARIA NFT #04</div>
+                <button class="btn-grey" style="font-size: 10px;" onclick="buyNFT(100000)">100K</button>
             </div>
         </div>
+        <p class="info-msg">📢 KEYINGI YANGILANISHDA REYTING REJIMI QO'SHILADI!</p>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('market', this)">MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('Roadmap: PvP Janglar tez kunda!')">INFO</div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    let balance = 0;
+    // Ma'lumotlarni eslab qolish (LocalStorage)
+    let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
+    let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
+    let aps = 50 + (farmLevel - 1) * 25;
+    let upgradeCost = 5000 * Math.pow(2, farmLevel - 1);
+    
     let sessionCoins = 0;
-    let farmLevel = 1;
-    let aps = 50;
-    let upgradeCost = 5000;
     let stakedCoins = 0;
     let isStaking = false;
 
-    // 1. MINING SYSTEM
     setInterval(() => {
         sessionCoins += aps;
-        document.getElementById('current-mining').innerText = sessionCoins;
+        document.getElementById('current-mining').innerText = Math.floor(sessionCoins);
     }, 300);
 
     function claimMining() {
         balance += sessionCoins;
         sessionCoins = 0;
+        saveData();
         updateUI();
         tg.HapticFeedback.impactOccurred('medium');
     }
 
-    // 2. STAKING SYSTEM (10 SECONDS)
     function startStake() {
         if (isStaking || balance <= 0) return;
         stakedCoins = balance;
@@ -152,57 +141,63 @@
         isStaking = true;
         updateUI();
 
-        let timeLeft = 10; // 10 soniya
-        const timerEl = document.getElementById('stake-timer');
-        
-        const countdown = setInterval(() => {
+        let timeLeft = 10;
+        const btn = document.getElementById('stake-btn');
+        const status = document.getElementById('stake-status');
+
+        const timer = setInterval(() => {
             timeLeft--;
-            timerEl.innerText = timeLeft + "s KUTING...";
+            status.innerText = timeLeft + "s KUTING...";
             if (timeLeft <= 0) {
-                clearInterval(countdown);
-                balance += Math.floor(stakedCoins * 1.1); // +10%
+                clearInterval(timer);
+                balance += Math.floor(stakedCoins * 1.1);
                 stakedCoins = 0;
                 isStaking = false;
-                timerEl.innerText = "TAYYOR (+10%)";
+                status.innerText = "TAYYOR (+10%)";
+                saveData();
                 updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
             }
         }, 1000);
     }
 
-    // 3. FARM UPGRADE
     function upgradeFarm() {
-        if (farmLevel >= 5) return;
+        if (farmLevel >= 10) return;
         if (balance >= upgradeCost) {
             balance -= upgradeCost;
             farmLevel++;
             aps += 25;
             upgradeCost *= 2;
+            saveData();
             updateUI();
-            tg.showAlert(`Daraja LVL ${farmLevel} ga oshdi!`);
         } else {
             tg.showAlert("Mablag' yetarli emas!");
         }
     }
 
-    // 4. NFT PURCHASE
     function buyNFT(price) {
         if (balance >= price) {
             balance -= price;
+            saveData();
             updateUI();
-            tg.showPopup({ title: "Muvaffaqiyatli!", message: "NFT sotib olindi va kolleksiyangizga qo'shildi!" });
+            tg.showPopup({ title: "Sotib olindi!", message: "ARIA NFT kolleksiyangizga qo'shildi." });
         } else {
             tg.showAlert("Mablag' yetarli emas!");
         }
+    }
+
+    function saveData() {
+        localStorage.setItem('aira_bal', balance);
+        localStorage.setItem('aira_farm', farmLevel);
     }
 
     function updateUI() {
         document.getElementById('total-bal').innerText = Math.floor(balance);
-        document.getElementById('staked-display').innerText = stakedCoins;
+        document.getElementById('staked-display').innerText = Math.floor(stakedCoins);
         document.getElementById('aps-display').innerText = aps;
         document.getElementById('farm-lvl').innerText = farmLevel;
         document.getElementById('upgrade-cost').innerText = upgradeCost;
-        if(farmLevel >= 5) document.getElementById('up-btn').innerText = "MAX LEVEL";
+        if(farmLevel >= 10) document.getElementById('up-btn').innerText = "MAX LEVEL";
     }
 
     function switchTab(tab, el) {
