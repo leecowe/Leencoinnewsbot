@@ -3,71 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aira: Cyber Protocol</title>
+    <title>Aira Protocol</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; --gold: #ffcc00; }
+        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; flex-direction: column; }
 
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
         /* HUD */
-        .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; z-index: 100; }
-        .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 14px; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; }
-        .balance { font-family: 'Orbitron'; font-size: 42px; text-shadow: 0 0 20px var(--blue); margin-bottom: 5px; transition: 0.3s; }
-        .balance.boost { color: var(--gold); text-shadow: 0 0 30px var(--gold); transform: scale(1.1); }
+        .top-hud { padding: 40px 20px 10px; text-align: center; z-index: 100; }
+        .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 14px; letter-spacing: 2px; }
+        .balance { font-family: 'Orbitron'; font-size: 45px; text-shadow: 0 0 20px var(--blue); margin: 10px 0; }
 
-        /* HERO ZONE */
-        .hero-zone { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
-        
-        .character-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-        }
+        /* SECTIONS */
+        .section { display: none; flex-grow: 1; position: relative; overflow-y: auto; padding: 20px; }
+        .section.active { display: flex; flex-direction: column; }
 
-        .aira-avatar {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--blue);
-            z-index: 2;
-            box-shadow: 0 0 25px var(--blue);
-            animation: floating 4s ease-in-out infinite;
-            background: #01080e; /* Rasm yuklanguncha qora fon */
-        }
+        /* CORE / HERO ZONE */
+        .hero-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .character-container { position: relative; width: 280px; height: 280px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .aira-avatar { width: 230px; height: 230px; border-radius: 50%; border: 3px solid var(--blue); box-shadow: 0 0 25px var(--blue); z-index: 2; animation: floating 4s ease-in-out infinite; background: #01080e; object-fit: cover; }
+        .glow-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, rgba(0, 242, 255, 0.2) 0%, transparent 70%); z-index: 1; animation: pulse 2s infinite alternate; }
 
-        .glow-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
-            filter: blur(15px);
-            z-index: 1;
-            animation: pulse 2s infinite alternate;
-        }
+        /* MARKET STYLE */
+        .up-card { background: rgba(255,255,255,0.05); border: 1px solid var(--blue); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .up-card button { background: var(--blue); color: #000; border: none; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-weight: bold; }
+        .up-card button:disabled { background: #333; color: #666; }
 
-        /* ANIMATSIYALAR */
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes pulse { from { opacity: 0.4; transform: scale(0.95); } to { opacity: 0.8; transform: scale(1.05); } }
-
-        /* NAV VA PANEL */
-        .market-panel { position: fixed; bottom: -75vh; left: 0; width: 100%; height: 75vh; background: rgba(1, 8, 14, 0.98); border-top: 3px solid var(--blue); border-radius: 30px 30px 0 0; transition: 0.5s; z-index: 2000; padding: 25px; overflow-y: auto; }
-        .market-panel.open { bottom: 0; }
-        .nav { display: flex; height: 80px; background: #000; border-top: 2px solid var(--blue); z-index: 3000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
+        /* NAV */
+        .nav { display: flex; height: 80px; border-top: 2px solid var(--blue); background: #000; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 4px solid var(--blue); }
 
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; pointer-events: none; animation: fly 0.6s forwards; z-index: 4000; }
+        /* ANIMATIONS */
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { from { opacity: 0.4; transform: scale(0.95); } to { opacity: 0.8; transform: scale(1.05); } }
+        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; pointer-events: none; animation: fly 0.6s forwards; z-index: 5000; }
         @keyframes fly { to { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
@@ -76,7 +50,7 @@
     <canvas id="bg-canvas"></canvas>
 
     <div class="top-hud">
-        <div class="bot-name">Aira Protocol</div>
+        <div class="bot-name">AIRA PROTOCOL V1.0</div>
         <div class="balance" id="bal">0</div>
         <div style="display:flex; justify-content:center; gap:15px; font-family:Orbitron; font-size:12px;">
             <div style="color:var(--blue)">TAP: +<span id="t-pow">0</span></div>
@@ -84,84 +58,119 @@
         </div>
     </div>
 
-    <div class="hero-zone">
-        <div class="character-container" id="tap-btn">
-            <div class="glow-ring"></div>
-            <img class="aira-avatar" src="https://i.ibb.co/LzrYv5M/aira-avatar.png" alt="Aira">
+    <div id="core-sec" class="section active">
+        <div class="hero-zone">
+            <div class="character-container" id="tap-btn">
+                <div class="glow-ring"></div>
+                <img class="aira-avatar" src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Aira" alt="Aira AI">
+            </div>
         </div>
     </div>
 
-    <div id="market-panel" class="market-panel">
-        <h3 style="text-align:center; font-family:Orbitron; color:var(--blue);">MARKET</h3>
+    <div id="market-sec" class="section">
+        <h2 style="text-align:center; font-family:Orbitron; color:var(--blue)">UPGRADES</h2>
         <div id="up-list"></div>
     </div>
 
+    <div id="nft-sec" class="section">
+        <h2 style="text-align:center; font-family:Orbitron; color:var(--pink)">NFT GEAR</h2>
+        <p style="text-align:center; color:#666">Tez kunda...</p>
+    </div>
+
     <div class="nav">
-        <div class="nav-item active" onclick="toggleM(false)">CITY</div>
-        <div class="nav-item" onclick="toggleM(true)">MARKET</div>
-        <div class="nav-item">NFT</div>
+        <div class="nav-item active" onclick="showSec('core')">CORE</div>
+        <div class="nav-item" onclick="showSec('market')">MARKET</div>
+        <div class="nav-item" onclick="showSec('nft')">NFT</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         let data = {
             m: parseFloat(localStorage.getItem('aira_m')) || 0,
-            l: JSON.parse(localStorage.getItem('aira_l')) || {u1:1, u2:0, u3:0},
-            isBoosted: false
+            l: JSON.parse(localStorage.getItem('aira_l')) || {u1:0, u2:0, u3:0}
         };
 
         const ups = [
-            { id: 'u1', name: 'Neural Link', base: 50, val: 2, type: 'tap' },
-            { id: 'u2', name: 'Aira Bot', base: 500, val: 10, type: 'auto' },
-            { id: 'u3', name: 'Quantum CPU', base: 2000, val: 40, type: 'auto' }
+            { id: 'u1', name: 'Neural Chip', base: 100, val: 2, type: 'tap' },
+            { id: 'u2', name: 'Aira Drone', base: 500, val: 5, type: 'auto' },
+            { id: 'u3', name: 'Quantum CPU', base: 2500, val: 25, type: 'auto' }
         ];
 
         function getStats() {
             let t = 1, a = 0;
-            ups.forEach(u => { 
-                if(u.type==='tap') t += data.l[u.id]*u.val; 
+            ups.forEach(u => {
+                if(u.type==='tap') t += data.l[u.id]*u.val;
                 else a += data.l[u.id]*u.val;
             });
             return { t, a };
         }
 
-        function updateUI(full = false) {
+        function showSec(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id + '-sec').classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(id === 'market') updateMarket();
+        }
+
+        function updateMarket() {
+            const list = document.getElementById('up-list');
+            list.innerHTML = '';
+            ups.forEach(u => {
+                const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
+                list.innerHTML += `
+                    <div class="up-card">
+                        <div><b>${u.name}</b><br><small>Lvl: ${data.l[u.id]}</small></div>
+                        <button onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''}>${cost}</button>
+                    </div>`;
+            });
+        }
+
+        window.buyU = (id, c) => {
+            if(data.m >= c) {
+                data.m -= c; data.l[id]++;
+                updateUI(); updateMarket();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        };
+
+        function updateUI() {
             const s = getStats();
             document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
             document.getElementById('t-pow').innerText = s.t;
             document.getElementById('a-pow').innerText = s.a;
-            if(full) {
-                const container = document.getElementById('up-list');
-                container.innerHTML = '';
-                ups.forEach(u => {
-                    const cost = Math.floor(u.base * Math.pow(1.5, data.l[u.id]));
-                    container.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
-                        <span>${u.name}</span>
-                        <button onclick="buyU('${u.id}', ${cost})">${cost}</button>
-                    </div>`;
-                });
-            }
             localStorage.setItem('aira_m', data.m);
             localStorage.setItem('aira_l', JSON.stringify(data.l));
         }
 
-        window.buyU = (id, c) => {
-            if(data.m >= c) { data.m -= c; data.l[id]++; updateUI(true); }
-        };
-
-        function toggleM(open) {
-            document.getElementById('market-panel').classList.toggle('open', open);
-        }
-
         document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const s = getStats(); data.m += s.t;
+            const s = getStats();
+            data.m += s.t;
             updateUI();
-            tg.HapticFeedback.impactOccurred('light');
+            
+            const touch = e.touches[0];
+            const p = document.createElement('div');
+            p.className = 'pop'; p.innerText = '+' + s.t;
+            p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 600);
+            tg.HapticFeedback.impactOccurred('medium');
         });
 
+        // Background stars
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let stars = Array.from({length: 60}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: Math.random()*0.4 }));
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#00f2ff';
+            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, Math.PI*2); ctx.fill(); s.y += s.v; if(s.y > canvas.height) s.y = 0; });
+            requestAnimationFrame(draw);
+        }
+
         setInterval(() => { data.m += getStats().a / 10; updateUI(); }, 100);
-        updateUI(true);
+        draw(); updateUI();
     </script>
 </body>
 </html>
