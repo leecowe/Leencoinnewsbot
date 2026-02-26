@@ -3,124 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol</title>
+    <title>Aira Protocol V1.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-        
-        body { 
-            height: 100vh; background: var(--dark); color: #fff; 
-            font-family: 'Rajdhani', sans-serif; overflow: hidden; 
-            display: flex; flex-direction: column;
+        :root {
+            --cyan: #00f2ff;
+            --pink: #ff007f;
+            --bg: #000000;
+            --card-bg: rgba(13, 27, 42, 0.7);
+            --neon-glow: 0 0 15px rgba(0, 242, 255, 0.5);
         }
 
-        #bg-canvas { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -1; pointer-events: none; will-change: transform; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
-        .top-hud { padding: 45px 20px 10px; text-align: center; z-index: 100; flex-shrink: 0; }
-        .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
-        .balance { font-family: 'Orbitron'; font-size: 52px; text-shadow: 0 0 15px var(--blue); margin: 5px 0; }
-        .stats-bar { display: flex; justify-content: center; gap: 15px; font-family: 'Orbitron'; font-size: 11px; }
-
-        /* BO'LIMLAR KONTEYNERI */
-        #content-area { flex-grow: 1; position: relative; overflow: hidden; }
-        .section { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; flex-direction: column; padding: 20px; overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .section.active { display: flex; }
 
-        /* CORE */
-        .hero-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        .character-box { 
-            width: 260px; height: 260px; border-radius: 50%; border: 2px solid var(--blue); 
-            display: flex; align-items: center; justify-content: center; position: relative;
-            box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
-            transition: transform 0.05s ease-out; transform: translateZ(0);
+        /* Moving Star Background */
+        #star-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            z-index: -1;
         }
-        .character-box:active { transform: scale(0.94); }
-        .character-img { width: 85%; height: 85%; pointer-events: none; }
 
-        /* MARKET */
-        .up-card { 
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); 
-            border-radius: 12px; padding: 15px; margin-bottom: 12px; 
-            display: flex; justify-content: space-between; align-items: center;
+        /* Header UI */
+        .header {
+            padding: 50px 20px 10px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent);
         }
-        .up-info b { font-family: 'Orbitron'; font-size: 14px; display: block; }
-        .up-info span { font-size: 11px; color: #888; }
-        .buy-btn { 
-            background: #111; border: 1px solid #333; color: #fff; 
-            padding: 8px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 12px;
-        }
-        .buy-btn.active { border-color: var(--blue); background: rgba(0, 242, 255, 0.1); }
 
-        /* NAVIGATSIYA */
-        .nav { 
-            display: flex; height: 80px; background: #000; 
-            border-top: 1px solid rgba(255,255,255,0.1); 
+        .brand {
+            font-family: 'Orbitron';
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: var(--cyan);
+            text-shadow: var(--neon-glow);
+            margin-bottom: 5px;
+        }
+
+        .main-balance {
+            font-family: 'Orbitron';
+            font-size: 58px;
+            font-weight: 700;
+            margin: 10px 0;
+            background: linear-gradient(to bottom, #fff, var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0,242,255,0.4));
+        }
+
+        .mini-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-family: 'Orbitron';
+            font-size: 10px;
+        }
+
+        .stat-item span { color: var(--cyan); }
+        .stat-item.pink span { color: var(--pink); }
+
+        /* Content Area */
+        .content { flex: 1; position: relative; overflow: hidden; }
+        .page {
+            position: absolute;
+            width: 100%; height: 100%;
+            display: none;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Character Core */
+        .hero-container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-tap-btn {
+            position: relative;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.15) 0%, transparent 70%);
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.2);
+            transition: 0.1s;
+        }
+
+        .main-tap-btn:active { transform: scale(0.92); }
+
+        .robot-head {
+            width: 180px; height: 180px;
+            filter: drop-shadow(0 0 15px var(--cyan));
+        }
+
+        /* Market Cards - Professional Style */
+        .market-title {
+            font-family: 'Orbitron';
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--cyan);
+            letter-spacing: 2px;
+        }
+
+        .upgrade-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .up-info b { font-family: 'Orbitron'; font-size: 16px; color: #fff; display: block; }
+        .up-info span { font-size: 12px; color: #888; }
+
+        .buy-btn {
+            background: linear-gradient(45deg, #0b1a2d, #1a3a5d);
+            border: 1px solid var(--cyan);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-family: 'Orbitron';
+            font-size: 13px;
+            min-width: 90px;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .buy-btn:disabled { opacity: 0.4; border-color: #333; }
+
+        /* Navigation Bar */
+        .nav {
+            height: 90px;
+            background: rgba(0,0,0,0.8);
+            border-top: 1px solid rgba(0,242,255,0.1);
+            display: flex;
             padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item { 
-            flex: 1; display: flex; align-items: center; justify-content: center; 
-            font-family: 'Orbitron'; font-size: 10px; color: #444; cursor: pointer;
+
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            gap: 5px;
             transition: 0.3s;
         }
-        .nav-item.active { 
-            color: var(--blue); border-top: 3px solid var(--blue); 
-            background: linear-gradient(to top, rgba(0,242,255,0.05), transparent); 
+
+        .nav-tab.active {
+            color: var(--cyan);
+            background: linear-gradient(to top, rgba(0,242,255,0.1), transparent);
+            border-top: 3px solid var(--cyan);
         }
 
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; font-size: 24px; pointer-events: none; animation: fly 0.4s ease-out forwards; }
-        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+        /* Particle effect for tap */
+        .tap-particle {
+            position: absolute;
+            color: var(--cyan);
+            font-family: 'Orbitron';
+            font-weight: bold;
+            pointer-events: none;
+            animation: flyUp 0.6s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+<canvas id="star-canvas"></canvas>
 
-<div class="top-hud">
-    <div class="bot-name">Aira Protocol V1.0</div>
-    <div class="balance" id="bal">0</div>
-    <div class="stats-bar">
-        <div style="color:var(--blue)">TAP: +<span id="t-pow">1</span></div>
-        <div style="color:var(--pink)">AUTO: +<span id="a-pow">0</span>/s</div>
+<div class="header">
+    <div class="brand">AIRA PROTOCOL V1.0</div>
+    <div class="main-balance" id="balance">0</div>
+    <div class="mini-stats">
+        <div class="stat-item">TAP: +<span id="tap-val">1</span></div>
+        <div class="stat-item pink">AUTO: +<span id="auto-val">0</span>/s</div>
     </div>
 </div>
 
-<div id="content-area">
-    <div id="core-sec" class="section active">
-        <div class="hero-zone">
-            <div class="character-box" id="tap-btn">
-                <svg class="character-img" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="#5897fb" />
-                    <rect x="25" y="40" width="50" height="25" rx="12" fill="#0b1a2d" />
-                    <circle cx="40" cy="52" r="6" fill="#00f2ff" />
-                    <circle cx="60" cy="52" r="6" fill="#00f2ff" />
-                    <rect x="35" y="70" width="30" height="8" rx="2" fill="#0b1a2d" />
+<div class="content">
+    <div id="core" class="page active">
+        <div class="hero-container">
+            <div class="main-tap-btn" id="tap-trigger">
+                <svg class="robot-head" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#00f2ff" stroke-width="1" stroke-dasharray="5,5"/>
+                    <path d="M25 40 Q50 35 75 40 L75 60 Q50 65 25 60 Z" fill="#1a3a5d" stroke="#00f2ff" stroke-width="2"/>
+                    <circle cx="40" cy="50" r="5" fill="#00f2ff">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="60" cy="50" r="5" fill="#00f2ff">
+                        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <rect x="35" y="55" width="30" height="2" fill="#00f2ff" />
                 </svg>
             </div>
         </div>
     </div>
 
-    <div id="market-sec" class="section">
-        <h2 style="font-family:Orbitron; text-align:center; margin-bottom:20px; color:var(--blue)">SYSTEM MARKET</h2>
-        <div id="market-list"></div>
+    <div id="market" class="page">
+        <h3 class="market-title">SYSTEM MARKET</h3>
+        <div id="upgrade-list"></div>
     </div>
 
-    <div id="nft-sec" class="section">
-        <h2 style="font-family:Orbitron; text-align:center; margin-bottom:20px; color:var(--pink)">NFT GEAR</h2>
-        <p style="text-align:center; color:#555; margin-top:50px;">Tez kunda...</p>
+    <div id="nft" class="page">
+        <h3 class="market-title" style="color:var(--pink)">NFT GEAR</h3>
+        <div style="text-align:center; margin-top:100px; color:#444; font-family:Orbitron;">
+            COMING SOON
+        </div>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-item active" onclick="switchSection('core', this)">CORE</div>
-    <div class="nav-item" onclick="switchSection('market', this)">MARKET</div>
-    <div class="nav-item" onclick="switchSection('nft', this)">NFT</div>
+    <div class="nav-tab active" onclick="showPage('core', this)">
+        <span>CORE</span>
+    </div>
+    <div class="nav-tab" onclick="showPage('market', this)">
+        <span>MARKET</span>
+    </div>
+    <div class="nav-tab" onclick="showPage('nft', this)">
+        <span>NFT</span>
+    </div>
 </div>
 
 <script>
@@ -128,58 +258,57 @@
     tg.expand();
 
     let state = {
-        money: parseInt(localStorage.getItem('aira_m')) || 0,
-        upgrades: JSON.parse(localStorage.getItem('aira_u')) || { u1: 0, u2: 0, u3: 0 }
+        coins: parseFloat(localStorage.getItem('aira_coins')) || 0,
+        upgrades: JSON.parse(localStorage.getItem('aira_upgrades')) || { u1: 0, u2: 0, u3: 0 }
     };
 
-    const shop = [
+    const shopData = [
         { id: 'u1', name: 'Neural Link', base: 100, bonus: 2, type: 'tap' },
         { id: 'u2', name: 'Aira Drone', base: 500, bonus: 5, type: 'auto' },
-        { id: 'u3', name: 'Quantum CPU', base: 2000, bonus: 20, type: 'auto' }
+        { id: 'u3', name: 'Quantum CPU', base: 2500, bonus: 25, type: 'auto' }
     ];
 
-    function getStats() {
+    function getPower() {
         let t = 1, a = 0;
-        shop.forEach(i => {
-            const lvl = state.upgrades[i.id] || 0;
-            if(i.type === 'tap') t += lvl * i.bonus;
-            else a += lvl * i.bonus;
+        shopData.forEach(u => {
+            const lvl = state.upgrades[u.id] || 0;
+            if(u.type === 'tap') t += lvl * u.bonus;
+            else a += lvl * u.bonus;
         });
         return { t, a };
     }
 
-    function switchSection(id, el) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
-        document.getElementById(id + '-sec').classList.add('active');
+    function showPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
         el.classList.add('active');
-        
         if(id === 'market') renderMarket();
         tg.HapticFeedback.impactOccurred('light');
     }
 
     function renderMarket() {
-        const list = document.getElementById('market-list');
-        list.innerHTML = shop.map(i => {
-            const lvl = state.upgrades[i.id] || 0;
-            const cost = Math.floor(i.base * Math.pow(1.5, lvl));
+        const container = document.getElementById('upgrade-list');
+        container.innerHTML = shopData.map(u => {
+            const lvl = state.upgrades[u.id] || 0;
+            const cost = Math.floor(u.base * Math.pow(1.5, lvl));
             return `
-                <div class="up-card">
+                <div class="upgrade-card">
                     <div class="up-info">
-                        <b>${i.name}</b>
-                        <span>Lvl ${lvl} | +${i.bonus} ${i.type}</span>
+                        <b>${u.name}</b>
+                        <span>Lvl ${lvl} • +${u.bonus} ${u.type}</span>
                     </div>
-                    <button class="buy-btn ${state.money >= cost ? 'active' : ''}" onclick="buy('${i.id}', ${cost})">
-                        ${cost >= 1000 ? (cost/1000).toFixed(1) + 'K' : cost}
+                    <button class="buy-btn" onclick="buyUpgrade('${u.id}', ${cost})" ${state.coins < cost ? 'disabled' : ''}>
+                        ${cost >= 1000 ? (cost/1000).toFixed(1)+'K' : cost}
                     </button>
-                </div>`;
+                </div>
+            `;
         }).join('');
     }
 
-    window.buy = (id, cost) => {
-        if(state.money >= cost) {
-            state.money -= cost;
+    window.buyUpgrade = (id, cost) => {
+        if(state.coins >= cost) {
+            state.coins -= cost;
             state.upgrades[id]++;
             save();
             updateUI();
@@ -189,53 +318,70 @@
     };
 
     function updateUI() {
-        const s = getStats();
-        document.getElementById('bal').innerText = Math.floor(state.money).toLocaleString();
-        document.getElementById('t-pow').innerText = s.t;
-        document.getElementById('a-pow').innerText = s.a;
+        const p = getPower();
+        document.getElementById('balance').innerText = Math.floor(state.coins).toLocaleString();
+        document.getElementById('tap-val').innerText = p.t;
+        document.getElementById('auto-val').innerText = p.a;
     }
 
     function save() {
-        localStorage.setItem('aira_m', state.money);
-        localStorage.setItem('aira_u', JSON.stringify(state.upgrades));
+        localStorage.setItem('aira_coins', state.coins);
+        localStorage.setItem('aira_upgrades', JSON.stringify(state.upgrades));
     }
 
-    document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
+    // Tap logic
+    document.getElementById('tap-trigger').addEventListener('touchstart', (e) => {
         e.preventDefault();
-        const s = getStats();
-        state.money += s.t;
+        const p = getPower();
+        state.coins += p.t;
         updateUI();
         save();
 
-        const t = e.touches[0];
-        const p = document.createElement('div');
-        p.className = 'pop'; p.innerText = '+' + s.t;
-        p.style.left = t.clientX + 'px'; p.style.top = t.clientY + 'px';
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 400);
+        const touch = e.touches[0];
+        const part = document.createElement('div');
+        part.className = 'tap-particle';
+        part.innerText = '+' + p.t;
+        part.style.left = touch.clientX + 'px';
+        part.style.top = touch.clientY + 'px';
+        document.body.appendChild(part);
+        setTimeout(() => part.remove(), 600);
+
         tg.HapticFeedback.impactOccurred('medium');
     });
 
-    // Parallax & Background
-    const canvas = document.getElementById('bg-canvas');
+    // Background Stars
+    const canvas = document.getElementById('star-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth * 1.2;
-    canvas.height = window.innerHeight * 1.2;
-    let stars = Array.from({length: 50}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2 }));
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let stars = Array.from({length: 80}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        s: Math.random() * 2,
+        v: Math.random() * 0.5 + 0.2
+    }));
 
-    function draw() {
-        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = '#00f2ff55';
-        stars.forEach(s => { ctx.fillRect(s.x, s.y, s.s, s.s); s.y += 0.2; if(s.y > canvas.height) s.y = 0; });
-        requestAnimationFrame(draw);
+    function animate() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = '#00f2ff';
+        stars.forEach(s => {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.s, 0, Math.PI*2);
+            ctx.fill();
+            s.y += s.v;
+            if(s.y > canvas.height) s.y = 0;
+        });
+        requestAnimationFrame(animate);
     }
 
-    window.addEventListener('deviceorientation', (e) => {
-        canvas.style.transform = `translate(${e.gamma/2}px, ${(e.beta-45)/2}px)`;
-    });
+    setInterval(() => {
+        state.coins += getPower().a / 10;
+        updateUI();
+    }, 100);
 
-    setInterval(() => { state.money += getStats().a / 10; updateUI(); }, 100);
-    draw(); updateUI();
+    animate();
+    updateUI();
 </script>
 </body>
 </html>
