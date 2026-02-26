@@ -11,49 +11,42 @@
         :root {
             --accent: #ff007a;
             --secondary: #00f2ff;
-            --bg: #05050a;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --neon-shadow: 0 0 20px rgba(255, 0, 122, 0.3);
+            --bg: #0a0a1a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.15);
+            --neon-glow: 0 0 25px rgba(255, 0, 122, 0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         
         body { 
-            background: var(--bg); 
+            background: radial-gradient(circle at center, #1a0a2e 0%, #05050a 100%); 
             color: #fff; 
             font-family: 'Outfit', sans-serif; 
             height: 100vh; 
             overflow: hidden;
         }
 
+        /* Ambient Fog and Glow */
         .ambient-glow {
             position: fixed; width: 150vw; height: 150vw;
-            background: radial-gradient(circle, rgba(255, 0, 122, 0.08) 0%, transparent 70%);
-            top: -50%; left: -25%; z-index: 0; animation: drift 15s infinite alternate;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.07) 0%, transparent 70%);
+            top: -30%; right: -30%; z-index: 0; animation: float 20s infinite alternate;
             pointer-events: none;
         }
-        @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(10%, 10%); } }
+        .ambient-glow-2 {
+            position: fixed; width: 150vw; height: 150vw;
+            background: radial-gradient(circle, rgba(255, 0, 122, 0.07) 0%, transparent 70%);
+            bottom: -30%; left: -30%; z-index: 0; animation: float 15s infinite alternate-reverse;
+            pointer-events: none;
+        }
+        @keyframes float { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(10%, 10%) rotate(10deg); } }
 
         #bg-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-        /* Full Screen Tap Zone */
-        #tap-master {
-            position: fixed; inset: 0; z-index: 5;
-            cursor: pointer;
-        }
+        #tap-master { position: fixed; inset: 0; z-index: 5; cursor: pointer; }
 
-        .ai-status-bar {
-            position: fixed; top: 140px; left: 50%; transform: translateX(-50%);
-            width: 80%; text-align: center; z-index: 100; pointer-events: none;
-        }
-        #ai-thought {
-            font-size: 9px; color: var(--secondary); text-transform: uppercase;
-            letter-spacing: 2px; font-weight: 800; opacity: 0.7;
-            text-shadow: 0 0 10px var(--secondary);
-            font-family: 'Syncopate';
-        }
-
+        /* UI Styling */
         .ui-wrapper { 
             position: relative; z-index: 10; height: 100vh; 
             display: flex; flex-direction: column; 
@@ -65,195 +58,171 @@
         .header { display: flex; justify-content: space-between; align-items: center; }
         .chip {
             background: var(--glass); border: 1px solid var(--border);
-            padding: 10px 18px; border-radius: 100px; font-size: 9px;
-            backdrop-filter: blur(25px); font-weight: 700; letter-spacing: 1px;
+            padding: 10px 18px; border-radius: 100px; font-size: 10px;
+            backdrop-filter: blur(15px); font-weight: 700; letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10vh; pointer-events: none; }
+        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8vh; pointer-events: none; }
         .balance-main { 
-            font-family: 'Syncopate', sans-serif; font-size: 48px; font-weight: 700;
-            background: linear-gradient(180deg, #ffffff 0%, #888888 100%);
+            font-family: 'Syncopate', sans-serif; font-size: 52px; font-weight: 700;
+            background: linear-gradient(to bottom, #fff 30%, var(--secondary) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 2px; letter-spacing: -2px;
+            letter-spacing: -2px; filter: drop-shadow(0 0 10px rgba(0,242,255,0.3));
         }
-        .income-tag { font-size: 10px; color: var(--secondary); opacity: 0.8; font-weight: 600; }
+        .income-tag { font-size: 11px; color: var(--secondary); opacity: 0.9; font-weight: 800; letter-spacing: 1px; }
 
         .hud-glass {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
-            border-radius: 30px; padding: 22px; backdrop-filter: blur(30px);
-            margin-bottom: 85px; pointer-events: auto;
+            background: rgba(10, 10, 30, 0.6); border: 1px solid var(--border);
+            border-radius: 35px; padding: 25px; backdrop-filter: blur(25px);
+            margin-bottom: 90px; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
-        .track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 8px; }
-        .fill { height: 100%; border-radius: 20px; transition: width 0.3s ease; }
+        .track { height: 10px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .fill { height: 100%; border-radius: 20px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
         /* Panels */
         .side-panel {
             position: fixed; bottom: -110%; left: 0; width: 100%; height: 85vh;
-            background: #08080c; border-top: 2px solid var(--accent);
-            border-radius: 40px 40px 0 0; z-index: 1100; padding: 30px 20px;
-            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden; display: flex; flex-direction: column;
+            background: rgba(8, 8, 20, 0.98); border-top: 3px solid var(--secondary);
+            border-radius: 40px 40px 0 0; z-index: 1100; padding: 30px 25px;
+            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
         }
         .side-panel.active { bottom: 0; }
         
-        .tab-content { overflow-y: auto; flex-grow: 1; padding-bottom: 40px; }
-        .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
         .up-card {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            padding: 18px 12px; border-radius: 24px; text-align: center;
-            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
+            padding: 20px 15px; border-radius: 30px; text-align: center;
+            transition: 0.3s;
         }
-        .up-card::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(transparent, var(--accent), transparent 30%);
-            animation: rotate-border 6s linear infinite; opacity: 0.1; z-index: -1;
-        }
-        @keyframes rotate-border { 100% { transform: rotate(360deg); } }
+        .up-card:active { transform: scale(0.96); }
 
-        .up-card h4 { font-size: 10px; opacity: 0.5; margin-bottom: 4px; text-transform: uppercase; }
-        .up-card p { font-size: 13px; font-weight: 800; color: var(--secondary); margin-bottom: 10px; }
-        
         .price-btn {
-            width: 100%; background: #fff; color: #000; padding: 10px; border-radius: 12px;
-            font-weight: 900; font-size: 11px; cursor: pointer; border: none;
+            width: 100%; background: linear-gradient(90deg, var(--secondary), var(--accent));
+            color: #fff; padding: 12px; border-radius: 18px;
+            font-weight: 900; font-size: 12px; cursor: pointer; border: none;
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
         }
-        .price-btn.disabled { background: #222; color: #555; }
 
         .dock {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 92%; background: rgba(10, 10, 15, 0.95);
-            border: 1px solid var(--border); border-radius: 28px;
-            padding: 8px; display: flex; gap: 8px; z-index: 1000; pointer-events: auto;
+            width: 92%; background: rgba(15, 15, 35, 0.9);
+            border: 1px solid var(--border); border-radius: 30px;
+            padding: 10px; display: flex; gap: 10px; z-index: 1000;
+            backdrop-filter: blur(20px);
         }
-        .dock-item { flex: 1; padding: 14px; border-radius: 22px; border: none; background: transparent; color: #555; font-weight: 700; font-size: 12px; }
-        .dock-item.active { background: var(--glass); color: #fff; border: 1px solid var(--border); }
+        .dock-item { flex: 1; padding: 15px; border-radius: 22px; border: none; background: transparent; color: #666; font-weight: 800; font-size: 12px; transition: 0.3s; }
+        .dock-item.active { background: var(--accent); color: #fff; box-shadow: var(--neon-glow); }
 
         .float-val {
-            position: fixed; pointer-events: none; font-weight: 900; color: #fff;
-            z-index: 2000; animation: rise 0.8s forwards; font-family: 'Syncopate'; font-size: 18px;
+            position: fixed; pointer-events: none; font-weight: 900; color: var(--secondary);
+            z-index: 2000; animation: rise 0.8s ease-out forwards; font-family: 'Syncopate'; font-size: 22px;
+            text-shadow: 0 0 15px var(--secondary);
         }
-        @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-100px); } }
+        @keyframes rise { 0% { opacity: 0; transform: translateY(0) scale(0.8); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
     </style>
 </head>
 <body>
 
     <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
     <canvas id="bg-canvas"></canvas>
 
     <div id="tap-master"></div>
 
-    <div class="ai-status-bar">
-        <div id="ai-thought">CORE SYNCED</div>
-    </div>
-
     <div class="ui-wrapper">
         <div class="header">
-            <div class="chip">NODE: STABLE</div>
-            <div class="chip" style="color: var(--secondary); border-color: var(--secondary);">FPS: 60</div>
+            <div class="chip">🚀 NEURAL LINK</div>
+            <div class="chip" style="color: var(--secondary);">ONLINE</div>
         </div>
 
         <div class="hero">
             <h1 class="balance-main" id="bal-ui">0.00</h1>
-            <div class="income-tag">AUTO-FARMING: +<span id="pps-ui">0.0</span>/s</div>
+            <div class="income-tag">PROFIT: +<span id="pps-ui">0.0</span>/SEC</div>
         </div>
 
         <div class="hud-glass">
-            <div style="font-size: 11px; letter-spacing: 1px;">ENERGY <span id="mana-text" style="float:right">1000/1000</span></div>
-            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%; box-shadow: 0 0 10px var(--secondary);"></div></div>
+            <div style="font-size: 11px; font-weight: 800; color: var(--secondary);">ENERGY RESERVE <span id="mana-text" style="float:right">1000/1000</span></div>
+            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%; box-shadow: 0 0 15px var(--secondary);"></div></div>
             
-            <div style="font-size: 11px; letter-spacing: 1px; margin-top: 15px;">EVOLUTION <span id="lvl-text" style="float:right">LVL 1</span></div>
-            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent);"></div></div>
+            <div style="font-size: 11px; font-weight: 800; color: var(--accent); margin-top: 18px;">EVOLUTION LEVEL <span id="lvl-text" style="float:right">LVL 1</span></div>
+            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%; box-shadow: 0 0 15px var(--accent);"></div></div>
         </div>
     </div>
 
     <div class="side-panel" id="side-panel">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <h2 id="panel-title" style="font-family:'Syncopate'; font-size: 18px;">UPGRADES</h2>
-            <button onclick="togglePanel(false)" style="background:none; border:none; color:#555; font-size:20px;">✕</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 id="panel-title" style="font-family:'Syncopate'; font-size: 20px; color: var(--secondary);">SYSTEM UPGRADES</h2>
+            <button onclick="togglePanel(false)" style="background:var(--glass); border:none; color:#fff; width:35px; height:35px; border-radius:50%;">✕</button>
         </div>
-        
         <div class="tab-content" id="panel-content">
-            <div class="upgrades-grid" id="grid-container"></div>
+            <div class="upgrades-grid" id="grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
         </div>
     </div>
 
     <nav class="dock">
         <button class="dock-item active" id="nav-core" onclick="togglePanel(false)">CORE</button>
-        <button class="dock-item" id="nav-up" onclick="openTab('upgrades')">TAP</button>
-        <button class="dock-item" id="nav-farm" onclick="openTab('farming')">FARM</button>
+        <button class="dock-item" id="nav-up" onclick="openTab('upgrades')">UPGRADE</button>
+        <button class="dock-item" id="nav-farm" onclick="openTab('farming')">FARMING</button>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.headerColor = "#0a0a1a";
 
-        let state = JSON.parse(localStorage.getItem('ariai_v7')) || {
-            bal: 0, 
-            pwr: 1.0, 
-            pps: 0.0, // Passive Profit per Second
-            mana: 1000, 
-            maxMana: 1000, 
-            lvl: 1, 
-            xp: 0,
-            upgrades: {},
-            farmNodes: {}
+        let state = JSON.parse(localStorage.getItem('ariai_v8')) || {
+            bal: 0, pwr: 1.0, pps: 0.0, mana: 1000, maxMana: 1000, lvl: 1, xp: 0,
+            upgrades: {}, farmNodes: {}
         };
 
-        const farmData = [
-            { id: 'f1', name: 'Neural Ant', pps: 0.5, price: 150 },
-            { id: 'f2', name: 'Data Hive', pps: 2.5, price: 800 },
-            { id: 'f3', name: 'Logic Farm', pps: 12.0, price: 4500 },
-            { id: 'f4', name: 'Core Miner', pps: 55.0, price: 25000 },
-        ];
-
-        const tapData = [
-            { id: 't1', name: 'Nano Tips', pwr: 0.5, price: 100 },
-            { id: 't2', name: 'Force Link', pwr: 2.0, price: 650 },
-            { id: 't3', name: 'Bio Sync', pwr: 8.0, price: 3200 },
-        ];
-
-        // 3D Engine
-        let scene, camera, renderer, crystal;
+        // 3D Engine with Starfield
+        let scene, camera, renderer, crystal, stars;
         function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            const geo = new THREE.IcosahedronGeometry(2, 0);
-            const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
+            // Create Crystal
+            const geo = new THREE.IcosahedronGeometry(2, 1);
+            const mat = new THREE.MeshPhongMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.6 });
             crystal = new THREE.Mesh(geo, mat);
             scene.add(crystal);
-            scene.add(new THREE.PointLight(0xff007a, 2, 20), new THREE.AmbientLight(0xffffff, 0.1));
+
+            // Create Stars
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 1200;
+            const posArray = new Float32Array(starCount * 3);
+            for(let i=0; i < starCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 20; }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const starMat = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true });
+            stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            const light = new THREE.PointLight(0xff007a, 2, 20);
+            light.position.set(2, 3, 4);
+            scene.add(light, new THREE.AmbientLight(0x404040, 2));
             camera.position.z = 6;
 
             function anim() {
                 requestAnimationFrame(anim);
                 crystal.rotation.y += 0.005;
-                crystal.rotation.z += 0.002;
+                stars.rotation.y += 0.0005;
                 renderer.render(scene, camera);
             }
             anim();
         }
 
-        // Tap Logic
+        // Gameplay
         document.getElementById('tap-master').addEventListener('touchstart', (e) => {
-            if (state.mana < 1) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
+            if (state.mana < 1) { tg.HapticFeedback.notificationOccurred('error'); return; }
             const touch = e.touches[0];
             showFx(touch.clientX, touch.clientY, state.pwr);
-
             state.bal += state.pwr;
-            state.mana -= 1.5;
-            state.xp += 10;
-
-            if (state.xp >= state.lvl * 800) {
-                state.lvl++; state.xp = 0;
-                tg.HapticFeedback.notificationOccurred('success');
-            }
+            state.mana -= 1.2;
+            state.xp += 15;
+            if (state.xp >= state.lvl * 1000) { state.lvl++; state.xp = 0; tg.HapticFeedback.notificationOccurred('success'); }
             tg.HapticFeedback.impactOccurred('light');
             updateUI();
         });
@@ -262,11 +231,9 @@
             const el = document.createElement('div');
             el.className = 'float-val';
             el.innerHTML = `+${val.toFixed(1)}`;
-            el.style.left = `${x - 20}px`; el.style.top = `${y - 20}px`;
+            el.style.left = `${x - 20}px`; el.style.top = `${y - 40}px`;
             document.body.appendChild(el);
             setTimeout(() => el.remove(), 800);
-            crystal.scale.set(1.1, 1.1, 1.1);
-            setTimeout(() => crystal.scale.set(1, 1, 1), 50);
         }
 
         function updateUI() {
@@ -275,84 +242,46 @@
             document.getElementById('mana-text').innerText = `${Math.floor(state.mana)}/1000`;
             document.getElementById('mana-fill').style.width = `${(state.mana/10)}%`;
             document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-fill').style.width = `${(state.xp/(state.lvl*8))}%`;
-            localStorage.setItem('ariai_v7', JSON.stringify(state));
+            document.getElementById('xp-fill').style.width = `${(state.xp/(state.lvl*10))}%`;
+            localStorage.setItem('ariai_v8', JSON.stringify(state));
         }
 
-        function togglePanel(show) {
-            document.getElementById('side-panel').classList.toggle('active', show);
-            document.getElementById('nav-core').classList.toggle('active', !show);
-        }
+        const farmData = [ { id: 'f1', name: 'Neural Ant', pps: 0.5, price: 150 }, { id: 'f2', name: 'Data Hive', pps: 3.0, price: 1000 } ];
+        const tapData = [ { id: 't1', name: 'Power Link', pwr: 0.5, price: 100 }, { id: 't2', name: 'Cyber Glove', pwr: 2.5, price: 800 } ];
+
+        function togglePanel(show) { document.getElementById('side-panel').classList.toggle('active', show); }
 
         function openTab(tab) {
             togglePanel(true);
             const container = document.getElementById('grid-container');
-            const title = document.getElementById('panel-title');
             container.innerHTML = '';
-            
-            document.querySelectorAll('.dock-item').forEach(i => i.classList.remove('active'));
-            
-            if (tab === 'upgrades') {
-                title.innerText = "TAP SYSTEM";
-                document.getElementById('nav-up').classList.add('active');
-                tapData.forEach(item => {
-                    const count = state.upgrades[item.id] || 0;
-                    const price = Math.floor(item.price * Math.pow(1.5, count));
-                    const canBuy = state.bal >= price;
-                    container.innerHTML += createCard(item.name, `+${item.pwr} PWR`, price, canBuy, `buyTap('${item.id}', ${item.pwr}, ${price})`);
-                });
-            } else {
-                title.innerText = "AUTO FARMING";
-                document.getElementById('nav-farm').classList.add('active');
-                farmData.forEach(item => {
-                    const count = state.farmNodes[item.id] || 0;
-                    const price = Math.floor(item.price * Math.pow(1.4, count));
-                    const canBuy = state.bal >= price;
-                    container.innerHTML += createCard(item.name, `+${item.pps}/s`, price, canBuy, `buyFarm('${item.id}', ${item.pps}, ${price})`);
-                });
-            }
+            const data = tab === 'upgrades' ? tapData : farmData;
+            data.forEach(item => {
+                const count = (tab === 'upgrades' ? state.upgrades[item.id] : state.farmNodes[item.id]) || 0;
+                const price = Math.floor(item.price * Math.pow(1.5, count));
+                const canBuy = state.bal >= price;
+                container.innerHTML += `
+                    <div class="up-card">
+                        <h4 style="font-size:10px; color:#aaa;">${item.name}</h4>
+                        <p style="color:var(--secondary); font-weight:800;">+${tab==='upgrades'?item.pwr:item.pps}${tab==='upgrades'?' PWR':'/SEC'}</p>
+                        <button class="price-btn ${canBuy?'':'disabled'}" onclick="buy('${tab}', '${item.id}', ${tab==='upgrades'?item.pwr:item.pps}, ${price})">⚡ ${price}</button>
+                    </div>`;
+            });
         }
 
-        function createCard(name, benefit, price, canBuy, func) {
-            return `
-                <div class="up-card">
-                    <h4>${name}</h4>
-                    <p>${benefit}</p>
-                    <button class="price-btn ${canBuy?'':'disabled'}" onclick="${func}">${price}</button>
-                </div>
-            `;
-        }
-
-        window.buyTap = (id, pwr, price) => {
+        window.buy = (tab, id, val, price) => {
             if (state.bal >= price) {
                 state.bal -= price;
-                state.pwr += pwr;
-                state.upgrades[id] = (state.upgrades[id] || 0) + 1;
-                openTab('upgrades'); updateUI();
-                tg.HapticFeedback.notificationOccurred('success');
+                if(tab === 'upgrades') { state.pwr += val; state.upgrades[id] = (state.upgrades[id] || 0) + 1; }
+                else { state.pps += val; state.farmNodes[id] = (state.farmNodes[id] || 0) + 1; }
+                openTab(tab); updateUI(); tg.HapticFeedback.notificationOccurred('success');
             }
         };
 
-        window.buyFarm = (id, pps, price) => {
-            if (state.bal >= price) {
-                state.bal -= price;
-                state.pps += pps;
-                state.farmNodes[id] = (state.farmNodes[id] || 0) + 1;
-                openTab('farming'); updateUI();
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        };
-
-        // Passive Income Heartbeat
         setInterval(() => {
-            if (state.pps > 0) {
-                state.bal += (state.pps / 10);
-                updateUI();
-            }
-            if (state.mana < 1000) {
-                state.mana = Math.min(1000, state.mana + 1.2);
-                updateUI();
-            }
+            if (state.pps > 0) state.bal += (state.pps / 10);
+            if (state.mana < 1000) state.mana = Math.min(1000, state.mana + 1.5);
+            updateUI();
         }, 100);
 
         window.onload = () => { init3D(); updateUI(); };
