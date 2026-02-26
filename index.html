@@ -3,78 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova NFT Market</title>
+    <title>Leenova: Ultimate Fusion</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #00f2ff; --pink: #ff007f; --gold: #ffcc00; --purple: #bc00ff; --dark: #020b16; }
-        body {
-            margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            background: linear-gradient(rgba(2,11,22,0.8), rgba(2,11,22,0.9)), url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
-            background-size: cover; display: flex; flex-direction: column;
-        }
-
-        /* Stats HUD */
-        .hud { padding: 25px; background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--blue); display: flex; justify-content: space-between; align-items: center; }
-        .balance { font-family: 'Orbitron'; font-size: 28px; text-shadow: 0 0 10px var(--blue); }
-        .test-badge { font-size: 10px; background: var(--pink); padding: 2px 8px; border-radius: 4px; animation: blink 1s infinite; }
-
-        /* Navigation */
-        .nav { display: flex; background: rgba(0,242,255,0.05); }
-        .nav-btn { flex: 1; padding: 15px; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Orbitron'; font-size: 12px; }
-        .nav-btn.active { border-color: var(--blue); background: rgba(0,242,255,0.1); }
-
-        /* NFT Grid */
-        .content-area { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; }
-        .content-area.active { display: block; }
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px; }
-
-        .nft-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.2); border-radius: 12px;
-            overflow: hidden; position: relative; transition: 0.3s;
-        }
-        .nft-img { width: 100%; height: 140px; object-fit: cover; filter: brightness(0.8); }
-        .nft-info { padding: 10px; }
-        .nft-tier { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
         
-        /* Tiers */
-        .common { background: #555; }
-        .rare { background: var(--blue); color: #000; }
-        .epic { background: var(--purple); }
-        .legend { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
+        body {
+            margin: 0; height: 100vh; display: flex; flex-direction: column;
+            font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
+            background: linear-gradient(rgba(2, 11, 22, 0.85), rgba(2, 11, 22, 0.95)), 
+                        url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
+            background-size: cover;
+        }
 
-        .nft-card h5 { margin: 0; font-size: 13px; color: #fff; }
-        .nft-power { font-size: 11px; color: var(--blue); margin: 5px 0; }
-        .buy-btn { width: 100%; background: transparent; border: 1px solid var(--blue); color: var(--blue); padding: 6px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
-        .buy-btn:disabled { border-color: #444; color: #444; }
-        .buy-btn:active { background: var(--blue); color: #000; }
+        /* --- 1. HUD DESIGN --- */
+        .hud-top {
+            padding: 25px; background: rgba(0,0,0,0.6); border-bottom: 2px solid var(--blue);
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .credits-box { border-left: 3px solid var(--blue); padding-left: 15px; }
+        .label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
+        .amount { font-family: 'Orbitron'; font-size: 32px; text-shadow: 0 0 15px var(--blue); }
+        .stats-mini { display: flex; gap: 8px; margin-top: 8px; font-size: 11px; color: var(--blue); }
 
-        .owned-tag { position: absolute; top: 5px; right: 5px; font-size: 18px; }
+        /* --- 2. NAVIGATION --- */
+        .tabs { display: flex; background: rgba(0,242,255,0.05); border-bottom: 1px solid rgba(0,242,255,0.2); }
+        .tab-btn { flex: 1; padding: 15px; text-align: center; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; color: #666; transition: 0.3s; }
+        .tab-btn.active { color: var(--blue); background: rgba(0,242,255,0.1); border-bottom: 2px solid var(--blue); }
 
-        @keyframes blink { 50% { opacity: 0.3; } }
+        /* --- 3. MAIN CONTENT --- */
+        .scroll-area { flex-grow: 1; overflow-y: auto; padding: 20px; display: none; padding-bottom: 100px; }
+        .scroll-area.active { display: block; }
+
+        /* --- 4. CLICKER CORE --- */
+        .clicker-container { height: 300px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .core-circle {
+            width: 180px; height: 180px; border-radius: 50%; border: 2px solid var(--blue);
+            box-shadow: 0 0 30px var(--blue), inset 0 0 15px var(--blue);
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.1s;
+        }
+        .core-circle:active { transform: scale(0.92); }
+        .core-circle img { width: 90px; filter: drop-shadow(0 0 10px var(--blue)); }
+
+        /* --- 5. UPGRADE CARDS --- */
+        .up-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.2);
+            border-radius: 12px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .up-info h4 { margin: 0; font-size: 15px; color: #fff; }
+        .progress-bg { width: 100px; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
+        .progress-fill { height: 100%; background: var(--blue); transition: 0.3s; }
+
+        .buy-btn {
+            background: rgba(0,242,255,0.1); border: 1px solid var(--blue);
+            color: var(--blue); padding: 8px 12px; border-radius: 6px;
+            font-family: 'Orbitron'; font-size: 11px; cursor: pointer;
+        }
+        .buy-btn:disabled { opacity: 0.3; border-color: #444; color: #444; }
+
+        /* --- 6. NFT MARKET GRID --- */
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nft-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(188,0,255,0.3);
+            border-radius: 10px; overflow: hidden; position: relative;
+        }
+        .nft-img { width: 100%; height: 110px; background: #000; display: flex; justify-content: center; align-items: center; font-size: 40px; }
+        .nft-meta { padding: 8px; }
+        .tier { font-size: 8px; padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        .legendary { background: var(--gold); color: #000; }
+        .epic { background: var(--purple); color: #fff; }
+
+        /* Floating Text */
+        .pop { position: absolute; color: var(--blue); font-weight: bold; font-family: 'Orbitron'; pointer-events: none; animation: popUp 0.8s forwards; }
+        @keyframes popUp { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="hud">
-        <div>
-            <div style="font-size: 10px; color: var(--blue);">CREDITS <span class="test-badge">TEST MODE: ALL 1 CR</span></div>
-            <div class="balance" id="balance">0</div>
+    <div class="hud-top">
+        <div class="credits-box">
+            <div class="label">SYSTEM CREDITS</div>
+            <div class="amount" id="balance">0</div>
+            <div class="stats-mini">
+                <span>TAP: +<span id="t-val">1</span></span> | <span>AUTO: +<span id="a-val">0</span>/s</span>
+            </div>
         </div>
-        <div id="tap-zone" style="cursor:pointer; font-size:30px;">⚡</div>
+        <div style="color:var(--blue); font-size: 20px;">⚙️</div>
     </div>
 
-    <div class="nav">
-        <div class="nav-btn active" onclick="tab('market')">NFT MARKET</div>
-        <div class="nav-btn" onclick="tab('inventory')">MY CARDS</div>
+    <div class="tabs">
+        <div class="tab-btn active" id="t-core" onclick="openTab('core')">CORE</div>
+        <div class="tab-btn" id="t-up" onclick="openTab('upgrades')">UPGRADES (8)</div>
+        <div class="tab-btn" id="t-nft" onclick="openTab('nft')">NFT MARKET</div>
     </div>
 
-    <div id="market" class="content-area active">
-        <div class="nft-grid" id="market-list"></div>
+    <div id="core" class="scroll-area active">
+        <div class="clicker-container">
+            <div class="core-circle" id="main-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
+            </div>
+        </div>
     </div>
 
-    <div id="inventory" class="content-area">
-        <div class="nft-grid" id="my-list"></div>
+    <div id="upgrades" class="scroll-area">
+        <div id="up-list"></div>
+    </div>
+
+    <div id="nft" class="scroll-area">
+        <div class="nft-grid" id="nft-list"></div>
     </div>
 
     <script>
@@ -82,109 +120,107 @@
         tg.expand();
 
         let game = {
-            credits: parseFloat(localStorage.getItem('ln_nft_bal')) || 100,
-            owned: JSON.parse(localStorage.getItem('ln_nft_owned')) || []
+            bal: parseFloat(localStorage.getItem('ln_mix_bal')) || 0,
+            lvls: JSON.parse(localStorage.getItem('ln_mix_lvls')) || { u1:0, u2:0, u3:0, u4:0, u5:0, u6:0, u7:0, u8:0 },
+            nfts: JSON.parse(localStorage.getItem('ln_mix_nfts')) || []
         };
 
-        // 15+ NFT Kartalar Ma'lumotlar Bazasi
-        const nfts = [
-            { id: 1, name: "Neon Samurai", tier: "rare", power: 15, img: "https://picsum.photos/seed/n1/200/300" },
-            { id: 2, name: "Cyber Monk", tier: "epic", power: 45, img: "https://picsum.photos/seed/n2/200/300" },
-            { id: 3, name: "Star Voyager", tier: "legend", power: 120, img: "https://picsum.photos/seed/n3/200/300" },
-            { id: 4, name: "Data Ghost", tier: "common", power: 5, img: "https://picsum.photos/seed/n4/200/300" },
-            { id: 5, name: "Plasma Queen", tier: "epic", power: 55, img: "https://picsum.photos/seed/n5/200/300" },
-            { id: 6, name: "Void Runner", tier: "rare", power: 25, img: "https://picsum.photos/seed/n6/200/300" },
-            { id: 7, name: "Mecha Titan", tier: "legend", power: 250, img: "https://picsum.photos/seed/n7/200/300" },
-            { id: 8, name: "Binary Witch", tier: "rare", power: 30, img: "https://picsum.photos/seed/n8/200/300" },
-            { id: 9, name: "Giga Bot", tier: "common", power: 8, img: "https://picsum.photos/seed/n9/200/300" },
-            { id: 10, name: "Cyber Dragon", tier: "legend", power: 500, img: "https://picsum.photos/seed/n10/200/300" },
-            { id: 11, name: "Chrome Assassin", tier: "epic", power: 70, img: "https://picsum.photos/seed/n11/200/300" },
-            { id: 12, name: "Solar Pilot", tier: "rare", power: 20, img: "https://picsum.photos/seed/n12/200/300" },
-            { id: 13, name: "Neural Hacker", tier: "epic", power: 90, img: "https://picsum.photos/seed/n13/200/300" },
-            { id: 14, name: "Rusty Android", tier: "common", power: 2, img: "https://picsum.photos/seed/n14/200/300" },
-            { id: 15, name: "Infinite AI", tier: "legend", power: 1000, img: "https://picsum.photos/seed/n15/200/300" },
-            { id: 16, name: "Lava Guardian", tier: "rare", power: 40, img: "https://picsum.photos/seed/n16/200/300" }
+        // 8 ta Kuchaytirishlar (Arzon - Test rejimi: 1 ochko)
+        const systemUps = [
+            { id: 'u1', name: 'Neural Link', val: 2, type: 'tap' },
+            { id: 'u2', name: 'Bento Bot', val: 5, type: 'auto' },
+            { id: 'u3', name: 'Cyber Miner', val: 15, type: 'auto' },
+            { id: 'u4', name: 'Nano Pulse', val: 10, type: 'tap' },
+            { id: 'u5', name: 'Quantum Core', val: 50, type: 'auto' },
+            { id: 'u6', name: 'Data Hive', val: 150, type: 'auto' },
+            { id: 'u7', name: 'Void Engine', val: 50, type: 'tap' },
+            { id: 'u8', name: 'Galaxy Drive', val: 1000, type: 'auto' }
         ];
 
-        function save() {
-            localStorage.setItem('ln_nft_bal', game.credits);
-            localStorage.setItem('ln_nft_owned', JSON.stringify(game.owned));
+        // 15 ta Qimmat NFT Kartalar
+        const nftMarket = Array.from({length: 16}, (_, i) => ({
+            id: i,
+            name: `NFT-X ${i+1}`,
+            price: (i + 1) * 5000, // Haqiqiy narxlar
+            power: (i + 1) * 200,
+            tier: i > 12 ? 'legendary' : 'epic',
+            icon: ['🔥','💎','🚀','🤖','🛸','👽','🛡️','⚡','🌈','🧊','🧬','👑','👹','👺','🧿','🌀'][i]
+        }));
+
+        function openTab(name) {
+            document.querySelectorAll('.scroll-area, .tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            document.getElementById('t-' + (name === 'upgrades' ? 'up' : name)).classList.add('active');
         }
 
-        function tab(t) {
-            document.querySelectorAll('.content-area, .nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(t).classList.add('active');
-            event.currentTarget.classList.add('active');
-            render();
+        function getStats() {
+            let t = 1, a = 0;
+            systemUps.forEach(u => t += (game.lvls[u.id] || 0) * u.val * (u.type === 'tap' ? 1 : 0));
+            systemUps.forEach(u => a += (game.lvls[u.id] || 0) * u.val * (u.type === 'auto' ? 1 : 0));
+            nftMarket.filter(n => game.nfts.includes(n.id)).forEach(n => a += n.power);
+            return { t, a };
         }
 
         function render() {
-            document.getElementById('balance').innerText = Math.floor(game.credits).toLocaleString();
-            
-            // Market render
-            const marketList = document.getElementById('market-list');
-            marketList.innerHTML = '';
-            nfts.forEach(nft => {
-                const isOwned = game.owned.includes(nft.id);
-                marketList.innerHTML += `
+            const s = getStats();
+            document.getElementById('balance').innerText = Math.floor(game.bal).toLocaleString();
+            document.getElementById('t-val').innerText = s.t;
+            document.getElementById('a-val').innerText = s.a;
+
+            // System Upgrades Render
+            const upList = document.getElementById('up-list');
+            upList.innerHTML = '';
+            let showNext = true;
+            systemUps.forEach(u => {
+                if(!showNext) return;
+                let l = game.lvls[u.id];
+                upList.innerHTML += `
+                    <div class="up-card">
+                        <div class="up-info">
+                            <h4>${u.name} [Lvl ${l}/10]</h4>
+                            <div class="progress-bg"><div class="progress-fill" style="width:${l*10}%"></div></div>
+                        </div>
+                        ${l < 10 ? `<button class="buy-btn" onclick="buyUp('${u.id}')">💰 1</button>` : '<b>MAX</b>'}
+                    </div>`;
+                if(l < 10) showNext = false;
+            });
+
+            // NFT Render
+            const nftList = document.getElementById('nft-list');
+            nftList.innerHTML = '';
+            nftMarket.forEach(n => {
+                const owned = game.nfts.includes(n.id);
+                nftList.innerHTML += `
                     <div class="nft-card">
-                        <img src="${nft.img}" class="nft-img">
-                        ${isOwned ? '<span class="owned-tag">✅</span>' : ''}
-                        <div class="nft-info">
-                            <span class="nft-tier ${nft.tier}">${nft.tier.toUpperCase()}</span>
-                            <h5>${nft.name}</h5>
-                            <div class="nft-power">Auto: +${nft.power}/s</div>
-                            <button class="buy-btn" onclick="buy(${nft.id})" ${isOwned || game.credits < 1 ? 'disabled' : ''}>
-                                ${isOwned ? 'OWNED' : 'BUY (1 CR)'}
+                        <div class="nft-img">${n.icon}</div>
+                        <div class="nft-meta">
+                            <span class="tier ${n.tier}">${n.tier}</span>
+                            <h5>${n.name}</h5>
+                            <div style="font-size:10px; color:var(--blue)">+${n.power}/s</div>
+                            <button class="buy-btn" style="width:100%; margin-top:5px" 
+                                onclick="buyNft(${n.id}, ${n.price})" ${owned || game.bal < n.price ? 'disabled' : ''}>
+                                ${owned ? 'OWNED' : n.price.toLocaleString()}
                             </button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-
-            // Inventory render
-            const myList = document.getElementById('my-list');
-            myList.innerHTML = '';
-            nfts.filter(n => game.owned.includes(n.id)).forEach(nft => {
-                myList.innerHTML += `
-                    <div class="nft-card">
-                        <img src="${nft.img}" class="nft-img">
-                        <div class="nft-info">
-                            <span class="nft-tier ${nft.tier}">${nft.tier.toUpperCase()}</span>
-                            <h5>${nft.name}</h5>
-                            <div class="nft-power">Producing: ${nft.power}/s</div>
-                        </div>
-                    </div>
-                `;
-            });
-            save();
+            localStorage.setItem('ln_mix_bal', game.bal);
+            localStorage.setItem('ln_mix_lvls', JSON.stringify(game.lvls));
+            localStorage.setItem('ln_mix_nfts', JSON.stringify(game.nfts));
         }
 
-        window.buy = (id) => {
-            if(game.credits >= 1 && !game.owned.includes(id)) {
-                game.credits -= 1;
-                game.owned.push(id);
-                tg.HapticFeedback.notificationOccurred('success');
-                render();
-            }
+        window.buyUp = (id) => { if(game.bal >= 1) { game.bal--; game.lvls[id]++; render(); tg.HapticFeedback.impactOccurred('light'); } };
+        window.buyNft = (id, p) => { if(game.bal >= p) { game.bal -= p; game.nfts.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); } };
+
+        document.getElementById('main-btn').onclick = (e) => {
+            const s = getStats(); game.bal += s.t;
+            const p = document.createElement('div'); p.className = 'pop'; p.innerText = `+${s.t}`;
+            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+            document.body.appendChild(p); setTimeout(() => p.remove(), 800);
+            tg.HapticFeedback.impactOccurred('medium'); render();
         };
 
-        document.getElementById('tap-zone').onclick = () => {
-            game.credits += 1;
-            tg.HapticFeedback.impactOccurred('light');
-            render();
-        };
-
-        // Avtomatik daromad (NFT power asosida)
-        setInterval(() => {
-            let totalPower = 0;
-            nfts.filter(n => game.owned.includes(n.id)).forEach(n => totalPower += n.power);
-            if(totalPower > 0) {
-                game.credits += (totalPower / 10);
-                render();
-            }
-        }, 100);
-
+        setInterval(() => { const s = getStats(); if(s.a > 0) { game.bal += s.a/10; render(); } }, 100);
         render();
     </script>
 </body>
