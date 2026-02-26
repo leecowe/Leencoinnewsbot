@@ -3,139 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Evolution 1.0</title>
+    <title>Aira Protocol | Career</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --main-grey: #2c2c2c;
-            --light-grey: #a0a0a0;
+            --lvl-color: #a0a0a0;
             --bg: #0d0d0d;
-            --glass: rgba(255, 255, 255, 0.04);
-            --border: rgba(255, 255, 255, 0.08);
-            --black-grey: #1c1c1c;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background: var(--bg); color: #e0e0e0; font-family: 'Rajdhani', sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #e0e0e0; font-family: 'Rajdhani', sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: 0.5s; }
 
-        .header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border); background: var(--black-grey); position: relative; }
-        .bal-val { font-size: 40px; font-weight: 700; color: #fff; letter-spacing: -1px; }
+        /* HEADER & RANK */
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border); position: relative; }
+        .rank-btn { position: absolute; left: 20px; top: 25px; background: var(--glass); border: 1px solid var(--lvl-color); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--lvl-color); cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .bal-val { font-size: 42px; font-weight: 700; color: #fff; letter-spacing: -1px; }
+        .career-title { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--lvl-color); margin-top: 5px; }
 
-        .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; flex-direction: column; }
-        .view-content.active { display: flex; }
+        .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; }
+        .view-content.active { display: flex; flex-direction: column; }
 
-        .glass-card { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; backdrop-filter: blur(15px); }
-        .label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--light-grey); margin-bottom: 8px; font-weight: 600; }
+        .glass-card { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; backdrop-filter: blur(10px); border-left: 4px solid var(--lvl-color); }
+        
+        .btn-main { background: var(--lvl-color); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 13px; }
+        .btn-main:disabled { opacity: 0.2; filter: grayscale(1); }
 
-        .btn-grey { background: var(--main-grey); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-grey:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-grey:active:not(:disabled) { transform: scale(0.97); }
+        .lock-msg { font-size: 11px; color: #ff4444; margin-top: 8px; text-align: center; font-weight: 600; }
 
-        /* UI Sodda va Shaffof Dizayn */
-        .farm-status { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: #fff; }
+        .nav { height: 75px; background: #000; display: flex; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 11px; font-weight: 700; }
+        .nav-item.active { color: var(--lvl-color); border-top: 2px solid var(--lvl-color); }
 
-        /* Sodda Dizayn Tugmalari */
-        .btn-plain { background: var(--main-grey); color: #fff; border: 1px solid var(--border); padding: 14px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; width: auto; margin: 0 auto; display: block; }
-        .btn-plain:active { transform: scale(0.97); }
-
-        /* NFT Market Dizayni */
-        .nft-container { display: grid; grid-template-columns: 1fr; gap: 15px; padding: 15px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 16px; }
-        .nft-item { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; text-align: center; position: relative; transition: 0.3s; }
-        .nft-name { font-weight: 700; margin-bottom: 10px; font-size: 14px; }
-        .nft-img-sim { width: 100%; height: 90px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: var(--light-grey); font-family: 'Rajdhani'; font-size: 10px; }
-
-        /* Reyting Belgisi Dizayni */
-        .rank-circle-btn { width: 32px; height: 32px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; position: absolute; top: 20px; right: 20px; }
-        .view-prof-btn { position: absolute; top: 10px; right: 10px; background: var(--glass); border: 1px solid var(--border); border-radius: 5px; color: #fff; font-size: 9px; padding: 2px 5px; cursor: pointer; }
-
-        /* Pastki Bo'limlar Ramkasi va Sodda Dizayn */
-        .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); background-image: none; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light-grey); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; position: relative; transition: 0.3s; }
-        .nav-item.active { color: #fff; font-weight: 700; }
-        .nav-item::before { content: ''; position: absolute; top: -1px; left: 0; width: 100%; height: 2px; background: #fff; transform: scaleX(0); transition: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
-        .nav-item.active::before { transform: scaleX(1); }
-
+        /* RANK MODAL */
+        #rank-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; padding:20px; flex-direction:column; }
+        .rank-list-item { background:var(--glass); padding:12px; border-radius:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border); }
     </style>
 </head>
 <body>
 
     <header class="header">
+        <div class="rank-btn" onclick="openRank()">RANK</div>
         <div class="bal-val" id="total-bal">0</div>
-        <div style="font-size:11px; color:var(--light-grey); margin-top:5px; letter-spacing:1px;">
-            AUTO: <span id="aps-display">50</span>/300ms | AUTO-STAKE: <span id="auto-status">OFF</span>
-        </div>
-        <div class="rank-circle-btn" id="rank-indicator" onclick="switchTab('news', this)">0</div>
+        <div class="career-title" id="career-name">BOSHLANG'ICH</div>
     </header>
 
     <div id="view-core" class="view-content active">
-        <div class="glass-card">
-            <div class="farm-status">
-                <span>STAKING POOL</span>
-                <span>HAR 10S DA +<span id="stake-rate">5</span>%</span>
+        <div class="glass-card" id="card-stake">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+                <span>STAKING LVL: <b id="stake-lvl">0</b></span>
+                <span id="stake-timer">READY</span>
             </div>
-            <p id="mining-status" style="margin-top:20px; text-align:center;">HACKING TAYYOR...</p>
-            <div id="pool-timer" style="font-size:30px; text-align:center; font-family:'Rajdhani'; color: #fff;">READY</div>
-            <button class="btn-plain" id="stake-btn" onclick="claimStakedBalance()">HACK CORE (+10%)</button>
+            <button class="btn-main" onclick="startStake()" id="stake-btn">STAKE ALL</button>
+            <button class="btn-main" onclick="upgradeStake()" id="stake-up-btn" style="margin-top:8px; background:none; color:#fff; border:1px solid var(--lvl-color); font-size:10px;">UPGRADE STAKE</button>
+            <div id="lock-stake" class="lock-msg">Qulflangan: O'quvchi darajasi kerak!</div>
         </div>
 
-        <div class="glass-card">
-            <div class="stat-row" style="display:flex; justify-content: space-between;">
-                <span>LVL: <b id="farm-lvl">1</b></span>
-                <span>NARX: <b id="farm-cost">5000</b></span>
+        <div class="glass-card" id="card-farm">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+                <span>FARMING LVL: <b id="farm-lvl">1</b></span>
+                <span>APS: <b id="aps-display">50</b></span>
             </div>
-            <button class="btn-plain" onclick="upgradeFarm()" id="up-btn">UPGRADE FARM (MAX 25)</button>
+            <button class="btn-main" onclick="upgradeFarm()" id="farm-up-btn">UPGRADE FARM</button>
+            <div id="lock-farm" class="lock-msg"></div>
         </div>
     </div>
 
     <div id="view-market" class="view-content">
-        <div class="glass-card">
-            <div style="font-weight:700; margin-bottom:5px;">ELITE AUTO-STAKE CARD</div>
-            <div style="font-size:12px; color:var(--light-grey); margin-bottom:10px;">Har 10s da avtomatik staking qiladi.</div>
-            <button class="btn-plain" onclick="buyAutoStake()" id="autostake-btn">SOTIB OLISH (15K)</button>
+        <div class="glass-card" id="card-auto">
+            <div style="font-weight:700;">AUTO-STAKING CARD</div>
+            <button class="btn-main" style="margin-top:10px;" onclick="buyAuto()" id="auto-btn">BUY (15K)</button>
+            <div id="lock-auto" class="lock-msg">Qulflangan: Talaba darajasi kerak!</div>
         </div>
-        
-        <h3 style="font-family:'Rajdhani'; text-align:center; margin-top: 20px;">ARIA NFT MARKET</h3>
-        <div class="nft-container">
-            <div class="nft-item">
-                <div class="view-prof-btn">VIEW</div>
-                <div class="nft-name">ARIA NFT #01</div>
-                <div class="nft-img-sim">ARIA SERIES 1</div>
-                <button class="btn-plain" style="font-size:10px;" onclick="buyNFT(10000)">10K COINS</button>
+
+        <div id="card-nft">
+            <h4 style="text-align:center;">ARIA NFT COLLECTION</h4>
+            <div class="glass-card" style="text-align:center;">
+                <div>ARIA NFT #01</div>
+                <button class="btn-main" style="margin-top:10px;" onclick="buyNFT(100000)">100K</button>
             </div>
-            <div class="nft-item">
-                <div class="view-prof-btn">VIEW</div>
-                <div class="nft-name">ARIA NFT #02</div>
-                <div class="nft-img-sim">ARIA SERIES 2</div>
-                <button class="btn-plain" style="font-size:10px;" onclick="buyNFT(25000)">25K COINS</button>
-            </div>
-            <div class="nft-item">
-                <div class="view-prof-btn">VIEW</div>
-                <div class="nft-name">ARIA NFT #03</div>
-                <div class="nft-img-sim">ARIA SERIES 3</div>
-                <button class="btn-plain" style="font-size:10px;" onclick="buyNFT(50000)">50K COINS</button>
-            </div>
+            <div id="lock-nft" class="lock-msg">Qulflangan: Vazir darajasi kerak!</div>
         </div>
     </div>
 
     <div id="view-news" class="view-content">
-        <h3 style="font-family:'Rajdhani'; text-align:center;">ARIA NEWS & ROADMAP 1.0</h3>
         <div class="glass-card">
-            <h4>EVOLUTION 1.0 IS READY</h4>
-            <p>Aira Protocol Evolution 1.0 rasman ishga tushirildi! Yangi shaffof dizayn, elit darajadagi staking va farming tizimlari endi tayyor!</p>
+            <h4 style="margin:0;">ROADMAP 1.0</h4>
+            <p style="font-size:12px; opacity:0.7;">Keyingi yangilanish: Klanlar tizimi va haftalik turnirlar.</p>
         </div>
-        <div class="glass-card">
-            <h4>GLOBAL RANKING SIMULATION</h4>
-            <p>Airdrop yaqinlashmoqda, shuning uchun Global Ranking simulyatsiya tizimi (V1.0) joriy qilindi. Ismlarning oxirgi harfi yashirilgan.</p>
+    </div>
+
+    <div id="rank-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">GLOBAL RANK</h2>
+            <button onclick="closeRank()" style="background:none; border:none; color:#fff; font-size:24px;">×</button>
         </div>
-        <div class="glass-card" style="border-color: #fff;">
-            <h4>ROADMAP: NEXT STEPS</h4>
-            <ul style="font-size:12px; opacity:0.7;">
-                <li>🚀 PVP BATTLES - Reyting janglari</li>
-                <li>👥 KLANLAR - Jamoaviy staking</li>
-                <li>🤖 SHAXSIY BOTLAR - Airdrop koeffitsientini oshirish</li>
-            </ul>
-        </div>
+        <div id="rank-list"></div>
     </div>
 
     <nav class="nav">
@@ -146,125 +111,132 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
-    
-    // Ma'lumotlarni eslab qolish (LocalStorage)
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
-    let hasAutoStake = localStorage.getItem('aira_autostake') === 'true';
-
-    let aps = 50 + (farmLevel - 1) * 30; // Farm tezligi: +30/s
-    let upgradeCost = 5000 * farmLevel; // Farm narxi: xLevel
+    let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
+    let hasAuto = localStorage.getItem('aira_auto') === 'true';
 
     let isStaking = false;
-    let dummyUsersCount = 5;
+    let career = { name: "BOSHLANG'ICH", color: "#a0a0a0" };
 
-    function save() {
-        localStorage.setItem('aira_bal', balance);
-        localStorage.setItem('aira_farm', farmLevel);
+    // 1. DARAJA TIZIMI (Career Logic)
+    function checkCareer() {
+        if (balance >= 500000) {
+            career = { name: "VAZIR", color: "#FFD700", fMax: 50, sMax: 8, nft: true, auto: true, stake: true };
+        } else if (balance >= 100000) {
+            career = { name: "MAGISTR", color: "#ff4444", fMax: 25, sMax: 7, nft: false, auto: true, stake: true };
+        } else if (balance >= 10000) {
+            career = { name: "TALABA", color: "#44ff44", fMax: 15, sMax: 5, nft: false, auto: true, stake: true };
+        } else if (balance >= 1000) {
+            career = { name: "O'QUVCHI", color: "#ffffff", fMax: 10, sMax: 3, nft: false, auto: false, stake: true };
+        } else {
+            career = { name: "BOSHLANG'ICH", color: "#a0a0a0", fMax: 1, sMax: 0, nft: false, auto: false, stake: false };
+        }
+
+        document.documentElement.style.setProperty('--lvl-color', career.color);
+        document.getElementById('career-name').innerText = career.name;
+        updateLocks();
     }
 
-    // 1. MINING & AUTO-STAKE
+    function updateLocks() {
+        // Stake Lock
+        document.getElementById('stake-btn').disabled = !career.stake;
+        document.getElementById('stake-up-btn').disabled = !career.stake || stakeLevel >= career.sMax;
+        document.getElementById('lock-stake').style.display = career.stake ? "none" : "block";
+
+        // Farm Lock
+        document.getElementById('farm-up-btn').disabled = farmLevel >= career.fMax;
+        document.getElementById('lock-farm').innerText = farmLevel >= career.fMax ? "MAX DARADA (Keyingi unvonni kuting)" : "";
+
+        // Market Lock
+        document.getElementById('auto-btn').disabled = !career.auto;
+        document.getElementById('lock-auto').style.display = career.auto ? "none" : "block";
+        document.getElementById('lock-nft').style.display = career.nft ? "none" : "block";
+        document.querySelectorAll('#card-nft .btn-main').forEach(b => b.disabled = !career.nft);
+    }
+
+    // 2. MINING & AUTO-STAKE
     setInterval(() => {
-        balance += (aps / 3.33); // Har 300ms da avtomatik daromad qo'shiladi
+        let aps = 50 + (farmLevel - 1) * 30;
+        balance += (aps / 3.33);
         document.getElementById('total-bal').innerText = Math.floor(balance).toLocaleString();
+        document.getElementById('aps-display').innerText = aps;
+        checkCareer();
         
-        // Auto-Stake Mantiqi
-        if (hasAutoStake && !isStaking) {
-            startStake();
-        }
+        if(hasAuto && !isStaking && career.auto) startStake();
     }, 300);
 
-    // 2. STAKING (10 soniya)
+    // 3. STAKING
     function startStake() {
         if (isStaking || balance <= 0) return;
-        
-        stakedCoins = balance;
-        balance = 0;
-        isStaking = true;
-        updateUI();
-
+        let amount = balance; balance = 0; isStaking = true;
         let timeLeft = 10;
-        const btn = document.getElementById('stake-btn');
-        const timer = document.getElementById('pool-timer');
-        btn.disabled = true;
-        btn.innerText = "KUTING (+10%)";
-
+        const timer = document.getElementById('stake-timer');
         const countdown = setInterval(() => {
             timeLeft--;
-            timer.innerText = timeLeft + "s";
-
+            timer.innerText = timeLeft + "S";
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                balance += Math.floor(stakedCoins * 1.1); // +10%
-                stakedCoins = 0;
+                let bonus = 1.05 + (stakeLevel * 0.05);
+                balance += Math.floor(amount * bonus);
                 isStaking = false;
                 timer.innerText = "READY";
-                btn.disabled = false;
-                btn.innerText = "HACK CORE (+10%)";
                 save();
-                updateUI();
-                tg.HapticFeedback.notificationOccurred('success');
             }
         }, 1000);
     }
 
-    // 3. FARM UPGRADE (25 LVL MAX)
+    function upgradeStake() {
+        let cost = (stakeLevel + 1) * 5000;
+        if (balance >= cost && stakeLevel < career.sMax) {
+            balance -= cost; stakeLevel++; save(); updateUI();
+        }
+    }
+
     function upgradeFarm() {
-        if (farmLevel >= 25) return;
-        if (balance >= upgradeCost) {
-            balance -= upgradeCost;
-            farmLevel++;
-            aps += 30; // Har bir LVL uchun +30 tezlik
-            upgradeCost = 5000 * farmLevel; // Keyingi LVL narxi: xLevel
-            save();
-            updateUI();
-            tg.showAlert(`Farming LVL ${farmLevel} ga ko'tarildi! Tezlik: ${aps}/s`);
-        } else {
-            tg.showAlert("Mablag' yetarli emas!");
+        let cost = 5000 * farmLevel;
+        if (balance >= cost && farmLevel < career.fMax) {
+            balance -= cost; farmLevel++; save(); updateUI();
         }
     }
 
-    function buyAutoStake() {
-        if (balance >= 15000 && !hasAutoStake) {
-            balance -= 15000;
-            hasAutoStake = true;
-            localStorage.setItem('aira_autostake', 'true');
-            save();
-            updateUI();
-            tg.showAlert("Elite Auto-Stake Card faollashtirildi!");
-        } else if (hasAutoStake) {
-            tg.showAlert("Ushbu karta sizda mavjud!");
-        } else {
-            tg.showAlert("Mablag' yetarli emas (15K kerak)!");
-        }
+    // 4. RANK SYSTEM
+    function openRank() {
+        const modal = document.getElementById('rank-modal');
+        const list = document.getElementById('rank-list');
+        modal.style.display = "flex";
+        
+        let users = [
+            { name: "Siz*", bal: balance, lvl: career.name },
+            { name: "Bekru*", bal: 1200000, lvl: "VAZIR" },
+            { name: "Sardo*", bal: 450000, lvl: "MAGISTR" },
+            { name: "Dmitr*", bal: 15000, lvl: "TALABA" }
+        ].sort((a,b) => b.bal - a.bal);
+
+        list.innerHTML = users.map(u => `
+            <div class="rank-list-item">
+                <div><b>${u.name}</b><br><small>${u.lvl}</small></div>
+                <div>${Math.floor(u.bal).toLocaleString()}</div>
+            </div>
+        `).join('');
     }
 
-    function buyNFT(price) {
-        if (balance >= price) {
-            balance -= price;
-            save();
-            updateUI();
-            tg.showPopup({ title: "Muvaffaqiyatli!", message: "Aira NFT kolleksiyangizga qo'shildi!" });
-        } else {
-            tg.showAlert("Mablag' yetarli emas!");
-        }
+    function closeRank() { document.getElementById('rank-modal').style.display = "none"; }
+
+    function buyAuto() {
+        if (balance >= 15000) { balance -= 15000; hasAuto = true; localStorage.setItem('aira_auto', 'true'); save(); updateUI(); }
+    }
+
+    function save() {
+        localStorage.setItem('aira_bal', balance);
+        localStorage.setItem('aira_farm', farmLevel);
+        localStorage.setItem('aira_stake', stakeLevel);
     }
 
     function updateUI() {
-        document.getElementById('aps-display').innerText = aps;
         document.getElementById('farm-lvl').innerText = farmLevel;
-        document.getElementById('farm-cost').innerText = farmLevel >= 25 ? "MAX" : (upgradeCost / 1000).toLocaleString() + "K";
-        
-        // Elite Card tugmasi
-        if(hasAutoStake) {
-            document.getElementById('autostake-btn').innerText = "SOTIB OLINGAN";
-            document.getElementById('autostake-btn').disabled = true;
-            document.getElementById('auto-status').innerText = "ON";
-        }
-        
-        // Reyting belgisi ko'rsatkichi (simulyatsiya)
-        document.getElementById('rank-indicator').innerText = dummyUsersCount;
+        document.getElementById('stake-lvl').innerText = stakeLevel;
+        if(hasAuto) document.getElementById('auto-btn').innerText = "SOTIB OLINGAN";
     }
 
     function switchTab(tab, el) {
@@ -274,8 +246,6 @@
         el.classList.add('active');
     }
 
-    // Initial load
-    document.getElementById('total-bal').innerText = Math.floor(balance).toLocaleString();
     updateUI();
 </script>
 </body>
