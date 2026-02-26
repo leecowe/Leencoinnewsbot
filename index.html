@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova Kombat</title>
+    <title>Leenova Kombat - Evolutsiya</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -18,87 +18,66 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         body { background: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* HEADER & RANK */
+        /* HEADER */
         .header { padding: 15px; display: flex; align-items: center; gap: 10px; background: #1c1f24; border-bottom: 1px solid #32363c; }
-        .user-block { display: flex; align-items: center; gap: 10px; flex-grow: 1; cursor: pointer; padding: 5px; border-radius: 12px; transition: background 0.2s; }
-        .user-block:active { background: rgba(255,255,255,0.05); }
-        
+        .user-block { display: flex; align-items: center; gap: 10px; flex-grow: 1; cursor: pointer; }
         .avatar-box { width: 42px; height: 42px; background: var(--accent-yellow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 18px; }
-        .user-meta h4 { font-size: 14px; margin-bottom: 2px; }
         
         .rank-container { display: flex; align-items: center; gap: 8px; width: 140px; }
         .rank-text { font-size: 11px; color: var(--accent-yellow); font-weight: 700; }
         .rank-progress-mini { flex-grow: 1; height: 6px; background: #32363c; border-radius: 10px; overflow: hidden; }
         .rank-fill-mini { height: 100%; background: var(--accent-yellow); width: 0%; transition: width 0.3s; }
-        .rank-lvl-num { font-size: 11px; color: var(--text-sub); }
 
-        .settings-btn { cursor: pointer; padding: 8px; font-size: 20px; color: var(--text-sub); }
-
-        /* MODAL COMMON */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; backdrop-filter: blur(5px); }
-        .modal-content { position: absolute; bottom: 0; width: 100%; background: var(--panel-color); border-radius: 25px 25px 0 0; padding: 25px; border-top: 2px solid var(--accent-yellow); max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-modal { font-size: 24px; cursor: pointer; color: var(--text-sub); }
-
-        /* RANK LIST STYLE */
-        .rank-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; border: 1px solid transparent; }
-        .rank-list-item.active { border-color: var(--accent-yellow); background: rgba(245, 187, 95, 0.1); }
-        .rank-info-left { display: flex; flex-direction: column; }
-        .r-name { font-weight: bold; font-size: 14px; }
-        .r-req { font-size: 12px; color: var(--text-sub); }
-        .r-status { font-size: 12px; font-weight: bold; color: var(--accent-yellow); }
-
-        /* Qolgan qismlar o'zgarishsiz (Top stats, Clicker, Navbar...) */
-        .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 15px; }
-        .stat-item { background: var(--panel-color); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #333; }
-        .stat-label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .stat-value { font-size: 12px; font-weight: 700; }
-
-        .balance-main { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 40px 0; font-size: 44px; font-weight: 900; }
-        .coin-img { width: 45px; height: 45px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 15px rgba(245,187,95,0.5); }
+        /* MAIN CONTENT */
+        .view-port { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 50px; }
         
-        .main-button { width: 280px; height: 280px; background: radial-gradient(circle, #32363c, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 10px solid #1c1f24; margin: 0 auto; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .robot-img { width: 180px; height: 180px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+        .balance-main { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; font-size: 44px; font-weight: 900; }
+        .coin-img { width: 45px; height: 45px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 15px rgba(245,187,95,0.5); }
 
-        .energy-hud { padding: 20px; margin-top: auto; }
-        .energy-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: bold; }
-        .bar-bg { height: 10px; background: #32363c; border-radius: 10px; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, #f5bb5f, #fffb12); border-radius: 10px; transition: width 0.2s; }
+        /* PERSONAJ VA CLICKER */
+        .character-container { position: relative; width: 280px; height: 280px; margin-bottom: 20px; }
+        .main-button { 
+            width: 100%; height: 100%; 
+            background: radial-gradient(circle, #32363c, #000); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; border: 10px solid #1c1f24; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 0.05s;
+        }
+        .main-button:active { transform: scale(0.96); }
+        .robot-img { width: 190px; height: 190px; transition: all 0.5s ease; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
 
-        .navbar { background: #272a30; display: grid; grid-template-columns: repeat(4, 1fr); padding: 12px 0; border-top: 1px solid #333; }
-        .nav-tab { text-align: center; color: var(--text-sub); font-size: 10px; cursor: pointer; }
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; }
+        .modal-content { position: absolute; bottom: 0; width: 100%; background: var(--panel-color); border-radius: 25px 25px 0 0; padding: 25px; border-top: 2px solid var(--accent-yellow); max-height: 70vh; overflow-y: auto; }
+        .rank-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; border: 1px solid transparent; }
+        .rank-list-item.active { border-color: var(--accent-yellow); background: rgba(245,187,95,0.1); }
+
+        /* STATS & NAVBAR */
+        .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 15px; width: 100%; }
+        .stat-item { background: var(--panel-color); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+        .stat-label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; }
+        .stat-value { font-size: 12px; font-weight: 700; display: block; margin-top: 2px; }
+
+        .energy-hud { padding: 20px; width: 100%; }
+        .bar-bg { height: 10px; background: #32363c; border-radius: 10px; margin-top: 8px; }
+        .bar-fill { height: 100%; background: var(--accent-yellow); border-radius: 10px; transition: width 0.2s; }
+
+        .navbar { background: #1c1f24; display: grid; grid-template-columns: repeat(4, 1fr); padding: 12px 0; border-top: 1px solid #333; width: 100%; }
+        .nav-tab { text-align: center; color: var(--text-sub); font-size: 10px; }
         .nav-tab.active { color: #fff; }
-        .nav-tab i { display: block; font-size: 22px; margin-bottom: 4px; }
 
-        .tap-anim { position: absolute; color: white; font-size: 32px; font-weight: 900; pointer-events: none; animation: fly 0.6s ease-out forwards; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
+        .tap-anim { position: absolute; color: white; font-size: 32px; font-weight: 900; pointer-events: none; animation: fly 0.6s forwards; z-index: 1000; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
 
-    <div id="rank-modal" class="modal" onclick="closeModal('rank-modal')">
+    <div id="rank-modal" class="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Darajalar</h3>
-                <span class="close-modal" onclick="closeModal('rank-modal')">✕</span>
-            </div>
-            <div id="rank-list">
-                </div>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="modal" onclick="closeModal('settings-modal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Sozlamalar</h3>
-                <span class="close-modal" onclick="closeModal('settings-modal')">✕</span>
-            </div>
-            <div style="padding: 10px 0; display: flex; justify-content: space-between;">
-                <span>Vibratsiya</span>
-                <input type="checkbox" checked onchange="useHaptic = this.checked">
-            </div>
-            <hr style="border:0; border-top: 1px solid #333; margin: 15px 0;">
-            <p style="color:var(--text-sub); font-size: 12px; text-align: center;">Versiya: 4.0.0 Stable</p>
+            <h3 style="margin-bottom:20px">Darajalar va Personajlar</h3>
+            <div id="rank-list"></div>
         </div>
     </div>
 
@@ -109,173 +88,133 @@
                 <h4 id="user-name">Bexruz</h4>
                 <div class="rank-container">
                     <span class="rank-text" id="rank-name">Bronze</span>
-                    <div class="rank-progress-mini">
-                        <div class="rank-fill-mini" id="rank-fill"></div>
-                    </div>
-                    <span class="rank-lvl-num" id="rank-lvl">1/10</span>
+                    <div class="rank-progress-mini"><div class="rank-fill-mini" id="rank-fill"></div></div>
                 </div>
             </div>
         </div>
-        <div class="settings-btn" onclick="openModal('settings-modal')">⚙️</div>
+        <div style="font-size:20px">⚙️</div>
     </div>
 
     <div class="top-stats">
-        <div class="stat-item">
-            <span class="stat-label">Tap Profit</span>
-            <span class="stat-value" id="ui-pwt">+1</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Next Rank</span>
-            <span class="stat-value" id="ui-next-rank" style="color:var(--accent-yellow)">5K</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Profit/hr</span>
-            <span class="stat-value" id="ui-pph" style="color:#4ade80">+0</span>
-        </div>
+        <div class="stat-item"><span class="stat-label">Tap Profit</span><span class="stat-value">+1</span></div>
+        <div class="stat-item"><span class="stat-label">Next Rank</span><span class="stat-value" id="ui-next">5K</span></div>
+        <div class="stat-item"><span class="stat-label">Profit/hr</span><span class="stat-value" style="color:#4ade80">+0</span></div>
     </div>
 
     <div class="view-port">
-        <section id="exchange" class="section active" style="display: block;">
-            <div class="balance-main">
-                <div class="coin-img"></div>
-                <span id="ui-bal">0</span>
-            </div>
+        <div class="balance-main">
+            <div class="coin-img"></div>
+            <span id="ui-bal">0</span>
+        </div>
+
+        <div class="character-container">
             <div class="main-button" id="tap-target">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Bexruz" class="robot-img">
+                <img id="char-img" src="" class="robot-img" alt="character">
             </div>
-        </section>
+        </div>
     </div>
 
     <div class="energy-hud">
-        <div class="energy-info">
+        <div style="display:flex; justify-content:space-between; font-size:14px">
             <span>⚡ <span id="ui-energy">1000</span> / 1000</span>
         </div>
-        <div class="bar-bg">
-            <div class="bar-fill" id="ui-bar" style="width: 100%;"></div>
-        </div>
+        <div class="bar-bg"><div class="bar-fill" id="ui-bar" style="width:100%"></div></div>
     </div>
 
     <nav class="navbar">
-        <div class="nav-tab active"><i>🏠</i>Exchange</div>
-        <div class="nav-tab"><i>⛏️</i>Mine</div>
-        <div class="nav-tab"><i>👥</i>Friends</div>
-        <div class="nav-tab"><i>🐹</i>Airdrop</div>
+        <div class="nav-tab active">🏠<br>Exchange</div>
+        <div class="nav-tab">⛏️<br>Mine</div>
+        <div class="nav-tab">👥<br>Friends</div>
+        <div class="nav-tab">🐹<br>Airdrop</div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        let useHaptic = true;
 
+        // PERSONAJLAR RO'YXATI (Har bir rank uchun har xil ko'rinish)
         const RANKS = [
-            { name: "Bronze", min: 0 },
-            { name: "Silver", min: 5000 },
-            { name: "Gold", min: 25000 },
-            { name: "Platinum", min: 100000 },
-            { name: "Diamond", min: 1000000 },
-            { name: "Master", min: 5000000 },
-            { name: "Grandmaster", min: 20000000 },
-            { name: "Elite", min: 50000000 },
-            { name: "Legendary", min: 100000000 },
-            { name: "Lord", min: 500000000 }
+            { name: "Bronze", min: 0, img: "https://api.dicebear.com/7.x/bottts/svg?seed=1&colors=7d7d7d" },
+            { name: "Silver", min: 5000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=2&colors=c0c0c0" },
+            { name: "Gold", min: 25000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=3&colors=f5bb5f" },
+            { name: "Platinum", min: 100000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=4&colors=e5e4e2" },
+            { name: "Diamond", min: 1000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=5&colors=b9f2ff" },
+            { name: "Master", min: 5000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=6&colors=ff4d4d" },
+            { name: "Legendary", min: 50000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=7&colors=9933ff" }
         ];
 
-        let state = JSON.parse(localStorage.getItem('leenova_v4')) || {
-            bal: 0,
-            energy: 1000,
-            pwt: 1,
-            pph: 0
-        };
-
-        function openModal(id) {
-            document.getElementById(id).style.display = 'block';
-            if(useHaptic) tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        function openRankModal() {
-            const list = document.getElementById('rank-list');
-            list.innerHTML = '';
-            
-            let currentRankIdx = getRankIndex();
-
-            RANKS.forEach((r, i) => {
-                const item = document.createElement('div');
-                item.className = `rank-list-item ${i === currentRankIdx ? 'active' : ''}`;
-                item.innerHTML = `
-                    <div class="rank-info-left">
-                        <span class="r-name">${r.name}</span>
-                        <span class="r-req">Min: ${r.min.toLocaleString()}</span>
-                    </div>
-                    <span class="r-status">${i === currentRankIdx ? 'Hozirgi' : (state.bal >= r.min ? '✅' : '🔒')}</span>
-                `;
-                list.appendChild(item);
-            });
-            openModal('rank-modal');
-        }
-
-        function getRankIndex() {
-            let idx = 0;
-            for (let i = RANKS.length - 1; i >= 0; i--) {
-                if (state.bal >= RANKS[i].min) return i;
-            }
-            return 0;
-        }
+        let state = JSON.parse(localStorage.getItem('leenova_save')) || { bal: 0, energy: 1000 };
 
         function updateUI() {
-            const bal = Math.floor(state.bal);
-            document.getElementById('ui-bal').innerText = bal.toLocaleString();
+            document.getElementById('ui-bal').innerText = Math.floor(state.bal).toLocaleString();
             document.getElementById('ui-energy').innerText = Math.floor(state.energy);
             document.getElementById('ui-bar').style.width = (state.energy / 10) + "%";
-            document.getElementById('ui-pph').innerText = "+" + state.pph.toLocaleString();
-            
-            let idx = getRankIndex();
-            const cur = RANKS[idx];
-            const next = RANKS[idx + 1] || cur;
+
+            // Rank va Personajni aniqlash
+            let currentIdx = 0;
+            for (let i = RANKS.length - 1; i >= 0; i--) {
+                if (state.bal >= RANKS[i].min) {
+                    currentIdx = i;
+                    break;
+                }
+            }
+
+            const cur = RANKS[currentIdx];
+            const next = RANKS[currentIdx + 1] || cur;
 
             document.getElementById('rank-name').innerText = cur.name;
-            document.getElementById('rank-lvl').innerText = (idx + 1) + "/10";
+            document.getElementById('char-img').src = cur.img; // Personaj rasmmi o'zgaradi
             
-            if (idx < RANKS.length - 1) {
+            if (currentIdx < RANKS.length - 1) {
                 let prog = ((state.bal - cur.min) / (next.min - cur.min)) * 100;
                 document.getElementById('rank-fill').style.width = Math.min(100, prog) + "%";
-                document.getElementById('ui-next-rank').innerText = next.min >= 1000000 ? (next.min/1000000).toFixed(1) + "M" : (next.min/1000) + "K";
+                document.getElementById('ui-next').innerText = next.min >= 1000000 ? (next.min/1000000).toFixed(1) + "M" : (next.min/1000) + "K";
             } else {
                 document.getElementById('rank-fill').style.width = "100%";
-                document.getElementById('ui-next-rank').innerText = "MAX";
+                document.getElementById('ui-next').innerText = "MAX";
             }
-            
-            localStorage.setItem('leenova_v4', JSON.stringify(state));
+
+            localStorage.setItem('leenova_save', JSON.stringify(state));
         }
 
         document.getElementById('tap-target').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (state.energy < state.pwt) return;
-            
+            if (state.energy <= 0) return;
+
             for (let i = 0; i < e.targetTouches.length; i++) {
-                state.bal += state.pwt;
-                state.energy -= state.pwt;
+                state.bal += 1;
+                state.energy -= 1;
                 
                 const t = e.targetTouches[i];
                 const anim = document.createElement('div');
                 anim.className = 'tap-anim';
-                anim.innerText = "+" + state.pwt;
+                anim.innerText = "+1";
                 anim.style.left = t.clientX + "px";
                 anim.style.top = t.clientY + "px";
                 document.body.appendChild(anim);
                 setTimeout(() => anim.remove(), 600);
             }
-            if(useHaptic) tg.HapticFeedback.impactOccurred('light');
+            tg.HapticFeedback.impactOccurred('light');
             updateUI();
         });
 
+        function openRankModal() {
+            const list = document.getElementById('rank-list');
+            list.innerHTML = '';
+            RANKS.forEach(r => {
+                const item = document.createElement('div');
+                item.className = `rank-list-item ${state.bal >= r.min ? 'active' : ''}`;
+                item.innerHTML = `<span>${r.name}</span><span>${r.min.toLocaleString()}</span>`;
+                list.appendChild(item);
+            });
+            document.getElementById('rank-modal').style.display = 'block';
+        }
+
         setInterval(() => {
-            if (state.energy < 1000) state.energy = Math.min(1000, state.energy + 3);
-            if (state.pph > 0) state.bal += (state.pph / 3600);
-            updateUI();
+            if (state.energy < 1000) {
+                state.energy = Math.min(1000, state.energy + 2);
+                updateUI();
+            }
         }, 1000);
 
         updateUI();
