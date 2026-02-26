@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Strategic Hack</title>
+    <title>Aira Protocol | Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -11,157 +11,156 @@
             --cyan: #00f2ff;
             --pink: #ff007f;
             --bg: #050a10;
-            --glass: rgba(0, 242, 255, 0.05);
             --border: rgba(0, 242, 255, 0.2);
-            --glow: 0 0 20px rgba(0, 242, 255, 0.3);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif;
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-            background-image: radial-gradient(circle at 50% 50%, #0a1a25 0%, #050a10 100%);
         }
 
-        .header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .bal-label { font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); letter-spacing: 4px; }
-        .bal-val { font-family: 'Orbitron'; font-size: 52px; font-weight: 900; text-shadow: var(--glow); margin: 5px 0; }
+        /* Stats Section */
+        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .bal-val { font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--cyan); }
+        .level-info { font-family: 'Orbitron'; font-size: 12px; color: var(--pink); margin-top: 5px; }
 
-        /* STRATEGIC GAME AREA */
-        .game-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .grid-container {
-            display: grid; grid-template-columns: repeat(3, 80px); gap: 15px;
-            padding: 20px; border: 1px solid var(--border); border-radius: 20px; background: var(--glass);
+        /* Game Board */
+        .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 280px; }
+        .tile {
+            aspect-ratio: 1; background: rgba(0, 242, 255, 0.05); border: 2px solid var(--border);
+            border-radius: 15px; display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 20px; transition: 0.2s; cursor: pointer;
         }
-        .node {
-            width: 80px; height: 80px; background: rgba(0, 242, 255, 0.1);
-            border: 2px solid var(--border); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron'; font-size: 24px; cursor: pointer; transition: 0.3s;
+        .tile.blink { background: var(--cyan); box-shadow: 0 0 25px var(--cyan); border-color: #fff; }
+
+        /* Reward Modal */
+        #reward-modal {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; background: #0a1a25; border: 2px solid var(--cyan); padding: 20px;
+            border-radius: 20px; z-index: 100; text-align: center; backdrop-filter: blur(10px);
         }
-        .node.active { border-color: var(--cyan); box-shadow: var(--glow); transform: scale(1.05); background: rgba(0, 242, 255, 0.2); }
-        .node.match { border-color: var(--pink); box-shadow: 0 0 20px var(--pink); background: rgba(255, 0, 127, 0.2); }
+        .opt-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            background: var(--glass); border: 1px solid var(--cyan); color: #fff;
+            border-radius: 10px; font-family: 'Orbitron'; cursor: pointer;
+        }
 
-        .game-info { margin-top: 20px; text-align: center; font-family: 'Orbitron'; font-size: 14px; color: var(--cyan); }
-
-        /* NAVIGATION */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(0,0,0,0.9); display: flex; border-top: 1px solid var(--border); }
-        .n-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; }
-        .n-btn.active { color: var(--cyan); border-top: 3px solid var(--cyan); background: linear-gradient(0deg, rgba(0,242,255,0.1), transparent); }
+        /* Nav */
+        .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
+        .n-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
+        .n-item.active { color: var(--cyan); border-top: 3px solid var(--cyan); }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="bal-label">AIRA PROTOCOL V2.0</div>
+    <div class="header">
         <div class="bal-val" id="score">0</div>
-        <div id="status" style="color: var(--pink); font-size: 12px; font-family: 'Orbitron';">TIZIMNI BUZIB KIRING...</div>
-    </header>
+        <div class="level-info" id="lvl-display">PROTOCOL LEVEL: 1</div>
+    </div>
 
-    <div class="game-stage" id="game-view">
-        <div class="grid-container" id="grid">
-            </div>
-        <div class="game-info" id="timer">VAQT: 30s</div>
+    <div class="game-area">
+        <div class="grid" id="board"></div>
+        <div id="reward-modal">
+            <h3 style="font-family:'Orbitron'; color:var(--cyan)">MUKOFOTNI TANLANG</h3>
+            <button class="opt-btn" onclick="claim(1)">+50 DATA COINS</button>
+            <button class="opt-btn" onclick="claim(2)">+1.5x MULTIPLIER</button>
+        </div>
+        <p id="msg" style="margin-top:20px; font-family:'Orbitron'; font-size:12px; color:var(--cyan)">TAYYOR TURING...</p>
     </div>
 
     <div class="nav">
-        <div class="n-btn active">HACK</div>
-        <div class="n-btn" onclick="tg.showAlert('Tez kunda!')">MARKET</div>
-        <div class="n-btn" onclick="tg.showAlert('Tez kunda!')">NFT</div>
+        <div class="n-item active">HACK</div>
+        <div class="n-item">MARKET</div>
+        <div class="n-item">WALLET</div>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    let state = {
+        score: parseInt(localStorage.getItem('a_sc')) || 0,
+        level: parseInt(localStorage.getItem('a_lv')) || 1,
+        diff: 1000, // boshlang'ich tezlik (ms)
+        seqLen: 3
+    };
 
-    // MALUMOTLARNI SAQLASH (LocalStorage)
-    let score = parseInt(localStorage.getItem('aira_score')) || 0;
     let sequence = [];
-    let userSequence = [];
-    let timeLeft = 30;
-    let gameActive = false;
+    let userStep = 0;
 
-    const scoreEl = document.getElementById('score');
-    const gridEl = document.getElementById('grid');
-    const statusEl = document.getElementById('status');
-    const timerEl = document.getElementById('timer');
-
-    function initGrid() {
-        gridEl.innerHTML = '';
+    function init() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
         for(let i=0; i<9; i++) {
-            const node = document.createElement('div');
-            node.className = 'node';
-            node.dataset.id = i;
-            node.innerText = '?';
-            node.onclick = () => handleNodeClick(i, node);
-            gridEl.appendChild(node);
+            let t = document.createElement('div');
+            t.className = 'tile';
+            t.onclick = () => handleTap(i, t);
+            board.appendChild(t);
         }
-        scoreEl.innerText = score;
+        document.getElementById('score').innerText = state.score;
+        document.getElementById('lvl-display').innerText = `PROTOCOL LEVEL: ${state.level}`;
+        setTimeout(startRound, 2000);
     }
 
-    function startGame() {
-        sequence = Array.from({length: 3}, () => Math.floor(Math.random() * 9));
-        userSequence = [];
-        showSequence();
-    }
+    function startRound() {
+        sequence = [];
+        userStep = 0;
+        document.getElementById('msg').innerText = "ESLAB QOLING!";
+        
+        for(let i=0; i < state.seqLen; i++) {
+            sequence.push(Math.floor(Math.random() * 9));
+        }
 
-    function showSequence() {
         let i = 0;
-        gameActive = false;
         const interval = setInterval(() => {
-            const nodes = document.querySelectorAll('.node');
-            nodes.forEach(n => n.classList.remove('active'));
-            nodes[sequence[i]].classList.add('active');
-            
+            const tiles = document.querySelectorAll('.tile');
+            tiles[sequence[i]].classList.add('blink');
+            setTimeout(() => tiles[sequence[i]].classList.remove('blink'), state.diff * 0.7);
             i++;
             if(i >= sequence.length) {
                 clearInterval(interval);
                 setTimeout(() => {
-                    nodes.forEach(n => n.classList.remove('active'));
-                    statusEl.innerText = "KETMA-KETLIKNI QAYTARING!";
-                    gameActive = true;
-                }, 1000);
+                    document.getElementById('msg').innerText = "QAYTARING!";
+                }, state.diff);
             }
-        }, 800);
+        }, state.diff);
     }
 
-    function handleNodeClick(id, node) {
-        if(!gameActive) return;
-
-        userSequence.push(id);
-        node.classList.add('active');
-        setTimeout(() => node.classList.remove('active'), 300);
-
-        if(userSequence[userSequence.length-1] !== sequence[userSequence.length-1]) {
-            tg.HapticFeedback.notificationOccurred('error');
-            statusEl.innerText = "XATO! QAYTADAN BOSHLANG.";
-            startGame();
-            return;
-        }
-
-        if(userSequence.length === sequence.length) {
-            score += 10;
-            localStorage.setItem('aira_score', score); // SAQLASH
-            scoreEl.innerText = score;
-            tg.HapticFeedback.notificationOccurred('success');
-            statusEl.innerText = "MUVAFFAQIYATLI HACK! +10";
-            setTimeout(startGame, 1000);
-        }
-    }
-
-    // Timer logic
-    setInterval(() => {
-        if(timeLeft > 0) {
-            timeLeft--;
-            timerEl.innerText = `VAQT: ${timeLeft}s`;
+    function handleTap(id, el) {
+        if(id === sequence[userStep]) {
+            el.classList.add('blink');
+            setTimeout(() => el.classList.remove('blink'), 200);
+            userStep++;
+            if(userStep === sequence.length) {
+                document.getElementById('reward-modal').style.display = 'block';
+                tg.HapticFeedback.notificationOccurred('success');
+            }
         } else {
-            timeLeft = 30;
-            startGame();
+            tg.HapticFeedback.notificationOccurred('error');
+            document.getElementById('msg').innerText = "XATO! TIZIM QAYTA YUKLANMOQDA...";
+            setTimeout(startRound, 2000);
         }
-    }, 1000);
+    }
 
-    initGrid();
-    startGame();
+    function claim(type) {
+        if(type === 1) state.score += 50;
+        else state.score += 100; // Multiplier mantiqi uchun soddalashtirilgan
+
+        state.level++;
+        // 20% QIYINLASHISH: Tezlikni oshirish va har 3 levelda uzunlikni qo'shish
+        state.diff = Math.max(300, state.diff * 0.8); // 20% tezlashadi
+        if(state.level % 3 === 0) state.seqLen++;
+
+        localStorage.setItem('a_sc', state.score);
+        localStorage.setItem('a_lv', state.level);
+        
+        document.getElementById('reward-modal').style.display = 'none';
+        document.getElementById('score').innerText = state.score;
+        document.getElementById('lvl-display').innerText = `PROTOCOL LEVEL: ${state.level}`;
+        startRound();
+    }
+
+    init();
 </script>
 </body>
 </html>
