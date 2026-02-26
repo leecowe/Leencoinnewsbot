@@ -3,177 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Cyber Edition</title>
+    <title>Aira Protocol | Ultra Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #00f2ff;
-            --accent: #7000ff;
-            --bg: #0a0b10;
-            --card-bg: rgba(22, 24, 33, 0.8);
-            --text-main: #ffffff;
-            --text-dim: #a0a0b0;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --gold: #ffcf4b;
-            --success: #4cd137;
+        :root { 
+            --primary: #00f2ff; --accent: #7000ff; --bg: #0a0b10; 
+            --card-bg: rgba(22, 24, 33, 0.9); --text-main: #ffffff; 
+            --text-dim: #a0a0b0; --border-color: rgba(255, 255, 255, 0.08); 
+            --gold: #ffcf4b; --success: #4cd137; 
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body { 
-            background: var(--bg); 
-            color: var(--text-main); 
-            font-family: 'Outfit', sans-serif; 
-            margin: 0; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
+            background: var(--bg); color: var(--text-main); 
+            font-family: 'Outfit', sans-serif; margin: 0; 
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
         }
 
-        /* 1. Futuristic Header */
+        /* UI Elements */
         .header { 
-            padding: 45px 20px 30px; 
-            text-align: center; 
-            background: radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.15) 0%, var(--bg) 80%);
-            border-bottom: 1px solid var(--border-color);
-            position: relative;
+            padding: 45px 20px 25px; text-align: center; 
+            background: radial-gradient(circle at top, rgba(0, 242, 255, 0.1) 0%, var(--bg) 100%); 
+            border-bottom: 1px solid var(--border-color); 
         }
 
-        .career-badge {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--primary);
-            text-transform: uppercase;
-            background: rgba(0, 242, 255, 0.1);
-            padding: 6px 16px;
-            border-radius: 30px;
-            display: inline-block;
-            margin-bottom: 15px;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+        .bal-val { font-size: 40px; font-weight: 800; letter-spacing: -1px; margin: 10px 0; display: block; text-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+
+        .rank-card { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); 
+            border-radius: 20px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border-color); 
         }
 
-        .bal-container { margin: 10px 0; }
-        .bal-val { font-size: 48px; font-weight: 800; letter-spacing: -1px; text-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        .progress-container { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 12px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--primary); }
+        
+        .rank-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
-        .profit-box {
-            position: absolute;
-            top: 40px;
-            right: 20px;
-            font-size: 11px;
-            color: var(--success);
-            font-weight: 700;
-            background: rgba(76, 209, 55, 0.1);
-            padding: 6px 12px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(76, 209, 55, 0.2);
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .view-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-upgrade { 
+            background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; 
+            padding: 15px; border-radius: 18px; width: 100%; margin-top: 10px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            font-weight: 600; cursor: pointer; transition: 0.2s;
         }
+        .btn-upgrade:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
 
-        /* 2. Scrollable Content Area */
-        .view-content { 
-            flex: 1; 
-            display: none; 
-            padding: 20px; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch;
+        /* Leaderboard */
+        .leader-item { 
+            display: flex; align-items: center; padding: 12px 16px; 
+            background: var(--card-bg); border-radius: 16px; 
+            border: 1px solid var(--border-color); margin-bottom: 10px; 
         }
-        .view-content.active { display: block; animation: slideUp 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 3. Cards & Glassmorphism */
-        .glass-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            border-radius: 28px; 
-            padding: 24px; 
-            margin-bottom: 20px; 
-            backdrop-filter: blur(15px);
+        .leader-item.me { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); box-shadow: 0 0 15px rgba(0, 242, 255, 0.1); }
+        .leader-rank { width: 30px; font-weight: 800; color: var(--text-dim); }
+        .leader-avatar { 
+            width: 36px; height: 36px; background: linear-gradient(45deg, var(--accent), var(--primary)); 
+            border-radius: 10px; margin-right: 12px; display: flex; align-items: center; 
+            justify-content: center; font-size: 12px; font-weight: 800; color: #fff; 
         }
+        .leader-info { flex: 1; }
+        .leader-name { font-size: 14px; font-weight: 600; display: block; }
+        .leader-score { font-size: 12px; color: var(--gold); font-weight: 800; }
 
-        .label-dim { color: var(--text-dim); font-size: 13px; font-weight: 500; }
-        .val-highlight { color: var(--primary); font-weight: 700; }
-
-        /* 4. Interactive Buttons */
-        .btn-primary { 
-            background: var(--primary); 
-            color: #000; 
-            border: none; 
-            padding: 18px; 
-            border-radius: 18px; 
-            font-weight: 800; 
-            width: 100%; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 13px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 6px 20px rgba(0, 242, 255, 0.2);
-        }
-        .btn-primary:active { transform: scale(0.96); box-shadow: none; }
-        .btn-primary:disabled { background: #1d1f2a !important; color: #444 !important; cursor: not-allowed; box-shadow: none; }
-
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid var(--primary);
-            color: var(--primary);
-            margin-top: 15px;
-            box-shadow: none;
-        }
-
-        /* 5. Bottom Navigation */
-        .nav { 
-            height: 85px; 
-            background: rgba(13, 15, 23, 0.95); 
-            display: flex; 
-            border-top: 1px solid var(--border-color); 
-            padding-bottom: env(safe-area-inset-bottom);
-            backdrop-filter: blur(10px);
-        }
-        .nav-item { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            color: #4e5471; 
-            font-size: 10px; 
-            font-weight: 700; 
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            transition: 0.3s;
-        }
-        .nav-item svg { margin-bottom: 6px; fill: #4e5471; transition: 0.3s; }
+        .nav { height: 75px; background: rgba(13, 15, 23, 0.95); display: flex; border-top: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #4e5471; font-size: 10px; font-weight: 700; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
-        .nav-item.active svg { fill: var(--primary); transform: translateY(-3px); filter: drop-shadow(0 0 5px var(--primary)); }
-
-        /* 6. Assets Grid */
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-bottom: 20px; }
-        .nft-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color);
-            border-radius: 24px; 
-            padding: 24px 15px; 
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .nft-card.owned { border-color: var(--gold); background: rgba(255, 207, 75, 0.03); }
-        .nft-card.owned::after {
-            content: "OWNED";
-            position: absolute;
-            top: 10px;
-            left: -20px;
-            background: var(--gold);
-            color: #000;
-            font-size: 8px;
-            font-weight: 900;
-            padding: 2px 20px;
-            transform: rotate(-45deg);
-        }
+        .nav-item svg { margin-bottom: 4px; fill: currentColor; transition: 0.3s; }
 
         ::-webkit-scrollbar { width: 0; }
     </style>
@@ -181,294 +82,214 @@
 <body>
 
     <header class="header">
-        <div id="career-name" class="career-badge">BOSHLANG'ICH</div>
-        <div class="profit-box" id="profit-val">+0/s</div>
-        <div class="bal-container">
-            <span class="bal-val" id="total-bal">0</span>
-        </div>
-        <div id="staked-info" style="color: var(--gold); font-size: 12px; font-weight: 800; visibility: hidden; margin-top: 8px;">
-            <span style="opacity: 0.7;">STAKED:</span> <span id="staked-amt">0</span>
-        </div>
+        <div id="user-display-name" style="font-size: 12px; color: var(--text-dim); margin-bottom: 5px; font-weight: 600;">@username</div>
+        <div id="career-badge" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">LOADING...</div>
+        <span class="bal-val" id="total-bal">0</span>
+        <div style="font-size: 12px; color: var(--success); font-weight: 700;" id="profit-val">+0/s</div>
     </header>
 
     <div id="view-core" class="view-content active">
-        <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <span class="label-dim">STAKING <span class="val-highlight" id="stake-lvl">LVL 0</span></span>
-                <span id="stake-timer" style="font-weight:800; font-size:12px; color: var(--primary); letter-spacing: 1px;">READY</span>
+        <div class="rank-card">
+            <div class="rank-labels">
+                <span id="current-rank-name">Bronze</span>
+                <span id="next-rank-name" style="color: var(--text-dim)">Silver</span>
             </div>
-            <button class="btn-primary" onclick="startStake()" id="stake-btn">STAKE ALL BALANCE</button>
-            
-            <div style="border-top: 1px solid var(--border-color); margin-top:24px; padding-top:20px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:12px">
-                    <span class="label-dim">Profit Multiplier</span>
-                    <span class="val-highlight" id="next-multiplier">+5%</span>
-                </div>
-                <button class="btn-primary btn-outline" onclick="upgradeStake()" id="stake-up-btn">
-                    UPGRADE <span id="stake-cost-tag">(500)</span>
-                </button>
+            <div class="progress-container">
+                <div class="progress-bar" id="rank-progress"></div>
+            </div>
+            <div style="text-align: center; font-size: 10px; color: var(--text-dim);">
+                KEYINGI RANK: <span id="needed-bal" style="color: #fff">0</span> AIRA
             </div>
         </div>
 
-        <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <span class="label-dim">FARMING <span class="val-highlight" id="farm-lvl">LVL 1</span></span>
-                <span id="aps-ui" style="font-weight:800; color: var(--success); text-shadow: 0 0 10px rgba(76, 209, 55, 0.2);">50/s</span>
-            </div>
-            <button class="btn-primary" onclick="upgradeFarm()" id="farm-up-btn">
-                UPGRADE FARM <span id="farm-cost-tag">(500)</span>
+        <button class="btn-upgrade" onclick="upgradeFarm()">
+            <span>🚜 FARMING LVL <b id="farm-lvl">1</b></span>
+            <span style="color: var(--primary)" id="farm-cost">500</span>
+        </button>
+
+        <button class="btn-upgrade" onclick="upgradeStake()">
+            <span>🏦 STAKING LVL <b id="stake-lvl">0</b></span>
+            <span style="color: var(--primary)" id="stake-cost">500</span>
+        </button>
+
+        <div style="margin-top: 20px;">
+            <button id="stake-btn" onclick="startStake()" style="width: 100%; padding: 18px; border-radius: 20px; border: none; background: var(--primary); color: #000; font-weight: 800; text-transform: uppercase; font-size: 14px; cursor: pointer;">
+                STAKE ALL (<span id="stake-timer">TAYYOR</span>)
             </button>
         </div>
     </div>
 
-    <div id="view-collection" class="view-content">
-        <h3 style="font-weight:800; margin: 0 0 25px 5px; letter-spacing: -0.5px;">MY COLLECTION</h3>
-        <div class="nft-grid" id="nft-list"></div>
-        <button id="load-more" class="btn-primary btn-outline" style="margin-bottom: 40px;" onclick="loadMoreNFTs()">DISCOVER MORE</button>
-    </div>
-
-    <div id="view-market" class="view-content">
-        <h3 style="font-weight:800; margin: 0 0 25px 5px;">MARKETPLACE</h3>
-        <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div style="font-weight:800; font-size:16px; margin-bottom: 4px;">Auto-Staking Bot</div>
-                    <div class="label-dim">Auto-stake every 30s</div>
-                </div>
-                <button class="btn-primary" style="width:auto; padding: 12px 28px;" onclick="buyAuto()" id="auto-btn">15k</button>
-            </div>
-        </div>
+    <div id="view-rank" class="view-content">
+        <h3 style="margin: 0 0 5px 0; font-weight: 800;">GLOBAL REYTING</h3>
+        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 20px;">Eng yaxshi natija ko'rsatganlar</p>
+        <div class="leader-list" id="leader-list"></div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">
             <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-            Terminal
+            TERMINAL
         </div>
-        <div class="nav-item" onclick="switchTab('collection', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-            Assets
-        </div>
-        <div class="nav-item" onclick="switchTab('market', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 5h6v2H9V5z"/></svg>
-            Market
+        <div class="nav-item" onclick="switchTab('rank', this)">
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M16 11V5h4v6h-4zm-6 4V9h4v6h-4zm-6 4V13h4v6H4z"/></svg>
+            REYTINQ
         </div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
+    tg.ready();
     tg.expand();
-    tg.enableClosingConfirmation();
 
-    // --- State Management ---
+    // 1. Foydalanuvchi Identity mantig'i
+    const user = tg.initDataUnsafe?.user || { first_name: "O'yinchi", last_name: "", username: "Guest" };
+    const fullName = (user.first_name + " " + (user.last_name || "")).trim();
+    const userInitials = (user.first_name[0] + (user.last_name ? user.last_name[0] : (user.first_name[1] || "P"))).toUpperCase();
+    
+    document.getElementById('user-display-name').innerText = user.username ? "@" + user.username : fullName;
+
+    // 2. O'yin holati
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
     let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
-    let hasAuto = localStorage.getItem('aira_auto') === 'true';
-    let ownedNFTs = JSON.parse(localStorage.getItem('aira_nfts')) || [];
-
     let isStaking = false;
-    let currentStaked = 0;
-    let autoTimer = 0;
-    let nftPage = 1;
 
-    // --- Core Logic ---
+    const ranks = [
+        { name: "BRONZE", min: 0, max: 10000, color: "#cd7f32" },
+        { name: "SILVER", min: 10000, max: 100000, color: "#c0c0c0" },
+        { name: "GOLD", min: 100000, max: 1000000, color: "#ffcf4b" },
+        { name: "DIAMOND", min: 1000000, max: 10000000, color: "#00f2ff" },
+        { name: "IMPERATOR", min: 10000000, max: 999999999, color: "#ff00ff" }
+    ];
+
     function f(n) {
-        if (n === undefined || isNaN(n)) return "0";
         if (n < 1000) return Math.floor(n).toString();
         const s = ["", "K", "M", "B", "T"];
         const e = Math.floor(Math.log10(n) / 3);
         const val = n / Math.pow(1000, e);
-        return (val < 10 ? val.toFixed(2) : val.toFixed(1)) + s[e];
+        return (val % 1 === 0 ? val : val.toFixed(1)) + s[e];
     }
 
-    function checkCareer() {
-        let total = balance + currentStaked;
-        let c = { name: "BOSHLANG'ICH", color: "#00f2ff" };
-        
-        if (total >= 10000000) c = { name: "IMPERATOR", color: "#ff00ff" };
-        else if (total >= 1000000) c = { name: "VAZIR", color: "#ffcf4b" };
-        else if (total >= 250000) c = { name: "MAGISTR", color: "#ff4757" };
-        else if (total >= 50000) c = { name: "TALABA", color: "#2ed573" };
-
-        document.documentElement.style.setProperty('--primary', c.color);
-        document.getElementById('career-name').innerText = c.name;
-        
-        const autoBtn = document.getElementById('auto-btn');
-        if(hasAuto) {
-            autoBtn.disabled = true;
-            autoBtn.innerText = "OWNED";
-            autoBtn.style.background = "rgba(255,255,255,0.05)";
+    function updateRankUX() {
+        let currentRank = ranks[0], nextRank = ranks[1];
+        for (let i = 0; i < ranks.length; i++) {
+            if (balance >= ranks[i].min) {
+                currentRank = ranks[i];
+                nextRank = ranks[i + 1] || ranks[i];
+            }
         }
+        document.getElementById('career-badge').innerText = currentRank.name;
+        document.getElementById('career-badge').style.color = currentRank.color;
+        document.getElementById('current-rank-name').innerText = currentRank.name;
+        document.getElementById('next-rank-name').innerText = nextRank.name;
+
+        let progress = ((balance - currentRank.min) / (nextRank.max - currentRank.min)) * 100;
+        document.getElementById('rank-progress').style.width = Math.min(progress, 100) + "%";
+        document.getElementById('needed-bal').innerText = f(Math.max(nextRank.max - balance, 0));
     }
 
-    // --- Game Loop (10 FPS for performance) ---
+    // 3. O'yin mexanikasi
     setInterval(() => {
         let aps = 50 * Math.pow(1.15, farmLevel - 1);
         balance += (aps / 10);
-        
         document.getElementById('total-bal').innerText = f(balance);
         document.getElementById('profit-val').innerText = "+" + f(aps) + "/s";
-        document.getElementById('aps-ui').innerText = f(aps) + "/s";
-
-        if(hasAuto && !isStaking && balance >= (aps * 5)) { // Smart auto-stake
-            autoTimer++;
-            if(autoTimer >= 300) { 
-                startStake();
-                autoTimer = 0;
-            }
-        }
+        updateRankUX();
+        if (Math.random() > 0.98) save(); 
     }, 100);
 
     function startStake() {
-        if (isStaking || balance < 1) return;
-        
-        tg.HapticFeedback.impactOccurred('heavy');
-        currentStaked = balance; 
-        balance = 0; 
+        if (isStaking || balance < 10) return;
+        tg.HapticFeedback.impactOccurred('medium');
         isStaking = true;
-        
-        const sInfo = document.getElementById('staked-info');
-        sInfo.style.visibility = "visible";
-        document.getElementById('staked-amt').innerText = f(currentStaked);
+        let amt = balance; balance = 0;
+        document.getElementById('stake-btn').style.opacity = "0.5";
         document.getElementById('stake-btn').disabled = true;
-
-        let timeLeft = 10;
-        const countdown = setInterval(() => {
-            timeLeft--;
-            document.getElementById('stake-timer').innerText = timeLeft + "S";
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                let bonus = 1.05 + (stakeLevel * 0.02);
-                balance += Math.floor(currentStaked * bonus);
-                currentStaked = 0; 
+        let t = 10;
+        const count = setInterval(() => {
+            t--;
+            document.getElementById('stake-timer').innerText = t + "S";
+            if(t <= 0) {
+                clearInterval(count);
+                balance += amt * (1.05 + (stakeLevel * 0.02));
                 isStaking = false;
-                sInfo.style.visibility = "hidden";
-                document.getElementById('stake-timer').innerText = "READY";
+                document.getElementById('stake-timer').innerText = "TAYYOR";
+                document.getElementById('stake-btn').style.opacity = "1";
                 document.getElementById('stake-btn').disabled = false;
-                save();
                 tg.HapticFeedback.notificationOccurred('success');
+                updateUI();
             }
         }, 1000);
     }
 
     function upgradeFarm() {
         let cost = 500 * Math.pow(1.18, farmLevel - 1);
-        if (balance >= cost) { 
-            balance -= cost; 
-            farmLevel++; 
-            tg.HapticFeedback.notificationOccurred('success');
-            updatePrices(); 
-            save();
-        } else {
-            tg.HapticFeedback.notificationOccurred('error');
-            tg.showAlert("Mablag' yetarli emas! SIZGA: " + f(cost) + " kerak.");
-        }
+        if(balance >= cost) {
+            balance -= cost; farmLevel++;
+            tg.HapticFeedback.impactOccurred('light');
+            updateUI();
+        } else tg.showAlert("Mablag' yetarli emas!");
     }
 
     function upgradeStake() {
         let cost = 500 * Math.pow(1.2, stakeLevel);
-        if (balance >= cost) { 
-            balance -= cost; 
-            stakeLevel++; 
-            tg.HapticFeedback.notificationOccurred('success');
-            updatePrices(); 
-            save();
-        } else {
-            tg.HapticFeedback.notificationOccurred('error');
-        }
+        if(balance >= cost) {
+            balance -= cost; stakeLevel++;
+            tg.HapticFeedback.impactOccurred('light');
+            updateUI();
+        } else tg.showAlert("Mablag' yetarli emas!");
     }
 
-    function updatePrices() {
-        document.getElementById('farm-cost-tag').innerText = "(" + f(500 * Math.pow(1.18, farmLevel - 1)) + ")";
-        document.getElementById('stake-cost-tag').innerText = "(" + f(500 * Math.pow(1.2, stakeLevel)) + ")";
-        document.getElementById('farm-lvl').innerText = "LVL " + farmLevel;
-        document.getElementById('stake-lvl').innerText = "LVL " + stakeLevel;
-        document.getElementById('next-multiplier').innerText = "+" + (5 + (stakeLevel * 2)) + "%";
-        checkCareer();
+    function updateUI() {
+        document.getElementById('farm-lvl').innerText = farmLevel;
+        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.18, farmLevel - 1));
+        document.getElementById('stake-lvl').innerText = stakeLevel;
+        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.2, stakeLevel));
+        save();
     }
 
-    function loadMoreNFTs() {
-        const list = document.getElementById('nft-list');
-        let html = "";
-        let start = (nftPage - 1) * 6 + 1;
-        let end = nftPage * 6;
-        
-        for(let i=start; i<=end; i++) {
-            let price = 100000 * Math.pow(1.4, i - 1);
-            let isOwned = ownedNFTs.includes(i);
-            let emojis = ['🛸','💎','🧬','👾','👑', '⚡️', '🌟', '🔥', '🪐', '🛡️'];
-            let emoji = emojis[i % emojis.length];
-            
-            html += `
-                <div class="nft-card ${isOwned ? 'owned' : ''}" id="nft-${i}">
-                    <div style="font-size:38px; margin-bottom:15px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));">${emoji}</div>
-                    <div style="font-size:11px; font-weight:800; opacity: 0.6; margin-bottom:4px">SERIES ${Math.ceil(i/10)}</div>
-                    <div style="font-size:14px; font-weight:800; margin-bottom:12px">TITAN #${i}</div>
-                    <div style="color:var(--gold); font-size:14px; font-weight:900; margin-bottom:15px">${f(price)}</div>
-                    <button class="btn-primary" style="padding:12px; font-size:10px; border-radius:12px;" 
-                        onclick="buyNFT(${price}, ${i})" ${isOwned ? 'disabled' : ''}>
-                        ${isOwned ? 'COLLECTED' : 'ACQUIRE'}
-                    </button>
-                </div>`;
-        }
-        list.insertAdjacentHTML('beforeend', html);
-        nftPage++;
+    // 4. Dinamik Leaderboard (Sizni ro'yxatga qo'shadi)
+    function loadLeaderboard() {
+        const list = document.getElementById('leader-list');
+        const fakePlayers = [
+            { n: "CryptoWhale", s: 50000000, i: "CW" },
+            { n: "Aira_Dev", s: 12000000, i: "AD" },
+            { n: "Shadow_Hunter", s: 1500000, i: "SH" },
+            { n: "NodeRunner", s: 800000, i: "NR" }
+        ];
+
+        const allPlayers = [...fakePlayers, { n: fullName, s: balance, i: userInitials, me: true }];
+        allPlayers.sort((a,b) => b.s - a.s);
+
+        list.innerHTML = allPlayers.map((p, i) => `
+            <div class="leader-item ${p.me ? 'me' : ''}">
+                <div class="leader-rank">#${i+1}</div>
+                <div class="leader-avatar">${p.i}</div>
+                <div class="leader-info">
+                    <span class="leader-name">${p.n} ${p.me ? '(Siz)' : ''}</span>
+                    <span class="leader-score">${f(p.s)} AIRA</span>
+                </div>
+            </div>
+        `).join('');
     }
 
-    function buyNFT(p, id) {
-        if (balance >= p) {
-            balance -= p;
-            ownedNFTs.push(id);
-            localStorage.setItem('aira_nfts', JSON.stringify(ownedNFTs));
-            save();
-            const card = document.getElementById(`nft-${id}`);
-            card.classList.add('owned');
-            const btn = card.querySelector('button');
-            btn.innerText = "COLLECTED";
-            btn.disabled = true;
-            tg.HapticFeedback.notificationOccurred('success');
-        } else {
-            tg.HapticFeedback.notificationOccurred('error');
-            tg.showAlert("NFT sotib olish uchun mablag' yetarli emas!");
-        }
-    }
-
-    function buyAuto() { 
-        if (balance >= 15000) { 
-            balance -= 15000; 
-            hasAuto = true; 
-            localStorage.setItem('aira_auto', 'true'); 
-            save(); 
-            checkCareer(); 
-            tg.HapticFeedback.notificationOccurred('success');
-        } else {
-            tg.showAlert("Bot sotib olish uchun 15k kerak!");
-        }
-    }
-
-    function save() { 
-        localStorage.setItem('aira_bal', balance); 
-        localStorage.setItem('aira_farm', farmLevel); 
-        localStorage.setItem('aira_stake', stakeLevel); 
-    }
-    
     function switchTab(tab, el) {
-        tg.HapticFeedback.impactOccurred('light');
         document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById('view-' + tab).classList.add('active');
         el.classList.add('active');
-        if(tab === 'collection' && nftPage === 1) loadMoreNFTs();
+        if(tab === 'rank') loadLeaderboard();
+        tg.HapticFeedback.impactOccurred('light');
     }
 
-    window.onload = () => {
-        updatePrices();
-        checkCareer();
-        // Birinchi marta kirganda animatsiya uchun
-        document.body.style.opacity = "0";
-        setTimeout(() => { document.body.style.transition = "opacity 0.5s"; document.body.style.opacity = "1"; }, 100);
-    };
+    function save() {
+        localStorage.setItem('aira_bal', balance);
+        localStorage.setItem('aira_farm', farmLevel);
+        localStorage.setItem('aira_stake', stakeLevel);
+    }
+
+    // Birinchi yuklash
+    window.onload = () => { updateUI(); updateRankUX(); };
 </script>
 </body>
 </html>
