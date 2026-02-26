@@ -3,237 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Archmage: Neural Resurrection</title>
+    <title>Archmage: Neural Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bio-pink: #ff007a;
-            --bio-cyan: #00f2ff;
-            --cell-void: #000000;
+            --accent: #ff007a;
+            --secondary: #00f2ff;
+            --bg: #05050a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --neon-shadow: 0 0 20px rgba(255, 0, 122, 0.3);
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
-        body { background: var(--cell-void); color: #fff; font-family: 'Orbitron', sans-serif; height: 100vh; overflow: hidden; }
         
-        #bg-canvas { position: fixed; inset: 0; z-index: 1; }
-
-        /* TAP ZONE - Faqat CORE bo'limida ishlaydi */
-        #tap-zone { position: fixed; inset: 0; z-index: 10; cursor: pointer; display: block; }
-
-        .ui-root { position: relative; z-index: 20; height: 100vh; display: flex; flex-direction: column; pointer-events: none; }
-        .ui-root * { pointer-events: auto; }
-
-        .top-hud { padding: 50px 20px 20px; display: flex; justify-content: space-between; pointer-events: none; }
-        .life-sign { 
-            background: rgba(255, 0, 122, 0.1); border: 1px solid var(--bio-pink);
-            padding: 8px 16px; border-radius: 20px; font-size: 10px; color: var(--bio-pink);
-            box-shadow: 0 0 10px var(--bio-pink); text-transform: uppercase; pointer-events: auto;
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Outfit', sans-serif; 
+            height: 100vh; 
+            overflow: hidden;
         }
 
-        .balance-box { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-        .ariai-count { 
-            font-family: 'Cinzel'; font-size: 60px; font-weight: 900;
-            background: linear-gradient(to bottom, #fff, var(--bio-pink));
+        /* Ambient Glow Background */
+        .ambient-glow {
+            position: fixed; width: 150vw; height: 150vw;
+            background: radial-gradient(circle, rgba(255, 0, 122, 0.08) 0%, transparent 70%);
+            top: -50%; left: -25%; z-index: 0; animation: drift 15s infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(10%, 10%); } }
+
+        #bg-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+        /* AI Hologram Effect */
+        .ai-status-bar {
+            position: fixed; top: 120px; left: 50%; transform: translateX(-50%);
+            width: 80%; text-align: center; z-index: 100; pointer-events: none;
+        }
+        #ai-thought {
+            font-size: 10px; color: var(--secondary); text-transform: uppercase;
+            letter-spacing: 2px; font-weight: 800; opacity: 0; transition: 1s;
+            text-shadow: 0 0 15px var(--secondary);
+            font-family: 'Syncopate';
+        }
+
+        /* UI Wrapper */
+        .ui-wrapper { 
+            position: relative; z-index: 10; height: 100vh; 
+            display: flex; flex-direction: column; 
+            padding: calc(env(safe-area-inset-top) + 15px) 20px calc(env(safe-area-inset-bottom) + 20px);
+            pointer-events: none;
+        }
+        .ui-wrapper * { pointer-events: auto; }
+
+        /* Header Chips */
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .chip {
+            background: var(--glass); border: 1px solid var(--border);
+            padding: 10px 18px; border-radius: 100px; font-size: 10px;
+            backdrop-filter: blur(25px); display: flex; align-items: center; gap: 8px;
+            font-weight: 700; letter-spacing: 1px;
+        }
+
+        /* Balance Section */
+        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15vh; }
+        .balance-main { 
+            font-family: 'Syncopate', sans-serif; font-size: 58px; font-weight: 700;
+            background: linear-gradient(180deg, #ffffff 0%, #888888 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px var(--bio-pink));
+            margin-bottom: 2px; letter-spacing: -3px;
         }
-        .stats-label { font-size: 10px; letter-spacing: 2px; color: var(--bio-cyan); margin-top: 10px; opacity: 0.8; }
 
-        .footer-hud { padding: 20px; padding-bottom: 120px; pointer-events: none; }
-        .bar-wrap { margin-bottom: 12px; pointer-events: auto; }
-        .bar-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--bio-cyan); margin-bottom: 6px; }
-        .bar-rail { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-        .bar-flow { height: 100%; transition: 0.3s ease; }
-
-        .nav { 
-            position: fixed; bottom: 0; width: 100%; display: flex; 
-            background: rgba(0,0,0,0.95); padding: 20px 10px 40px; 
-            z-index: 1000; border-top: 1px solid rgba(255,0,122,0.3);
+        /* HUD Footer */
+        .hud-glass {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+            border-radius: 30px; padding: 22px; backdrop-filter: blur(30px);
+            margin-bottom: 85px;
         }
-        .nav-btn { flex: 1; text-align: center; color: #555; font-size: 11px; font-weight: 900; background: none; border: none; cursor: pointer; }
-        .nav-btn.active { color: #fff; text-shadow: 0 0 10px var(--bio-pink); }
+        .track { height: 10px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 10px; }
+        .fill { height: 100%; border-radius: 20px; transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-        /* PANEL - Z-INDEX TAP ZONEDAN BALAND BO'LISHI SHART */
-        .panel { 
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 85vh; 
-            background: #050505; border-top: 2px solid var(--bio-pink); 
-            border-radius: 30px 30px 0 0; z-index: 1100; padding: 25px; 
-            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto;
+        /* Upgrade Cards with Rotating Border */
+        .up-card {
+            background: rgba(10, 10, 15, 0.8); border: 1px solid var(--border);
+            padding: 22px 15px; border-radius: 28px; text-align: center;
+            position: relative; overflow: hidden; z-index: 1;
         }
-        .panel.active { bottom: 0; }
+        .up-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, var(--accent), transparent 30%);
+            animation: rotate-border 4s linear infinite; opacity: 0.3; z-index: -1;
+        }
+        @keyframes rotate-border { 100% { transform: rotate(360deg); } }
 
-        .dna-pop { position: fixed; pointer-events: none; z-index: 2000; color: #fff; font-weight: 900; font-family: 'Cinzel'; animation: popUp 0.6s ease-out forwards; }
-        @keyframes popUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+        .up-card h4 { font-size: 12px; opacity: 0.6; margin-bottom: 5px; }
+        .up-card p { font-size: 16px; font-weight: 800; color: var(--secondary); margin-bottom: 12px; }
+        
+        .price-tag {
+            background: #fff; color: #000; padding: 10px; border-radius: 15px;
+            font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .price-tag.disabled { background: #222; color: #555; }
 
-        .cell-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; }
-        .cell-card:active { transform: scale(0.95); background: #15000a; }
-        .cell-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+        /* Navigation */
+        .dock {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 92%; background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--border); border-radius: 28px;
+            padding: 8px; display: flex; gap: 8px; z-index: 1000;
+        }
+        .dock-item { flex: 1; padding: 14px; border-radius: 22px; border: none; background: transparent; color: #555; font-weight: 700; }
+        .dock-item.active { background: var(--glass); color: #fff; border: 1px solid var(--border); }
+
+        .side-panel {
+            position: fixed; bottom: -110%; left: 0; width: 100%; height: 82vh;
+            background: #08080c; border-top: 2px solid var(--accent);
+            border-radius: 40px 40px 0 0; z-index: 1100; padding: 35px 25px;
+            transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .side-panel.active { bottom: 0; }
+        .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; overflow-y: auto; height: 75%; }
+
+        .float-val {
+            position: fixed; pointer-events: none; font-weight: 900;
+            color: #fff; z-index: 2000; animation: rise 0.8s forwards;
+            text-shadow: var(--neon-shadow); font-family: 'Syncopate';
+        }
+        @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
     </style>
 </head>
 <body>
 
+    <div class="ambient-glow"></div>
     <canvas id="bg-canvas"></canvas>
-    <div id="tap-zone"></div>
 
-    <div class="ui-root">
-        <div class="top-hud">
-            <div class="life-sign">BIO-SIGN: STABLE</div>
-            <div class="life-sign" style="border-color: var(--bio-cyan); color: var(--bio-cyan);">DNA: x<span id="mult-ui">1.0</span></div>
+    <div class="ai-status-bar">
+        <div id="ai-thought">SYSTEM INITIALIZING...</div>
+    </div>
+
+    <div id="tap-target" style="position:fixed; inset:0; z-index:5;"></div>
+
+    <div class="ui-wrapper">
+        <div class="header">
+            <div class="chip">NEURAL LINK</div>
+            <div class="chip" style="color: var(--secondary);">DNA x<span id="mult-ui">1.0</span></div>
         </div>
-        <div class="balance-box">
-            <h1 class="ariai-count" id="ariai-bal">0.00</h1>
-            <p class="stats-label">TOTAL $ARIAI SYNCED</p>
+
+        <div class="hero">
+            <h1 class="balance-main" id="bal-ui">0.00</h1>
+            <p style="font-size:11px; color:var(--secondary); letter-spacing:5px;">$ARIAI ASSETS</p>
         </div>
-        <div class="footer-hud">
-            <div class="bar-wrap">
-                <div class="bar-info"><span>PLASMA</span><span id="mana-text">1000 / 1000</span></div>
-                <div class="bar-rail"><div class="bar-flow" id="mana-bar" style="background: var(--bio-cyan); width: 100%; box-shadow: 0 0 10px var(--bio-cyan);"></div></div>
-            </div>
-            <div class="bar-wrap">
-                <div class="bar-info"><span>EVOLUTION</span><span id="xp-text">LVL 1</span></div>
-                <div class="bar-rail"><div class="bar-flow" id="xp-bar" style="background: var(--bio-pink); width: 0%; box-shadow: 0 0 10px var(--bio-pink);"></div></div>
-            </div>
+
+        <div class="hud-glass">
+            <div>PLASMA <span id="mana-text" style="float:right">1000/1000</span></div>
+            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%;"></div></div>
+            <div style="margin-top:15px">EVOLUTION <span id="lvl-text" style="float:right">LVL 1</span></div>
+            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%;"></div></div>
         </div>
     </div>
 
-    <div id="panel-genome" class="panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h2 style="font-family: 'Cinzel'; color: var(--bio-pink); font-size: 24px;">GENOME</h2>
-            <div onclick="closePanel()" style="padding: 10px; color: #fff; font-size: 20px; cursor: pointer;">✕</div>
-        </div>
-        <div id="cell-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 50px;"></div>
+    <div class="side-panel" id="panel-dna">
+        <h2 style="margin-bottom:25px; font-family:'Syncopate'">UPGRADES</h2>
+        <div class="upgrades-grid" id="upgrade-container"></div>
+        <button onclick="toggleMenu(false)" style="width:100%; margin-top:20px; padding:15px; border-radius:20px; background:var(--glass); border:1px solid var(--border); color:#fff;">CLOSE</button>
     </div>
 
-    <nav class="nav">
-        <button class="nav-btn active" onclick="tab('core', this)">CORE</button>
-        <button class="nav-btn" onclick="tab('genome', this)">GENOME</button>
+    <nav class="dock">
+        <button class="dock-item active" id="nav-core" onclick="toggleMenu(false)">CORE</button>
+        <button class="dock-item" id="nav-dna" onclick="toggleMenu(true)">GENOMES</button>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let state = JSON.parse(localStorage.getItem('ariai_v2')) || {
-            bal: 0, pwr: 1.0, mana: 1000, lvl: 1, xp: 0, unlocked: 1
+        let state = JSON.parse(localStorage.getItem('ariai_v6')) || {
+            bal: 0, pwr: 1.0, mana: 1000, maxMana: 1000, lvl: 1, xp: 0
         };
 
-        let scene, camera, renderer, core;
-        function init3D() {
+        const thoughts = [
+            "Analyzing neural pathways...",
+            "DNA synchronization active",
+            "Optimizing evolution speed",
+            "Plasma levels stable",
+            "Detecting new mutations...",
+            "AI consciousness expanding"
+        ];
+
+        function rotateAIThoughts() {
+            const el = document.getElementById('ai-thought');
+            setInterval(() => {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
+                    el.style.opacity = 1;
+                }, 1000);
+            }, 5000);
+        }
+
+        // 3D Engine
+        let scene, camera, renderer, crystal;
+        function initEngine() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            const geo = new THREE.IcosahedronGeometry(2, 1);
+
+            const geo = new THREE.OctahedronGeometry(2, 0);
             const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
-            core = new THREE.Mesh(geo, mat);
-            scene.add(core);
-            const l1 = new THREE.PointLight(0xff007a, 2, 10);
-            l1.position.set(2, 2, 5);
-            scene.add(l1, new THREE.AmbientLight(0x202020));
+            crystal = new THREE.Mesh(geo, mat);
+            scene.add(crystal);
+            scene.add(new THREE.PointLight(0xff007a, 2, 10), new THREE.AmbientLight(0xffffff, 0.2));
             camera.position.z = 6;
-            function animate() {
-                requestAnimationFrame(animate);
-                core.rotation.y += 0.005;
+
+            function loop() {
+                requestAnimationFrame(loop);
+                crystal.rotation.y += 0.01;
                 renderer.render(scene, camera);
             }
-            animate();
+            loop();
         }
 
-        // TAP LOGIC
-        document.getElementById('tap-zone').onclick = (e) => {
-            if (state.mana < 2) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
+        document.getElementById('tap-target').addEventListener('touchstart', (e) => {
+            if (state.mana < 2) return;
+            const t = e.touches[0];
+            const fx = document.createElement('div');
+            fx.className = 'float-val';
+            fx.innerText = `+${state.pwr.toFixed(1)}`;
+            fx.style.left = `${t.clientX}px`; fx.style.top = `${t.clientY}px`;
+            document.body.appendChild(fx);
+            setTimeout(() => fx.remove(), 800);
+
             state.bal += state.pwr;
             state.mana -= 2;
-            state.xp += 15;
-            if (state.xp >= state.lvl * 500) {
-                state.lvl++; state.xp = 0; state.pwr += 0.1;
+            state.xp += 20;
+
+            if (state.xp >= state.lvl * 1000) {
+                state.lvl++; state.xp = 0; state.pwr += 0.5;
                 tg.HapticFeedback.notificationOccurred('success');
             }
-            createPop(e.clientX, e.clientY);
-            core.scale.set(1.2, 1.2, 1.2);
-            setTimeout(() => core.scale.set(1, 1, 1), 100);
             tg.HapticFeedback.impactOccurred('light');
             updateUI();
-        };
-
-        function createPop(x, y) {
-            const pop = document.createElement('div');
-            pop.className = 'dna-pop';
-            pop.innerText = `+${state.pwr.toFixed(1)}`;
-            pop.style.left = x + 'px'; pop.style.top = y + 'px';
-            document.body.appendChild(pop);
-            setTimeout(() => pop.remove(), 600);
-        }
+        });
 
         function updateUI() {
-            document.getElementById('ariai-bal').innerText = state.bal.toFixed(2);
-            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / 1000`;
-            document.getElementById('mana-bar').style.width = (state.mana / 10) + '%';
-            document.getElementById('xp-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-bar').style.width = (state.xp / (state.lvl * 5)) + '%';
+            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
             document.getElementById('mult-ui').innerText = state.pwr.toFixed(1);
-            localStorage.setItem('ariai_v2', JSON.stringify(state));
+            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)}/1000`;
+            document.getElementById('mana-fill').style.width = `${state.mana/10}%`;
+            document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
+            document.getElementById('xp-fill').style.width = `${state.xp/(state.lvl*10)}%`;
+            localStorage.setItem('ariai_v6', JSON.stringify(state));
         }
 
-        // TUGMALARNI BOSISH LOGIKASI
-        function buyUpgrade(id, cost) {
-            if (state.bal >= cost) {
-                state.bal -= cost;
-                state.pwr += (id * 0.2);
+        function toggleMenu(show) {
+            document.getElementById('panel-dna').classList.toggle('active', show);
+            document.getElementById('nav-core').classList.toggle('active', !show);
+            document.getElementById('nav-dna').classList.toggle('active', show);
+            if(show) {
+                const container = document.getElementById('upgrade-container');
+                container.innerHTML = '';
+                for(let i=1; i<=6; i++) {
+                    const price = i * 500;
+                    const canBuy = state.bal >= price;
+                    container.innerHTML += `
+                        <div class="up-card">
+                            <h4>MODULE ${i}</h4>
+                            <p>+${(i*0.5).toFixed(1)} PWR</p>
+                            <div class="price-tag ${canBuy?'':'disabled'}" onclick="buy(${i}, ${price})">
+                                ${canBuy ? 'SYNC '+price : 'LOCKED'}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        window.buy = (i, price) => {
+            if(state.bal >= price) {
+                state.bal -= price;
+                state.pwr += (i * 0.5);
+                updateUI(); toggleMenu(true);
                 tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-                renderCells(); // Ro'yxatni yangilash
-            } else {
-                tg.showPopup({ message: "Mablag' yetarli emas!" });
-                tg.HapticFeedback.notificationOccurred('error');
             }
-        }
-
-        function tab(t, btn) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (t === 'genome') {
-                document.getElementById('panel-genome').classList.add('active');
-                document.getElementById('tap-zone').style.pointerEvents = 'none'; // Panel ochiqligida tapni o'chirish
-                renderCells();
-            } else {
-                closePanel();
-            }
-        }
-
-        function closePanel() {
-            document.getElementById('panel-genome').classList.remove('active');
-            document.getElementById('tap-zone').style.pointerEvents = 'auto'; // Tapni qayta yoqish
-            document.querySelectorAll('.nav-btn')[0].classList.add('active');
-            document.querySelectorAll('.nav-btn')[1].classList.remove('active');
-        }
-
-        function renderCells() {
-            const list = document.getElementById('cell-list');
-            list.innerHTML = '';
-            for(let i=1; i<=10; i++) {
-                const cost = i * 200;
-                const div = document.createElement('div');
-                div.className = 'cell-card';
-                div.onclick = () => buyUpgrade(i, cost); // Bosish funksiyasi qo'shildi
-                div.innerHTML = `
-                    <div style="font-size:9px; color:var(--bio-pink);">NEURAL_${i}</div>
-                    <div style="font-size:13px; margin:8px 0; font-weight:900;">EVOLVE</div>
-                    <div style="font-size:10px; color:var(--bio-cyan)">⚡ ${cost}</div>
-                `;
-                list.appendChild(div);
-            }
-        }
+        };
 
         setInterval(() => {
-            if (state.mana < 1000) { state.mana = Math.min(1000, state.mana + 1); updateUI(); }
+            if(state.mana < 1000) { state.mana = Math.min(1000, state.mana + 1.5); updateUI(); }
         }, 1000);
 
-        window.onload = () => { init3D(); updateUI(); };
+        window.onload = () => { initEngine(); updateUI(); rotateAIThoughts(); };
     </script>
 </body>
 </html>
