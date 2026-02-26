@@ -7,27 +7,25 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* 1. RANG VA ASOSIY STILLAR */
         :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; --gold: #ffcc00; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* FON UCHUN CANVAS */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* 2. HUD (TEPA QISM) */
+        /* HUD */
         .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; z-index: 100; }
         .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 14px; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; }
         .balance { font-family: 'Orbitron'; font-size: 42px; text-shadow: 0 0 20px var(--blue); margin-bottom: 5px; transition: 0.3s; }
         .balance.boost { color: var(--gold); text-shadow: 0 0 30px var(--gold); transform: scale(1.1); }
 
-        /* 3. AIRA AVATAR ZONE (MARKAZ) */
+        /* HERO ZONE */
         .hero-zone { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
         
         .character-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 280px;
+            height: 280px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -36,55 +34,41 @@
         }
 
         .aira-avatar {
-            width: 240px;
-            height: 240px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid rgba(0, 252, 255, 0.4);
+            border: 3px solid var(--blue);
             z-index: 2;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 25px var(--blue);
             animation: floating 4s ease-in-out infinite;
-            pointer-events: none;
+            background: #01080e; /* Rasm yuklanguncha qora fon */
         }
 
         .glow-ring {
             position: absolute;
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 75%);
-            filter: blur(20px);
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            filter: blur(15px);
             z-index: 1;
             animation: pulse 2s infinite alternate;
         }
 
-        .neon-ring { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            border: 2px solid var(--blue); 
-            border-radius: 50%; 
-            box-shadow: inset 0 0 20px var(--blue), 0 0 20px var(--blue); 
-            animation: rotate 15s linear infinite; 
-            opacity: 0.2; 
-        }
+        /* ANIMATSIYALAR */
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse { from { opacity: 0.4; transform: scale(0.95); } to { opacity: 0.8; transform: scale(1.05); } }
 
-        /* 4. ANIMATSIYALAR */
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes pulse { from { opacity: 0.3; transform: scale(0.9); } to { opacity: 0.7; transform: scale(1.1); } }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* 5. MARKET VA NAV */
-        #overload-btn { position: absolute; top: 15%; right: 20px; background: rgba(255,0,127,0.2); border: 2px solid var(--pink); color: var(--pink); padding: 12px; border-radius: 12px; font-family: 'Orbitron'; font-size: 9px; display: none; animation: btnPulse 1s infinite; z-index: 500; }
-        .market-panel { position: fixed; bottom: -75vh; left: 0; width: 100%; height: 75vh; background: rgba(1, 8, 14, 0.98); border-top: 3px solid var(--blue); border-radius: 30px 30px 0 0; transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); z-index: 2000; padding: 25px; overflow-y: auto; }
+        /* NAV VA PANEL */
+        .market-panel { position: fixed; bottom: -75vh; left: 0; width: 100%; height: 75vh; background: rgba(1, 8, 14, 0.98); border-top: 3px solid var(--blue); border-radius: 30px 30px 0 0; transition: 0.5s; z-index: 2000; padding: 25px; overflow-y: auto; }
         .market-panel.open { bottom: 0; }
-        .up-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.1); border-radius: 15px; padding: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .nav { display: flex; height: 80px; background: #000; border-top: 1px solid rgba(0,242,255,0.3); z-index: 3000; }
+        .nav { display: flex; height: 80px; background: #000; border-top: 2px solid var(--blue); z-index: 3000; }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
-        .nav-item.active { color: var(--blue); background: linear-gradient(to top, rgba(0,242,255,0.1), transparent); border-top: 3px solid var(--blue); }
+        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 4px solid var(--blue); }
 
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; z-index: 4000; text-shadow: 0 0 10px var(--blue); }
-        @keyframes fly { to { transform: translateY(-150px) scale(1.5); opacity: 0; } }
+        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; pointer-events: none; animation: fly 0.6s forwards; z-index: 4000; }
+        @keyframes fly { to { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -92,88 +76,51 @@
     <canvas id="bg-canvas"></canvas>
 
     <div class="top-hud">
-        <div class="bot-name">Aira Protocol v1.0</div>
+        <div class="bot-name">Aira Protocol</div>
         <div class="balance" id="bal">0</div>
-        <div style="display:flex; justify-content:center; gap:15px; font-family:Orbitron; font-size:11px;">
-            <div style="color:var(--blue)">POWER: +<span id="t-pow">0</span></div>
-            <div style="color:var(--pink)">AUTO-FLOW: +<span id="a-pow">0</span>/s</div>
+        <div style="display:flex; justify-content:center; gap:15px; font-family:Orbitron; font-size:12px;">
+            <div style="color:var(--blue)">TAP: +<span id="t-pow">0</span></div>
+            <div style="color:var(--pink)">AUTO: +<span id="a-pow">0</span>/s</div>
         </div>
     </div>
 
     <div class="hero-zone">
-        <button id="overload-btn" onclick="startOverload()">⚡ AIRA OVERLOAD (x10)</button>
-        
         <div class="character-container" id="tap-btn">
             <div class="glow-ring"></div>
-            <div class="neon-ring"></div>
-            <img class="aira-avatar" src="aira.png" alt="Aira AI">
+            <img class="aira-avatar" src="https://i.ibb.co/LzrYv5M/aira-avatar.png" alt="Aira">
         </div>
     </div>
 
     <div id="market-panel" class="market-panel">
-        <h3 style="text-align:center; font-family:Orbitron; color:var(--blue); margin-bottom:20px;">SYSTEM UPGRADES</h3>
+        <h3 style="text-align:center; font-family:Orbitron; color:var(--blue);">MARKET</h3>
         <div id="up-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="toggleM(false)">CORE</div>
+        <div class="nav-item active" onclick="toggleM(false)">CITY</div>
         <div class="nav-item" onclick="toggleM(true)">MARKET</div>
-        <div class="nav-item">NFT-GEAR</div>
+        <div class="nav-item">NFT</div>
     </div>
 
     <script>
-        // 6. TEXNIK LOGIKA (BOT TEXNIKASI)
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
         let data = {
             m: parseFloat(localStorage.getItem('aira_m')) || 0,
-            l: JSON.parse(localStorage.getItem('aira_l')) || {u1:1, u2:0, u3:0, u4:0, u5:0, u6:0},
+            l: JSON.parse(localStorage.getItem('aira_l')) || {u1:1, u2:0, u3:0},
             isBoosted: false
         };
 
         const ups = [
             { id: 'u1', name: 'Neural Link', base: 50, val: 2, type: 'tap' },
-            { id: 'u2', name: 'Aira Bot', base: 500, val: 5, type: 'auto' },
-            { id: 'u3', name: 'Cyber Miner', base: 2000, val: 15, type: 'auto' },
-            { id: 'u4', name: 'Pulse Drive', base: 10000, val: 50, type: 'tap' },
-            { id: 'u5', name: 'Quantum Core', base: 50000, val: 200, type: 'auto' },
-            { id: 'u6', name: 'Void Server', base: 200000, val: 1000, type: 'auto' }
+            { id: 'u2', name: 'Aira Bot', base: 500, val: 10, type: 'auto' },
+            { id: 'u3', name: 'Quantum CPU', base: 2000, val: 40, type: 'auto' }
         ];
 
-        // Canvas va animatsiyalar kodi bu yerda davom etadi...
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = Array.from({length: 80}, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                s: Math.random() * 1.5,
-                v: Math.random() * 0.3 + 0.1
-            }));
-        }
-
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = data.isBoosted ? '#ff007f' : '#00f2ff';
-            stars.forEach(s => {
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2); ctx.fill();
-                s.y += s.v; if(s.y > canvas.height) s.y = 0;
-            });
-            requestAnimationFrame(drawStars);
-        }
-
-        // BOOST VA STATISTIKA FUNKSIYALARI
         function getStats() {
             let t = 1, a = 0;
             ups.forEach(u => { 
-                let mult = data.isBoosted ? 10 : 1;
-                if(u.type==='tap') t += data.l[u.id]*u.val*mult; 
-                else a += data.l[u.id]*u.val*mult;
+                if(u.type==='tap') t += data.l[u.id]*u.val; 
+                else a += data.l[u.id]*u.val;
             });
             return { t, a };
         }
@@ -181,45 +128,40 @@
         function updateUI(full = false) {
             const s = getStats();
             document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-            document.getElementById('t-pow').innerText = s.t.toLocaleString();
-            document.getElementById('a-pow').innerText = s.a.toLocaleString();
+            document.getElementById('t-pow').innerText = s.t;
+            document.getElementById('a-pow').innerText = s.a;
             if(full) {
                 const container = document.getElementById('up-list');
                 container.innerHTML = '';
                 ups.forEach(u => {
-                    const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
-                    container.innerHTML += `
-                        <div class="up-card">
-                            <div><b>${u.name} (Lvl ${data.l[u.id]})</b></div>
-                            <button onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''} 
-                                style="background:${data.m >= cost ? 'var(--blue)' : '#222'}; color:${data.m >= cost ? '#000' : '#666'}; border:none; padding:8px 15px; border-radius:8px; font-family:Orbitron; font-size:10px;">
-                                ${cost.toLocaleString()}
-                            </button>
-                        </div>`;
+                    const cost = Math.floor(u.base * Math.pow(1.5, data.l[u.id]));
+                    container.innerHTML += `<div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
+                        <span>${u.name}</span>
+                        <button onclick="buyU('${u.id}', ${cost})">${cost}</button>
+                    </div>`;
                 });
             }
             localStorage.setItem('aira_m', data.m);
             localStorage.setItem('aira_l', JSON.stringify(data.l));
         }
 
-        // TAP VA INTERAKSIYA
+        window.buyU = (id, c) => {
+            if(data.m >= c) { data.m -= c; data.l[id]++; updateUI(true); }
+        };
+
+        function toggleM(open) {
+            document.getElementById('market-panel').classList.toggle('open', open);
+        }
+
         document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
             e.preventDefault();
             const s = getStats(); data.m += s.t;
-            const touch = e.touches[0];
-            const p = document.createElement('div');
-            p.className = 'pop'; p.innerText = `+${s.t}`;
-            p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
-            document.body.appendChild(p); setTimeout(() => p.remove(), 600);
-            document.getElementById('tap-btn').style.transform = 'scale(0.92)';
-            setTimeout(() => document.getElementById('tap-btn').style.transform = 'scale(1)', 50);
             updateUI();
-            tg.HapticFeedback.impactOccurred('medium');
+            tg.HapticFeedback.impactOccurred('light');
         });
 
-        // INITIALIZE
-        initStars(); drawStars(); updateUI(true);
-        setInterval(() => { const s = getStats(); data.m += s.a / 10; updateUI(); }, 100);
+        setInterval(() => { data.m += getStats().a / 10; updateUI(); }, 100);
+        updateUI(true);
     </script>
 </body>
 </html>
