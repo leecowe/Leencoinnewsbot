@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Farm Update</title>
+    <title>Aira Protocol | Unified Core</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -26,82 +26,99 @@
             font-family: 'Orbitron'; font-size: 10px; padding: 10px; border-bottom: 1px solid var(--pink);
         }
 
-        .header { padding: 20px; text-align: center; }
-        .bal-val { font-family: 'Orbitron'; font-size: 42px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid var(--border); }
+        .bal-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
 
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; flex-direction: column; align-items: center; }
+        .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; flex-direction: column; }
         .view-content.active { display: flex; }
 
         .card {
             width: 100%; background: var(--glass); border: 1px solid var(--border);
-            border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 15px;
+            border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 12px;
         }
-
-        .farm-status { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--primary); }
 
         .btn-main {
-            background: var(--primary); color: #000; border: none; padding: 15px;
-            border-radius: 12px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            background: var(--primary); color: #000; border: none; padding: 12px;
+            border-radius: 10px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); margin-top: 10px;
         }
 
-        .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .nft-item { background: var(--glass); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; }
+        .nft-img { width: 100%; height: 80px; background: linear-gradient(45deg, #111, #222); border-radius: 5px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: var(--pink); }
+
+        .nav { height: 70px; background: #000; display: flex; border-top: 1px solid var(--border); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 10px; font-family: 'Orbitron'; }
         .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
-        
-        .level-badge { background: var(--pink); color: white; padding: 2px 8px; border-radius: 5px; font-size: 10px; }
+
+        .stat-row { display: flex; justify-content: space-between; font-size: 12px; font-family: 'Orbitron'; color: var(--primary); margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANMAYDI!</div>
+    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANIB QOLMAYDI!</div>
 
     <header class="header">
         <div class="bal-val" id="total-bal">0</div>
-        <div style="font-family:'Orbitron'; font-size:12px; color:var(--primary); margin-top:5px;">
-            AUTO APS: <span id="aps-display">50</span>/300ms
+        <div class="stat-row">
+            <span>STAKED: <b id="staked-display">0</b></span>
+            <span>AUTO: <b id="aps-display">50</b>/300ms</span>
         </div>
     </header>
 
-    <div id="view-hack" class="view-content active">
+    <div id="view-core" class="view-content active">
         <div class="card">
-            <h3 style="font-family:'Orbitron'; color:var(--primary);">MINING CORE</h3>
-            <div style="font-size:36px; font-family:'Orbitron'; margin:15px 0;" id="current-mining">0</div>
-            <button class="btn-main" onclick="claimMining()">ACHKOLARNI YIG'ISH</button>
-        </div>
-    </div>
-
-    <div id="view-farm" class="view-content">
-        <div class="card">
-            <h3 style="font-family:'Orbitron'; color:var(--primary);">FARM UPGRADE</h3>
-            <div class="farm-status">
-                <span>Current Level:</span>
-                <span class="level-badge" id="farm-lvl">LVL 1</span>
-            </div>
-            <p style="font-size: 12px; opacity: 0.7;" id="next-perk">Keyingi daraja: +25 achko/300ms</p>
-            <button class="btn-main" id="upgrade-btn" onclick="upgradeFarm()">LVL UP (<span id="upgrade-cost">5000</span>)</button>
+            <h4 style="margin:0; font-family:'Orbitron';">MINING CORE</h4>
+            <div style="font-size:28px; font-family:'Orbitron'; margin:10px 0;" id="current-mining">0</div>
+            <button class="btn-main" onclick="claimMining()">YIG'ISH</button>
         </div>
 
         <div class="card" style="border-color: var(--pink);">
-            <p style="font-size: 11px; color: var(--pink); font-family: 'Orbitron'; margin: 0;">
-                📢 OGOHLANTIRISH: Hozircha maksimal LVL 5. Keyingi yangilanishda yangi darajalar qo'shiladi!
-            </p>
+            <h4 style="margin:0; font-family:'Orbitron'; color:var(--pink);">STAKING (10s)</h4>
+            <div id="stake-timer" style="font-size:20px; margin:5px 0;">TAYYOR (+10%)</div>
+            <button class="btn-main" style="background:var(--pink); color:white;" onclick="startStake()">STAKE ALL</button>
+        </div>
+
+        <div class="card">
+            <div class="stat-row">
+                <span>LVL: <b id="farm-lvl">1</b></span>
+                <span>COST: <b id="upgrade-cost">5000</b></span>
+            </div>
+            <button class="btn-main" onclick="upgradeFarm()" id="up-btn">FARM UPGRADE</button>
+            <p style="font-size:9px; color:var(--pink); margin-top:8px;">📢 Maksimal LVL 5. Tez orada yangi LVL'lar qo'shiladi!</p>
         </div>
     </div>
 
-    <div id="view-stake" class="view-content">
-        <div class="card">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">STAKING HUB</h2>
-            <p style="font-size:14px; opacity:0.7;">1 daqiqada +10% foyda</p>
-            <div id="timer" style="font-size:32px; color:var(--pink); font-family:'Orbitron'; margin:15px 0;">TAYYOR</div>
-            <button class="btn-main" id="stake-btn" onclick="startStake()">STAKE ALL</button>
+    <div id="view-market" class="view-content">
+        <h3 style="font-family:'Orbitron'; text-align:center;">NFT MARKETPLACE</h3>
+        <div class="nft-grid">
+            <div class="nft-item">
+                <div class="nft-img">AIRA CARD #1</div>
+                <div style="font-size:12px;">Cyber Punk</div>
+                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(10000)">10K COINS</button>
+            </div>
+            <div class="nft-item">
+                <div class="nft-img">AIRA CARD #2</div>
+                <div style="font-size:12px;">Neon Bot</div>
+                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(25000)">25K COINS</button>
+            </div>
+            <div class="nft-item">
+                <div class="nft-img">AIRA CARD #3</div>
+                <div style="font-size:12px;">Giga Unit</div>
+                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(50000)">50K COINS</button>
+            </div>
+            <div class="nft-item">
+                <div class="nft-img">AIRA CARD #4</div>
+                <div style="font-size:12px;">Protocol X</div>
+                <button class="btn-main" style="font-size:10px;" onclick="buyNFT(100000)">100K COINS</button>
+            </div>
         </div>
     </div>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="switchTab('hack', this)">CORE</div>
-        <div class="nav-item" onclick="switchTab('farm', this)">FARM</div>
-        <div class="nav-item" onclick="switchTab('stake', this)">STAKE</div>
+        <div class="nav-item active" onclick="switchTab('core', this)">CORE</div>
+        <div class="nav-item" onclick="switchTab('market', this)">MARKET</div>
+        <div class="nav-item" onclick="tg.showAlert('Roadmap: PvP Janglar tez kunda!')">INFO</div>
     </nav>
 
 <script>
@@ -109,81 +126,83 @@
     let balance = 0;
     let sessionCoins = 0;
     let farmLevel = 1;
-    let aps = 50; // Achko per 300ms
+    let aps = 50;
     let upgradeCost = 5000;
+    let stakedCoins = 0;
     let isStaking = false;
 
-    // 1. DYNAMIK MINING
-    let miningInterval = setInterval(runMining, 300);
-
-    function runMining() {
+    // 1. MINING SYSTEM
+    setInterval(() => {
         sessionCoins += aps;
         document.getElementById('current-mining').innerText = sessionCoins;
-    }
+    }, 300);
 
     function claimMining() {
         balance += sessionCoins;
         sessionCoins = 0;
         updateUI();
-        tg.HapticFeedback.impactOccurred('heavy');
+        tg.HapticFeedback.impactOccurred('medium');
     }
 
-    // 2. FARM UPGRADE SYSTEM (MAX LVL 5)
-    function upgradeFarm() {
-        if (farmLevel >= 5) {
-            tg.showAlert("Hozircha maksimal darajadasiz!");
-            return;
-        }
+    // 2. STAKING SYSTEM (10 SECONDS)
+    function startStake() {
+        if (isStaking || balance <= 0) return;
+        stakedCoins = balance;
+        balance = 0;
+        isStaking = true;
+        updateUI();
 
+        let timeLeft = 10; // 10 soniya
+        const timerEl = document.getElementById('stake-timer');
+        
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerEl.innerText = timeLeft + "s KUTING...";
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                balance += Math.floor(stakedCoins * 1.1); // +10%
+                stakedCoins = 0;
+                isStaking = false;
+                timerEl.innerText = "TAYYOR (+10%)";
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }, 1000);
+    }
+
+    // 3. FARM UPGRADE
+    function upgradeFarm() {
+        if (farmLevel >= 5) return;
         if (balance >= upgradeCost) {
             balance -= upgradeCost;
             farmLevel++;
-            aps += 25; // Har bir LVL uchun +25 tezlik
-            upgradeCost *= 2; // Narx ikki barobar oshadi
-            
+            aps += 25;
+            upgradeCost *= 2;
             updateUI();
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`Tabriklaymiz! Ferma LVL ${farmLevel} ga ko'tarildi!`);
+            tg.showAlert(`Daraja LVL ${farmLevel} ga oshdi!`);
         } else {
             tg.showAlert("Mablag' yetarli emas!");
         }
     }
 
-    // 3. STAKING (1 MINUTE)
-    function startStake() {
-        if (isStaking || balance <= 0) return;
-        let amount = balance;
-        balance = 0;
-        isStaking = true;
-        updateUI();
-
-        let timeLeft = 60;
-        const countdown = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = timeLeft + "s";
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                balance += Math.floor(amount * 1.1);
-                isStaking = false;
-                document.getElementById('timer').innerText = "TAYYOR";
-                updateUI();
-                tg.showPopup({ title: "Foyda!", message: "Staking muvaffaqiyatli yakunlandi." });
-            }
-        }, 1000);
+    // 4. NFT PURCHASE
+    function buyNFT(price) {
+        if (balance >= price) {
+            balance -= price;
+            updateUI();
+            tg.showPopup({ title: "Muvaffaqiyatli!", message: "NFT sotib olindi va kolleksiyangizga qo'shildi!" });
+        } else {
+            tg.showAlert("Mablag' yetarli emas!");
+        }
     }
 
     function updateUI() {
         document.getElementById('total-bal').innerText = Math.floor(balance);
+        document.getElementById('staked-display').innerText = stakedCoins;
         document.getElementById('aps-display').innerText = aps;
-        document.getElementById('farm-lvl').innerText = "LVL " + farmLevel;
+        document.getElementById('farm-lvl').innerText = farmLevel;
         document.getElementById('upgrade-cost').innerText = upgradeCost;
-        
-        if (farmLevel >= 5) {
-            document.getElementById('upgrade-btn').innerText = "MAX LEVEL";
-            document.getElementById('next-perk').innerText = "Keyingi yangilanishni kuting...";
-        } else {
-            document.getElementById('next-perk').innerText = `Keyingi daraja: +25 achko/300ms`;
-        }
+        if(farmLevel >= 5) document.getElementById('up-btn').innerText = "MAX LEVEL";
     }
 
     function switchTab(tab, el) {
