@@ -1,29 +1,104 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Aira Protocol - TEST MODE FREE</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #000; --test: #ffea00; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { background: var(--dark); color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* TEST MODE HUD */
+        .test-header { background: var(--test); color: #000; font-family: 'Orbitron'; font-size: 10px; text-align: center; padding: 4px 0; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 1000; letter-spacing: 1px; box-shadow: 0 0 15px var(--test); }
+
+        /* HEADER */
+        .header { padding: 60px 20px 10px; text-align: center; }
+        .balance { font-family: 'Orbitron'; font-size: 50px; font-weight: 700; text-shadow: 0 0 15px var(--cyan); margin: 5px 0; }
+        .stats { display: flex; justify-content: center; gap: 15px; font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); }
+
+        /* PAGES */
+        .content { flex: 1; position: relative; overflow: hidden; }
+        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; overflow-y: auto; }
+        .page.active { display: flex; flex-direction: column; }
+
+        /* CARDS */
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,242,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 50px; }
+        .nft-item { background: rgba(13,27,42,0.8); border: 1px solid var(--pink); border-radius: 10px; padding: 10px; text-align: center; }
+        .nft-item.owned { border-color: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+        /* TEST MODE BUTTONS */
+        .btn-test { background: var(--cyan); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-test:disabled { background: #333; color: #777; }
+        .free-tag { color: var(--test); font-size: 9px; display: block; margin-top: 2px; }
+
+        /* NAV */
+        .nav { height: 80px; background: #000; border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-t { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; }
+        .nav-t.active { color: var(--cyan); border-top: 2px solid var(--cyan); }
+    </style>
+</head>
+<body>
+
+<div class="test-header">FREE TEST MODE: BARCHA ELEMENTLAR BEPUL 🧪</div>
+
+<div class="header">
+    <div style="font-family:Orbitron; font-size:12px; letter-spacing:2px;">AIRA PROTOCOL</div>
+    <div class="balance" id="money">0</div>
+    <div class="stats">
+        <div>TAP: +<span id="t-val">1</span></div>
+        <div style="color:var(--pink)">FLOW: +<span id="f-val">0</span>/s</div>
+    </div>
+</div>
+
+<div class="content">
+    <div id="core" class="page active">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+            <div id="tap-btn" style="width:240px; height:240px; border-radius:50%; border:2px solid var(--cyan); display:flex; align-items:center; justify-content:center; background:radial-gradient(circle, rgba(0,242,255,0.1), transparent);">
+                <svg width="120" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#1a3a5d" stroke="var(--cyan)" stroke-width="2"/><circle cx="40" cy="45" r="4" fill="var(--cyan)"/><circle cx="60" cy="45" r="4" fill="var(--cyan)"/><rect x="35" y="60" width="30" height="2" fill="var(--cyan)"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="market" class="page">
+        <div id="m-list"></div>
+    </div>
+
+    <div id="nft" class="page">
+        <div class="nft-grid" id="n-list"></div>
+    </div>
+</div>
+
+<div class="nav">
+    <div class="nav-t active" onclick="tab('core', this)">CORE</div>
+    <div class="nav-t" onclick="tab('market', this)">MARKET</div>
+    <div class="nav-t" onclick="tab('nft', this)">NFT</div>
+</div>
+
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
     const storage = tg.CloudStorage;
+    tg.expand();
 
-    // Boshlang'ich holat
     let state = {
         coins: parseFloat(localStorage.getItem('tc_coins')) || 0,
         upgrades: JSON.parse(localStorage.getItem('tc_up')) || { u1:0, u2:0, u3:0 },
         nfts: JSON.parse(localStorage.getItem('tc_nft')) || []
     };
 
-    // Bulutdan yuklashni boshlash
-    loadFromCloud();
-
     const marketMap = [
-        { id: 'u1', name: 'Neural Chip', base: 100, bonus: 2, type: 'tap' },
-        { id: 'u2', name: 'Nano Drone', base: 500, bonus: 5, type: 'auto' },
-        { id: 'u3', name: 'Quantum Core', base: 2000, bonus: 20, type: 'auto' }
+        { id: 'u1', name: 'Neural Chip', bonus: 5, type: 'tap' },
+        { id: 'u2', name: 'Nano Drone', bonus: 10, type: 'auto' },
+        { id: 'u3', name: 'Quantum Core', bonus: 50, type: 'auto' }
     ];
 
     const nftCatalog = Array.from({length: 100}, (_, i) => ({
         id: 'nft_' + i,
         name: 'Unit-X' + (i + 1),
-        price: Math.floor(1000 * Math.pow(1.18, i)),
-        power: Math.floor(5 * Math.pow(1.15, i))
+        power: Math.floor(10 * Math.pow(1.15, i))
     }));
 
     function getStats() {
@@ -40,71 +115,63 @@
         return { tap, farm };
     }
 
-    // --- SINXRONIZATSIYA ---
-    function saveAll() {
-        // 1. Local Storage (Tezkorlik uchun)
-        localStorage.setItem('tc_coins', state.coins);
-        localStorage.setItem('tc_up', JSON.stringify(state.upgrades));
-        localStorage.setItem('tc_nft', JSON.stringify(state.nfts));
-        
-        // 2. Telegram Cloud Storage (Xavfsizlik uchun)
-        saveToCloud();
+    function tab(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-t').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+        if(id === 'market') renderMarket();
+        if(id === 'nft') renderNFTs();
     }
 
-    function saveToCloud() {
-        storage.setItem('aira_protocol_state', JSON.stringify(state));
+    function renderMarket() {
+        document.getElementById('m-list').innerHTML = marketMap.map(u => {
+            const lvl = state.upgrades[u.id] || 0;
+            const isMax = lvl >= 10;
+            return `<div class="card">
+                <div><b>${u.name}</b><span>Lvl ${lvl}/10 | +${u.bonus} ${u.type}</span><span class="free-tag">TEST: FREE</span></div>
+                <button class="btn-test" onclick="buyU('${u.id}')" ${isMax ? 'disabled' : ''}>${isMax?'MAX':'GET FREE'}</button>
+            </div>`;
+        }).join('');
     }
 
-    function loadFromCloud() {
-        storage.getItem('aira_protocol_state', (err, value) => {
-            if (!err && value) {
-                const cloudData = JSON.parse(value);
-                if(cloudData.coins > state.coins) {
-                    state = cloudData;
-                    updateUI();
-                }
-            }
-        });
+    function renderNFTs() {
+        document.getElementById('n-list').innerHTML = nftCatalog.map(n => {
+            const owned = state.nfts.includes(n.id);
+            return `<div class="nft-item ${owned?'owned':''}">
+                <div style="font-size:11px; font-family:Orbitron;">${n.name}</div>
+                <div style="color:var(--cyan); font-size:10px;">⚡ ${n.power}/s</div>
+                <button class="btn-test" style="width:100%; margin-top:5px;" onclick="buyN('${n.id}')" ${owned ? 'disabled' : ''}>
+                    ${owned ? 'ACTIVE' : 'FREE'}
+                </button>
+            </div>`;
+        }).join('');
     }
 
-    // Xarid funksiyalari (saveAll chaqiriladi)
-    window.buyU = (id, c) => { 
-        if(state.coins >= c) { 
-            state.coins -= c; 
-            state.upgrades[id]++; 
-            updateUI(); 
-            renderMarket();
-            saveAll(); 
-            tg.HapticFeedback.notificationOccurred('success'); 
-        } 
-    };
-
-    window.buyN = (id, c) => { 
-        if(state.coins >= c) { 
-            state.coins -= c; 
-            state.nfts.push(id); 
-            updateUI(); 
-            renderNFTs();
-            saveAll(); 
-            tg.HapticFeedback.notificationOccurred('success'); 
-        } 
-    };
+    window.buyU = (id) => { state.upgrades[id]++; save(); updateUI(); renderMarket(); tg.HapticFeedback.impactOccurred('light'); };
+    window.buyN = (id) => { state.nfts.push(id); save(); updateUI(); renderNFTs(); tg.HapticFeedback.impactOccurred('light'); };
 
     function updateUI() {
         const s = getStats();
-        document.getElementById('m-bal').innerText = Math.floor(state.coins).toLocaleString();
-        document.getElementById('t-p').innerText = s.tap;
-        document.getElementById('f-p').innerText = s.farm;
+        document.getElementById('money').innerText = Math.floor(state.coins).toLocaleString();
+        document.getElementById('t-val').innerText = s.tap;
+        document.getElementById('f-val').innerText = s.farm;
     }
 
-    // Auto-save har 30 soniyada
-    setInterval(saveAll, 30000);
+    function save() {
+        localStorage.setItem('tc_coins', state.coins);
+        localStorage.setItem('tc_up', JSON.stringify(state.upgrades));
+        localStorage.setItem('tc_nft', JSON.stringify(state.nfts));
+        storage.setItem('aira_protocol_state', JSON.stringify(state));
+    }
 
-    // Farming Loop
-    setInterval(() => { 
-        state.coins += getStats().farm / 10; 
-        updateUI(); 
-    }, 100);
+    document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault(); state.coins += getStats().tap; updateUI();
+        tg.HapticFeedback.impactOccurred('medium');
+    });
 
-    // Boshqa barcha dizayn va event listenerlar (tap, nav) o'zgarishsiz qoladi...
+    setInterval(() => { state.coins += getStats().farm / 10; updateUI(); }, 100);
+    updateUI();
 </script>
+</body>
+</html>
