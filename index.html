@@ -3,197 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Anime: Perfect</title>
+    <title>Leenova: Infinite Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #ff007f; --c: #00e5ff; --v: #7000ff; --glass: rgba(0,0,0,0.8); }
-        
+        :root {
+            --accent: #ff007f; /* Anime Pink */
+            --neon: #00f2ff;   /* Cyber Cyan */
+            --bg: #05050a;
+            --glass: rgba(0, 0, 0, 0.85);
+        }
+
         body {
             margin: 0; height: 100vh; display: flex; flex-direction: column;
-            font-family: 'Poppins', sans-serif; color: #fff; overflow: hidden;
+            font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                         url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
             background-size: cover;
         }
 
-        /* Dashboard */
-        .header {
-            padding: 25px 20px; background: var(--glass); backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--p); text-align: center;
+        /* Dashboard: Premium Glassmorphism */
+        .dashboard {
+            padding: 30px 20px; background: var(--glass); backdrop-filter: blur(15px);
+            border-bottom: 3px solid var(--accent); text-align: center;
+            box-shadow: 0 10px 30px rgba(255, 0, 127, 0.2);
         }
-        .score { 
-            font-family: 'Fredoka One', cursive; font-size: 55px; margin: 0;
-            background: linear-gradient(to bottom, #fff, #ffb3d9);
+        .main-score {
+            font-family: 'Fredoka One', cursive; font-size: 60px; margin: 0;
+            background: linear-gradient(to bottom, #fff, var(--accent));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px var(--p));
+            filter: drop-shadow(0 0 15px var(--accent));
         }
+        .stats-bar { display: flex; justify-content: space-around; margin-top: 10px; font-size: 14px; color: var(--neon); font-weight: 700; }
 
-        /* Game Area */
-        .game-zone { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        .main-button {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: radial-gradient(circle, var(--p), var(--v));
-            border: 4px solid #fff; box-shadow: 0 0 30px var(--p);
+        /* Central Gameplay Area */
+        .click-area { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .anime-core {
+            position: relative; width: 220px; height: 220px;
+            background: radial-gradient(circle, var(--accent), #7000ff);
+            border-radius: 50%; border: 6px solid #fff;
+            box-shadow: 0 0 50px var(--accent), inset 0 0 30px rgba(255,255,255,0.5);
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.1s transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10;
+            cursor: pointer; transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
         }
-        .main-button:active { transform: scale(0.92); }
-        .main-button img { width: 110px; filter: drop-shadow(0 0 10px #fff); }
+        .anime-core:active { transform: scale(0.9) rotate(5deg); filter: hue-rotate(45deg); }
+        .anime-core img { width: 130px; pointer-events: none; }
 
-        /* Shop System */
-        .shop-panel {
+        /* Dynamic Shop System */
+        .shop-container {
             background: var(--glass); border-radius: 40px 40px 0 0;
-            padding: 20px; border-top: 3px solid var(--c);
-            max-height: 45%; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            padding: 25px; border-top: 4px solid var(--neon);
+            max-height: 42%; overflow-y: auto;
         }
-        .card {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0,229,255,0.2);
-            border-radius: 20px; padding: 15px; margin-bottom: 12px;
+        .upgrade-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.1);
+            border-radius: 20px; padding: 18px; margin-bottom: 15px;
             display: flex; justify-content: space-between; align-items: center;
             transition: 0.3s;
         }
-        .card-info { flex-grow: 1; text-align: left; }
-        .card-info h3 { margin: 0; font-size: 15px; color: var(--c); text-transform: uppercase; }
+        .card-meta h3 { margin: 0; font-size: 18px; color: var(--neon); text-transform: uppercase; }
         
-        /* Progress Bar */
-        .lvl-progress {
-            width: 100px; height: 6px; background: #222; border-radius: 3px;
-            margin-top: 8px; overflow: hidden;
+        /* Level Progress Bar */
+        .progress-track {
+            width: 120px; height: 8px; background: #111; border-radius: 4px;
+            margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
         }
-        .fill { height: 100%; background: var(--p); transition: 0.3s; }
+        .progress-fill { height: 100%; background: var(--accent); transition: 0.5s ease; box-shadow: 0 0 10px var(--accent); }
 
-        .btn-buy {
-            background: linear-gradient(45deg, var(--p), var(--v));
-            border: none; padding: 12px 18px; border-radius: 12px;
-            color: #fff; font-weight: 700; cursor: pointer; min-width: 80px;
+        .buy-btn {
+            background: linear-gradient(135deg, var(--accent), #7000ff);
+            border: none; padding: 12px 20px; border-radius: 14px;
+            color: #fff; font-weight: 900; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 0, 127, 0.3);
         }
-        .btn-buy:disabled { opacity: 0.3; filter: grayscale(1); }
+        .buy-btn:disabled { filter: grayscale(1); opacity: 0.3; }
 
-        /* Pop-up Text */
-        .tap-effect {
+        /* Particles & Effects */
+        .tap-particle {
             position: absolute; color: #fff; font-weight: 900; font-size: 35px;
-            pointer-events: none; animation: animeUp 0.7s forwards;
-            text-shadow: 2px 2px 0 var(--p); z-index: 20;
+            pointer-events: none; animation: animePopUp 0.8s forwards;
+            text-shadow: 2px 2px 0 var(--accent), 0 0 10px #fff;
         }
-        @keyframes animeUp { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.4); } }
+        @keyframes animePopUp { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.6) rotate(15deg); } }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 class="score" id="score">0</h1>
-        <div style="font-size: 11px; color: var(--c); letter-spacing: 2px; margin-top: 5px;">
-            TAP: +<span id="tap-val">1</span> | AUTO: +<span id="auto-val">0</span>/s
+    <div class="dashboard">
+        <h1 class="main-score" id="score-display">0</h1>
+        <div class="stats-bar">
+            <span>🚀 TAP: +<span id="tap-stat">1</span></span>
+            <span>⚡ AUTO: +<span id="auto-stat">0</span>/s</span>
         </div>
     </div>
 
-    <div class="game-zone">
-        <div class="main-button" id="clicker">
+    <div class="click-area">
+        <div class="anime-core" id="main-target">
             <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
         </div>
     </div>
 
-    <div class="shop-panel" id="shop">
+    <div class="shop-container" id="shop-area">
         </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
+        const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
 
-        // 1. MUSTAHKAM SAQLASH TIZIMI
-        let state = {
-            score: parseFloat(localStorage.getItem('leeno_sc')) || 0,
-            lvls: JSON.parse(localStorage.getItem('leeno_lv')) || { p1: 0, p2: 0, p3: 0 }
+        // 1. ENGINE: MUSTAHKAM MA'LUMOT TIZIMI
+        let gameData = {
+            balance: 0,
+            upgrades: {
+                u1: 0, // Neko Strike
+                u2: 0, // Bento Bot
+                u3: 0, // Cyber Sensei
+                u4: 0, // Galactic Goddess
+                u5: 0  // Infinite Void
+            }
         };
 
-        const upgrades = [
-            { id: 'p1', name: 'Neko Strike', desc: 'Tap kuchini oshirish', base: 40, grow: 1.7, val: 2, type: 'tap' },
-            { id: 'p2', name: 'Bento Bot', desc: 'Avtomatik yig‘ish +12/s', base: 400, grow: 1.6, val: 12, type: 'auto' },
-            { id: 'p3', name: 'Cyber Sensei', desc: 'Global daromad +80/s', base: 2000, grow: 1.6, val: 80, type: 'auto' }
+        const config = [
+            { id: 'u1', name: 'Neko Strike', desc: 'Tap kuchini oshirish', base: 50, growth: 1.8, val: 2, type: 'tap' },
+            { id: 'u2', name: 'Bento Bot', desc: 'Avto-yig‘ish +15/s', base: 450, growth: 1.6, val: 15, type: 'auto' },
+            { id: 'u3', name: 'Cyber Sensei', desc: 'Global daromad +120/s', base: 2500, growth: 1.6, val: 120, type: 'auto' },
+            { id: 'u4', name: 'Mecha Maid', desc: 'Tap kuchini +50 ga oshirish', base: 10000, growth: 1.7, val: 50, type: 'tap' },
+            { id: 'u5', name: 'Infinite Void', desc: 'Soniya: +1000 Energy', base: 50000, growth: 1.8, val: 1000, type: 'auto' }
         ];
 
-        function getStats() {
-            let t = 1, a = 0;
-            upgrades.forEach(u => {
-                let l = state.lvls[u.id] || 0;
-                if(u.type === 'tap') t += (l * u.val);
-                if(u.type === 'auto') a += (l * u.val);
+        // 2. LOGIC: SAQLASH VA YUKLASH
+        function init() {
+            const saved = localStorage.getItem('leenova_v3_data');
+            if (saved) {
+                try {
+                    gameData = JSON.parse(saved);
+                } catch(e) { console.error("Data error"); }
+            }
+            refreshUI();
+        }
+
+        function save() {
+            localStorage.setItem('leenova_v3_data', JSON.stringify(gameData));
+        }
+
+        function getPower() {
+            let tap = 1, auto = 0;
+            config.forEach(item => {
+                let lvl = gameData.upgrades[item.id] || 0;
+                if(item.type === 'tap') tap += (lvl * item.val);
+                if(item.type === 'auto') auto += (lvl * item.val);
             });
-            return { t, a };
+            return { tap, auto };
         }
 
-        function sync() {
-            localStorage.setItem('leeno_sc', state.score);
-            localStorage.setItem('leeno_lv', JSON.stringify(state.lvls));
-        }
+        // 3. RENDER: DINAMIK DO'KON VA ZANJIRLI OCHILISH
+        function refreshUI() {
+            const stats = getPower();
+            document.getElementById('score-display').innerText = Math.floor(gameData.balance).toLocaleString();
+            document.getElementById('tap-stat').innerText = stats.tap;
+            document.getElementById('auto-stat').innerText = stats.auto;
 
-        function render() {
-            let s = getStats();
-            document.getElementById('score').innerText = Math.floor(state.score).toLocaleString();
-            document.getElementById('tap-val').innerText = s.t;
-            document.getElementById('auto-val').innerText = s.a;
+            const container = document.getElementById('shop-area');
+            container.innerHTML = '';
 
-            const shop = document.getElementById('shop');
-            shop.innerHTML = '';
+            let canUnlock = true;
+            config.forEach(item => {
+                if (!canUnlock) return;
 
-            let canShow = true;
-            upgrades.forEach(item => {
-                if (!canShow) return;
+                let lvl = gameData.upgrades[item.id] || 0;
+                let price = Math.floor(item.base * Math.pow(item.growth, lvl));
+                let progress = (lvl / 10) * 100;
 
-                let l = state.lvls[item.id] || 0;
-                let price = Math.floor(item.base * Math.pow(item.grow, l));
-                let progress = (l / 10) * 100;
-
-                shop.innerHTML += `
-                    <div class="card">
-                        <div class="card-info">
-                            <h3>${item.name} (LVL ${l}/10)</h3>
-                            <div class="lvl-progress"><div class="fill" style="width: ${progress}%"></div></div>
+                container.innerHTML += `
+                    <div class="upgrade-card">
+                        <div class="card-meta">
+                            <h3>${item.name} [Lvl ${lvl}/10]</h3>
+                            <div class="progress-track"><div class="progress-fill" style="width: ${progress}%"></div></div>
                         </div>
-                        ${l < 10 ? 
-                            `<button class="btn-buy" onclick="buy('${item.id}', ${price})" ${state.score < price ? 'disabled' : ''}>💰 ${price}</button>` : 
-                            `<span style="color:var(--p); font-weight:900;">MAX!</span>`
+                        ${lvl < 10 ? 
+                            `<button class="buy-btn" onclick="buyUpgrade('${item.id}', ${price})">💰 ${price.toLocaleString()}</button>` : 
+                            `<span style="color:var(--accent); font-weight:900;">MAX LEVEL</span>`
                         }
                     </div>
                 `;
-                if (l < 10) canShow = false; // Zanjirli ochilish logikasi
+
+                if (lvl < 10) canUnlock = false; // Faqat MAX bo'lganda keyingisi
             });
-            sync();
+            save();
         }
 
-        function buy(id, price) {
-            if(state.score >= price && state.lvls[id] < 10) {
-                state.score -= price;
-                state.lvls[id]++;
+        function buyUpgrade(id, price) {
+            if (gameData.balance >= price && gameData.upgrades[id] < 10) {
+                gameData.balance -= price;
+                gameData.upgrades[id]++;
                 tg.HapticFeedback.notificationOccurred('success');
-                render();
+                refreshUI();
             }
         }
 
-        document.getElementById('clicker').onclick = (e) => {
-            let s = getStats();
-            state.score += s.t;
-            
+        // 4. INTERACTION: TAP VA EFFEKTLAR
+        document.getElementById('main-target').onclick = (e) => {
+            const stats = getPower();
+            gameData.balance += stats.tap;
+
             const p = document.createElement('div');
-            p.className = 'tap-effect'; p.innerText = `+${s.t}`;
-            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+            p.className = 'tap-particle';
+            p.innerText = `+${stats.tap}`;
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
             document.body.appendChild(p);
-            setTimeout(() => p.remove(), 700);
+            setTimeout(() => p.remove(), 750);
 
             tg.HapticFeedback.impactOccurred('medium');
-            render();
+            refreshUI();
         };
 
-        // Silliq avto-mining
+        // 5. AUTO-LOOP: SILLIQ MINING
         setInterval(() => {
-            let s = getStats();
-            state.score += (s.a / 10);
-            render();
+            const stats = getPower();
+            if (stats.auto > 0) {
+                gameData.balance += (stats.auto / 10);
+                refreshUI();
+            }
         }, 100);
 
-        render();
+        init();
     </script>
 </body>
 </html>
