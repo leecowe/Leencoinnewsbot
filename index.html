@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova Pro | Advanced Bot</title>
+    <title>Leenova Pro | AI Humanity Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --ios-bg: #000000;
-            --ios-card: #161618;
-            --ios-gold: #f1b912;
-            --ios-green: #32D74B;
-            --ios-border: rgba(255, 255, 255, 0.08);
+            --ios-card: #1c1c1e;
+            --ios-gold: #f3ba2f;
+            --ios-green: #32d74b;
+            --ios-border: rgba(255, 255, 255, 0.1);
             --text-main: #FFFFFF;
             --text-sec: #8E8E93;
         }
@@ -20,194 +20,301 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'SF Pro Display', sans-serif; }
         body { background: var(--ios-bg); color: var(--text-main); margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 110px; }
+        .view { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 110px; animation: iosSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .view.active { display: flex; }
+        @keyframes iosSlide { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Header (Rasmdagidek) */
-        .header { padding: 45px 20px 15px; text-align: center; position: relative; }
-        .vazir-badge { position: absolute; left: 20px; top: 60px; border: 1.2px solid var(--ios-gold); color: var(--ios-gold); padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
-        .profit-badge { position: absolute; right: 20px; top: 60px; background: rgba(50, 215, 75, 0.12); color: var(--ios-green); padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid rgba(50, 215, 75, 0.2); }
-        .bal-display { font-size: 44px; font-weight: 800; letter-spacing: -1px; margin-top: 15px; }
-        .staked-txt { color: var(--ios-gold); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
-        .rank-txt { font-size: 11px; color: var(--ios-gold); font-weight: 800; margin-top: 8px; letter-spacing: 1.5px; opacity: 0.9; }
+        /* iOS Header (Rasmdagi kabi) */
+        .header { padding: 45px 20px 15px; text-align: center; position: relative; border-bottom: 0.5px solid var(--ios-border); }
+        .vazir-badge { position: absolute; left: 20px; top: 55px; border: 1.2px solid var(--ios-gold); color: var(--ios-gold); padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .profit-badge { position: absolute; right: 20px; top: 55px; background: rgba(50, 215, 75, 0.15); color: var(--ios-green); padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid rgba(50, 215, 75, 0.2); }
+        .main-bal { font-size: 46px; font-weight: 800; letter-spacing: -1.5px; margin-top: 15px; }
+        .staked-txt { color: var(--ios-gold); font-size: 13px; font-weight: 700; margin-top: 5px; }
 
-        /* Kartochkalar (Sariq yon chiziqli - Rasm #3 va #9) */
-        .card { background: var(--ios-card); border-radius: 20px; padding: 20px; margin: 10px 15px; border: 1px solid var(--ios-border); position: relative; }
-        .card.with-indicator::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px; background: var(--ios-gold); border-radius: 0 4px 4px 0; }
+        /* Character Area */
+        .char-zone { text-align: center; padding: 25px 0; }
+        .avatar-main { width: 220px; height: 220px; border-radius: 50%; filter: drop-shadow(0 0 30px rgba(243, 186, 47, 0.2)); transition: transform 0.1s; cursor: pointer; }
+        .avatar-main:active { transform: scale(0.94); }
+
+        /* Cards (Sariq yon chiziq bilan - Rasm #2) */
+        .card { background: var(--ios-card); border-radius: 20px; padding: 20px; margin: 10px 15px; border: 1px solid var(--ios-border); position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px; background: var(--ios-gold); border-radius: 0 4px 4px 0; }
         
-        .btn-main { background: var(--ios-gold); color: #000; border: none; padding: 16px; border-radius: 15px; font-weight: 800; width: 100%; font-size: 15px; text-transform: uppercase; margin-top: 12px; }
-        .btn-sub { background: #2c2c2e; color: #fff; border: none; padding: 16px; border-radius: 15px; font-weight: 800; width: 100%; font-size: 15px; text-transform: uppercase; margin-top: 8px; }
+        .btn-ios { background: var(--ios-gold); color: #000; border: none; padding: 16px; border-radius: 15px; font-weight: 800; width: 100%; font-size: 15px; text-transform: uppercase; }
+        .btn-dark { background: #2c2c2e; color: #fff; border: none; padding: 16px; border-radius: 15px; font-weight: 800; width: 100%; font-size: 15px; text-transform: uppercase; }
 
-        /* Titan Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; }
-        .titan-card { background: var(--ios-card); border-radius: 18px; padding: 18px; text-align: center; border: 1px solid var(--ios-border); transition: 0.2s; }
-        .buy-sm { background: var(--ios-gold); color: #000; border: none; width: 100%; padding: 10px; border-radius: 10px; font-weight: 800; margin-top: 10px; font-size: 12px; }
+        /* Grid System (Market & Squad) */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .item-box { background: var(--ios-card); border-radius: 22px; padding: 18px; text-align: center; border: 1px solid var(--ios-border); position: relative; }
+        .item-icon { font-size: 35px; margin-bottom: 10px; display: block; }
 
-        /* Nav */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; justify-content: space-around; padding-bottom: 20px; border-top: 0.5px solid var(--ios-border); z-index: 100; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sec); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .nav-btn.active { color: var(--ios-gold); }
-        .nav-btn i { font-size: 22px; margin-bottom: 4px; }
+        /* Mahjong Mini Game */
+        .mj-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 15px; background: #141416; border-radius: 20px; margin: 10px 15px; }
+        .tile { height: 60px; background: #fdfcf0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; border-bottom: 3px solid #d1d1d1; cursor: pointer; }
+        .tile.selected { background: var(--ios-gold); transform: scale(0.95); }
+        .tile.matched { opacity: 0; pointer-events: none; }
 
-        /* Popup */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-body { background: #1c1c1e; width: 80%; border-radius: 30px; padding: 35px 25px; text-align: center; border: 1px solid var(--ios-gold); }
+        /* Navigation */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 88px; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding-bottom: 25px; border-top: 0.5px solid var(--ios-border); z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-sec); font-size: 10px; font-weight: 700; }
+        .nav-item.active { color: var(--ios-gold); }
+        .nav-item span { font-size: 22px; margin-bottom: 4px; }
+
+        /* Floating Animation */
+        .pop-num { position: fixed; color: var(--ios-gold); font-weight: 800; font-size: 22px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 2000; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div id="modal">
-    <div class="modal-body">
-        <div style="font-size: 45px; margin-bottom: 15px;">🚀</div>
-        <p id="modal-msg" style="font-weight: 700; font-size: 17px;"></p>
-        <button class="btn-main" onclick="toggleModal(false)">OK</button>
-    </div>
-</div>
-
 <header class="header">
     <div class="vazir-badge">VAZIR</div>
-    <div class="profit-badge" id="p-val">+0.0/s</div>
-    <div class="bal-display" id="b-val">0.0</div>
-    <div class="staked-txt" id="s-val">STAKED: 0.0</div>
-    <div class="rank-txt">AIRA NEOPHYTE</div>
+    <div class="profit-badge" id="p-rate">+2.5/s</div>
+    <div class="main-bal" id="b-display">0.0</div>
+    <div class="staked-txt" id="s-display">STAKED: 0.0</div>
 </header>
 
 <div id="v-core" class="view active">
-    <div style="text-align:center; padding: 25px 0;">
-        <img src="https://cdn-icons-png.flaticon.com/512/3593/3593452.png" style="width:180px; filter: drop-shadow(0 0 25px rgba(241,185,18,0.3))" onclick="tap()">
-        <div style="margin-top:15px; font-weight:800; font-size:20px; color:var(--ios-gold)">⚡ <span id="e-val">1000</span> / 1000</div>
+    <div class="char-zone">
+        <div style="font-size: 11px; color: var(--ios-gold); font-weight: 800; letter-spacing: 2px; margin-bottom: 10px;">AIRA NEOPHYTE</div>
+        <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="avatar-main" onclick="handleTap(event)">
+        <div style="margin-top:20px; font-size:22px; font-weight:800; color:var(--ios-gold)">
+            ⚡ <span id="e-display">1000</span> <span style="color:var(--text-sec); font-size:14px">/ 1000</span>
+        </div>
     </div>
 
-    <div class="card with-indicator">
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
-            <span style="color:var(--text-sec)">STAKE LVL: <span id="stk-lvl" style="color:#fff">1</span></span>
-            <span>6S</span>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:700;">
+            <span style="color:var(--text-sec)">STAKE LEVEL <span id="stk-lvl" style="color:#fff">1</span></span>
+            <span>6.0S</span>
         </div>
-        <button class="btn-sub" onclick="stake()">STAKE ALL</button>
-        <div style="text-align:right; font-size:11px; color:var(--ios-gold); font-weight:700; margin-top:8px">Upgrade: <span id="stk-c">1.0k</span></div>
+        <button class="btn-dark" onclick="stakeAll()">STAKE ALL</button>
+        <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--ios-gold); font-weight:800">COST: <span id="stk-cost">1.0k</span></div>
     </div>
 
-    <div class="card with-indicator">
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
-            <span style="color:var(--text-sec)">FARM LVL: <span id="frm-lvl" style="color:#fff">1</span></span>
-            <span id="frm-r">2.5/s</span>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:700;">
+            <span style="color:var(--text-sec)">FARMING LEVEL <span id="frm-lvl" style="color:#fff">1</span></span>
+            <span id="frm-rate-txt">2.5/s</span>
         </div>
-        <button class="btn-main" onclick="upgrade()">UPGRADE FARMING</button>
-        <div style="text-align:right; font-size:11px; color:var(--text-sec); margin-top:8px">Cost: <span id="frm-c">500.0</span></div>
+        <button class="btn-ios" onclick="upgradeFarm()">UPGRADE FARMING</button>
+        <div style="text-align:right; margin-top:8px; font-size:11px; color:var(--text-sec)">COST: <span id="frm-cost">500.0</span></div>
     </div>
 </div>
 
-<div id="v-coll" class="view">
-    <div class="grid" id="coll-list"></div>
+<div id="v-games" class="view">
+    <div style="padding: 20px; text-align: center;">
+        <h2 style="margin:0; font-size:24px;">AI MAHJONG</h2>
+        <p style="color:var(--text-sec); font-size:13px;">Juftliklarni toping va +1.0k bonus oling!</p>
+    </div>
+    <div class="mj-grid" id="mj-board"></div>
+    <button class="btn-ios" style="margin: 0 15px; width: calc(100% - 30px);" onclick="resetMahjong()">YANGI O'YIN</button>
 </div>
 
-<div id="v-mark" class="view">
-    <div class="card with-indicator">
-        <h3 style="margin:0; color:var(--ios-gold); font-size:17px">AUTO-STAKING</h3>
-        <p style="font-size:11px; color:var(--text-sec); margin:8px 0">Har 30 soniyada balansingizni avtomatik stake qiladi.</p>
-        <button class="btn-main" id="auto-btn" onclick="buyAuto()">SOTIB OLISH (15.0K)</button>
+<div id="v-market" class="view">
+    <div class="card">
+        <h3 style="margin:0; color:var(--ios-gold)">AUTO-STAKING</h3>
+        <p style="font-size:12px; color:var(--text-sec); margin:10px 0;">Siz yo'qligingizda har 30 soniyada avtomatik stake qiladi.</p>
+        <button class="btn-ios" id="auto-btn" onclick="buyAuto()">SOTIB OLISH (15.0K)</button>
     </div>
-    <div class="grid" id="mark-list"></div>
+    <div class="grid" id="market-list"></div>
+</div>
+
+<div id="v-squad" class="view">
+    <div style="padding: 20px; text-align: center;">
+        <h2 style="margin:0; font-size:24px;">MY SQUAD</h2>
+        <p style="color:var(--text-sec); font-size:13px;">Siz to'plagan barcha Titanlar.</p>
+    </div>
+    <div class="grid" id="squad-list"></div>
 </div>
 
 <nav class="nav">
-    <div class="nav-btn active" onclick="tab('core', this)"><i>🏠</i>CORE</div>
-    <div class="nav-btn" onclick="tab('coll', this)"><i>📦</i>COLLECTION</div>
-    <div class="nav-btn" onclick="tab('mark', this)"><i>🛍️</i>MARKET</div>
+    <div class="nav-item active" onclick="tab('core', this)"><span>👤</span>CORE</div>
+    <div class="nav-item" onclick="tab('games', this)"><span>🎮</span>GAMES</div>
+    <div class="nav-item" onclick="tab('market', this)"><span>🛒</span>MARKET</div>
+    <div class="nav-item" onclick="tab('squad', this)"><span>🛡️</span>SQUAD</div>
 </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    let state = { bal: 0, stk: 59.8, fL: 1, sL: 1, en: 1000, auto: false, items: [] };
+    tg.expand();
 
-    // Formatlash (undefined xatosini yopadi)
+    let state = {
+        bal: 0, stk: 59.8, en: 1000, fL: 1, sL: 1, 
+        auto: false, owned: []
+    };
+
+    // "undefined" XATOSINI TUZATUVCHI FUNKSIYA
     function f(n) {
-        if (!n || isNaN(n)) return "0.0";
-        const units = ["", "k", "m", "b", "t", "q"];
-        const e = Math.floor(Math.log10(n) / 3);
-        return e < 1 ? n.toFixed(1) : (n / Math.pow(10, e * 3)).toFixed(1) + units[e];
+        if (!n || isNaN(n) || n === 0) return "0.0";
+        const units = ["", "k", "m", "b", "t", "q", "Q", "s", "S"];
+        const e = Math.floor(Math.log10(Math.abs(n)) / 3);
+        if (e < 1) return n.toFixed(1);
+        const unit = units[e] || "!!";
+        return (n / Math.pow(10, e * 3)).toFixed(1) + unit;
     }
 
     function sync() {
-        document.getElementById('b-val').innerText = f(state.bal);
-        document.getElementById('s-val').innerText = "STAKED: " + f(state.stk);
-        document.getElementById('p-val').innerText = "+" + f(state.fL * 2.5) + "/s";
-        document.getElementById('frm-r').innerText = f(state.fL * 2.5) + "/s";
-        document.getElementById('e-val').innerText = Math.floor(state.en);
+        document.getElementById('b-display').innerText = f(state.bal);
+        document.getElementById('s-display').innerText = "STAKED: " + f(state.stk);
+        document.getElementById('p-rate').innerText = "+" + f(state.fL * 2.5) + "/s";
+        document.getElementById('e-display').innerText = Math.floor(state.en);
         document.getElementById('frm-lvl').innerText = state.fL;
-        document.getElementById('frm-c').innerText = f(500 * Math.pow(1.5, state.fL-1));
-        document.getElementById('stk-c').innerText = f(1000 * Math.pow(1.4, state.sL-1));
-        if(state.auto) document.getElementById('auto-btn').innerText = "FAOL";
+        document.getElementById('frm-rate-txt').innerText = f(state.fL * 2.5) + "/s";
+        document.getElementById('stk-lvl').innerText = state.sL;
+        document.getElementById('frm-cost').innerText = f(500 * Math.pow(1.5, state.fL - 1));
+        document.getElementById('stk-cost').innerText = f(1000 * Math.pow(1.4, state.sL - 1));
+        
+        if(state.auto) {
+            const ab = document.getElementById('auto-btn');
+            ab.innerText = "FAOL";
+            ab.style.background = "#2c2c2e";
+            ab.style.color = "#32d74b";
+        }
     }
 
-    function tap() {
-        if(state.en >= 1) { state.bal += (1 + state.fL * 0.2); state.en--; sync(); tg.HapticFeedback.impactOccurred('light'); }
-    }
-
-    function stake() {
-        if(state.bal > 0) { state.stk += state.bal; state.bal = 0; sync(); tg.HapticFeedback.notificationOccurred('success'); }
-    }
-
-    function buyAuto() {
-        if(state.bal >= 15000 && !state.auto) { state.bal -= 15000; state.auto = true; toggleModal(true, "Auto-Stake faollashdi!"); sync(); }
-    }
-
-    function upgrade() {
-        let cost = 500 * Math.pow(1.5, state.fL-1);
-        if(state.bal >= cost) { state.bal -= cost; state.fL++; sync(); }
-    }
-
-    function tab(name, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('v-'+name).classList.add('active');
-        el.classList.add('active');
-    }
-
-    function toggleModal(show, msg="") {
-        document.getElementById('modal').style.display = show ? 'flex' : 'none';
-        if(msg) document.getElementById('modal-msg').innerText = msg;
-    }
-
-    // Market generatsiyasi (Rasmdagi ikonkalar bilan)
-    const icons = ["🔱", "⚔️", "🛡️", "🌀"];
-    const mList = document.getElementById('mark-list');
-    const cList = document.getElementById('coll-list');
-
-    for(let i=50; i<=60; i++) {
-        let icon = icons[i % icons.length];
-        let price = i * 1000000;
-        mList.innerHTML += `
-            <div class="titan-card">
-                <div style="font-size:32px; margin-bottom:5px">${icon}</div>
-                <div style="font-size:10px; font-weight:800; color:var(--text-sec)">TITAN #${i}</div>
-                <div style="color:var(--ios-gold); font-weight:800; margin:5px 0">${f(price)}</div>
-                <button class="buy-sm" id="m-${i}" onclick="buy(${i}, ${price}, '${icon}')">BUY</button>
-            </div>`;
-    }
-
-    function buy(id, p, icon) {
-        if(state.bal >= p && !state.items.includes(id)) {
-            state.bal -= p; state.items.push(id);
-            cList.innerHTML += `
-                <div class="titan-card">
-                    <div style="font-size:32px; margin-bottom:5px">${icon}</div>
-                    <div style="font-size:10px; font-weight:800; color:var(--text-sec)">TITAN #${id}</div>
-                    <button class="buy-sm" style="background:#2c2c2e; color:#fff">OWNED</button>
-                </div>`;
-            document.getElementById(`m-${id}`).innerText = "OWNED";
-            document.getElementById(`m-${id}`).disabled = true;
+    function handleTap(e) {
+        if(state.en >= 1) {
+            let gain = 1 + (state.fL * 0.2);
+            state.bal += gain;
+            state.en -= 1;
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            const p = document.createElement('div');
+            p.className = 'pop-num';
+            p.innerText = "+" + gain.toFixed(1);
+            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
             sync();
         }
     }
 
-    setInterval(() => { 
-        state.bal += (state.fL * 2.5) / 10; 
-        if(state.en < 1000) state.en += 0.3;
-        sync(); 
+    function stakeAll() {
+        if(state.bal > 0) {
+            state.stk += state.bal;
+            state.bal = 0;
+            tg.HapticFeedback.notificationOccurred('success');
+            sync();
+        }
+    }
+
+    function upgradeFarm() {
+        let cost = 500 * Math.pow(1.5, state.fL - 1);
+        if(state.bal >= cost) {
+            state.bal -= cost;
+            state.fL++;
+            sync();
+        }
+    }
+
+    function buyAuto() {
+        if(state.bal >= 15000 && !state.auto) {
+            state.bal -= 15000;
+            state.auto = true;
+            sync();
+        }
+    }
+
+    function tab(name, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('v-' + name).classList.add('active');
+        el.classList.add('active');
+        if(name === 'games') resetMahjong();
+    }
+
+    // Market & Squad Logic
+    const items = [
+        {id: 50, icon: "🔱", price: 1000000},
+        {id: 51, icon: "⚔️", price: 1500000},
+        {id: 52, icon: "🛡️", price: 2000000},
+        {id: 53, icon: "🌀", price: 3000000}
+    ];
+
+    function initMarket() {
+        const mList = document.getElementById('market-list');
+        mList.innerHTML = "";
+        items.forEach(item => {
+            mList.innerHTML += `
+                <div class="item-box">
+                    <span class="item-icon">${item.icon}</span>
+                    <div style="font-size:11px; font-weight:800; color:var(--text-sec)">TITAN #${item.id}</div>
+                    <div style="color:var(--ios-gold); font-weight:800; margin:8px 0">${f(item.price)}</div>
+                    <button class="btn-ios" style="padding:8px; font-size:12px;" onclick="buyTitan(${item.id}, ${item.price}, '${item.icon}')">BUY</button>
+                </div>`;
+        });
+    }
+
+    function buyTitan(id, price, icon) {
+        if(state.bal >= price && !state.owned.includes(id)) {
+            state.bal -= price;
+            state.owned.push({id, icon});
+            updateSquad();
+            sync();
+            tg.showAlert(`TITAN #${id} SQUADga qo'shildi!`);
+        } else {
+            tg.showAlert("Mablag' yetarli emas!");
+        }
+    }
+
+    function updateSquad() {
+        const sList = document.getElementById('squad-list');
+        sList.innerHTML = "";
+        state.owned.forEach(item => {
+            sList.innerHTML += `
+                <div class="item-box">
+                    <span class="item-icon">${item.icon}</span>
+                    <div style="font-size:11px; font-weight:800; color:var(--text-sec)">TITAN #${item.id}</div>
+                    <div style="color:var(--ios-green); font-size:10px; font-weight:800; margin-top:5px;">ACTIVE</div>
+                </div>`;
+        });
+    }
+
+    // Mahjong Logic
+    let selected = null;
+    const emojis = ["🤖", "🧬", "💾", "📡", "🛸", "🔋"];
+    
+    function resetMahjong() {
+        const board = document.getElementById('mj-board');
+        board.innerHTML = "";
+        let deck = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+        deck.forEach((em, i) => {
+            const t = document.createElement('div');
+            t.className = 'tile';
+            t.innerText = em;
+            t.onclick = () => {
+                if(t.classList.contains('matched')) return;
+                t.classList.add('selected');
+                if(!selected) {
+                    selected = t;
+                } else {
+                    if(selected.innerText === t.innerText && selected !== t) {
+                        t.classList.add('matched');
+                        selected.classList.add('matched');
+                        state.bal += 1000;
+                        sync();
+                    } else {
+                        const s = selected;
+                        setTimeout(() => { s.classList.remove('selected'); t.classList.remove('selected'); }, 400);
+                    }
+                    selected = null;
+                }
+            };
+            board.appendChild(t);
+        });
+    }
+
+    // Main Loops
+    setInterval(() => {
+        state.bal += (state.fL * 2.5) / 10;
+        if(state.en < 1000) state.en += 0.5;
+        sync();
     }, 100);
 
-    setInterval(() => { if(state.auto) stake(); }, 30000);
+    setInterval(() => { if(state.auto) stakeAll(); }, 30000);
+
+    initMarket();
     sync();
 </script>
 </body>
