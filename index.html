@@ -3,199 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Cyber City</title>
+    <title>Leenova NFT Market</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #020b16; }
-
+        :root { --blue: #00f2ff; --pink: #ff007f; --gold: #ffcc00; --purple: #bc00ff; --dark: #020b16; }
         body {
-            margin: 0; height: 100vh; display: flex; flex-direction: column;
-            font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            /* Fon: Skrinshotdagi kiber-shahar */
-            background: linear-gradient(rgba(2, 11, 22, 0.75), rgba(2, 11, 22, 0.85)), 
-                        url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
-            background-size: cover;
+            margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
+            background: linear-gradient(rgba(2,11,22,0.8), rgba(2,11,22,0.9)), url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
+            background-size: cover; display: flex; flex-direction: column;
         }
 
-        /* 1. TOP HUD: Skrinshot 14 va 15 dagi kabi dizayn */
-        .hud-top {
-            padding: 30px 20px 10px 20px;
-            background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent);
-        }
-        .credits-container { border-left: 3px solid var(--blue); padding-left: 15px; position: relative; }
-        .credits-label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
-        .credits-value { font-family: 'Orbitron'; font-size: 36px; text-shadow: 0 0 15px var(--blue); }
-        .settings-icon { position: absolute; right: 0; top: 0; font-size: 20px; color: var(--blue); opacity: 0.7; }
+        /* Stats HUD */
+        .hud { padding: 25px; background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--blue); display: flex; justify-content: space-between; align-items: center; }
+        .balance { font-family: 'Orbitron'; font-size: 28px; text-shadow: 0 0 10px var(--blue); }
+        .test-badge { font-size: 10px; background: var(--pink); padding: 2px 8px; border-radius: 4px; animation: blink 1s infinite; }
 
-        .stat-chips { display: flex; gap: 10px; margin-top: 15px; }
-        .chip { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 3px 12px; font-size: 11px; border-radius: 4px; font-family: 'Orbitron'; }
+        /* Navigation */
+        .nav { display: flex; background: rgba(0,242,255,0.05); }
+        .nav-btn { flex: 1; padding: 15px; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; font-family: 'Orbitron'; font-size: 12px; }
+        .nav-btn.active { border-color: var(--blue); background: rgba(0,242,255,0.1); }
 
-        /* 2. CENTER: Clicker Core (Skrinshot 14/15 dagi kvadratli effekt) */
-        .game-area { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .core-wrapper { width: 220px; height: 220px; position: relative; cursor: pointer; }
-        .core-circle { 
-            position: absolute; inset: 0; border: 2px solid var(--blue); border-radius: 50%;
-            box-shadow: 0 0 40px var(--blue), inset 0 0 20px var(--blue);
-            animation: pulse 2s infinite;
-        }
-        .core-inner-box {
-            position: absolute; inset: 50px; background: rgba(0, 242, 255, 0.1);
-            border: 1px solid var(--blue); border-radius: 12px; transform: rotate(45deg);
-            display: flex; justify-content: center; align-items: center;
-        }
-        .core-inner-box img { width: 60px; transform: rotate(-45deg); filter: drop-shadow(0 0 10px var(--blue)); }
+        /* NFT Grid */
+        .content-area { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; }
+        .content-area.active { display: block; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px; }
 
-        /* 3. SHOP: Skrinshotdagi "System Upgrades" qismi */
-        .shop-container {
-            background: rgba(2, 11, 22, 0.98); border-top: 2px solid var(--blue);
-            border-radius: 35px 35px 0 0; padding: 25px; max-height: 40%; overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0, 242, 255, 0.25);
+        .nft-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.2); border-radius: 12px;
+            overflow: hidden; position: relative; transition: 0.3s;
         }
-        .shop-title { font-family: 'Orbitron'; font-size: 14px; color: var(--blue); margin-bottom: 20px; letter-spacing: 3px; }
-
-        .upgrade-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.15);
-            border-radius: 18px; padding: 18px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .upgrade-info h4 { margin: 0; font-size: 16px; color: #fff; letter-spacing: 1px; }
-        .lvl-text { color: var(--blue); font-size: 11px; margin-left: 5px; }
+        .nft-img { width: 100%; height: 140px; object-fit: cover; filter: brightness(0.8); }
+        .nft-info { padding: 10px; }
+        .nft-tier { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
         
-        .progress-track { width: 130px; height: 5px; background: #111; margin-top: 10px; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--blue); box-shadow: 0 0 10px var(--blue); transition: 0.4s; }
+        /* Tiers */
+        .common { background: #555; }
+        .rare { background: var(--blue); color: #000; }
+        .epic { background: var(--purple); }
+        .legend { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
 
-        .buy-button {
-            background: rgba(0, 242, 255, 0.05); border: 1px solid var(--blue);
-            color: var(--blue); padding: 10px 20px; border-radius: 10px;
-            font-family: 'Orbitron'; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
-        .buy-button:disabled { border-color: #333; color: #333; opacity: 0.4; }
-        .buy-button:active { transform: scale(0.9); background: var(--blue); color: #000; }
+        .nft-card h5 { margin: 0; font-size: 13px; color: #fff; }
+        .nft-power { font-size: 11px; color: var(--blue); margin: 5px 0; }
+        .buy-btn { width: 100%; background: transparent; border: 1px solid var(--blue); color: var(--blue); padding: 6px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
+        .buy-btn:disabled { border-color: #444; color: #444; }
+        .buy-btn:active { background: var(--blue); color: #000; }
 
-        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } 100% { opacity: 0.5; transform: scale(1); } }
-        .float-text { position: absolute; color: var(--blue); font-weight: 900; animation: floatUp 0.8s forwards; font-family: 'Orbitron'; pointer-events: none; }
-        @keyframes floatUp { to { transform: translateY(-130px); opacity: 0; } }
+        .owned-tag { position: absolute; top: 5px; right: 5px; font-size: 18px; }
+
+        @keyframes blink { 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
-    <div class="hud-top">
-        <div class="credits-container">
-            <div class="settings-icon">⚙️</div>
-            <div class="credits-label">CREDITS AVAILABLE</div>
-            <div class="credits-value" id="balance">0</div>
-            <div class="stat-chips">
-                <div class="chip">T: +<span id="tap-stat">1</span></div>
-                <div class="chip">A: +<span id="auto-stat">0</span>/s</div>
-            </div>
+    <div class="hud">
+        <div>
+            <div style="font-size: 10px; color: var(--blue);">CREDITS <span class="test-badge">TEST MODE: ALL 1 CR</span></div>
+            <div class="balance" id="balance">0</div>
         </div>
+        <div id="tap-zone" style="cursor:pointer; font-size:30px;">⚡</div>
     </div>
 
-    <div class="game-area">
-        <div class="core-wrapper" id="core-btn">
-            <div class="core-circle"></div>
-            <div class="core-inner-box">
-                <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
-            </div>
-        </div>
+    <div class="nav">
+        <div class="nav-btn active" onclick="tab('market')">NFT MARKET</div>
+        <div class="nav-btn" onclick="tab('inventory')">MY CARDS</div>
     </div>
 
-    <div class="shop-container">
-        <div class="shop-title">SYSTEM UPGRADES</div>
-        <div id="shop-list"></div>
+    <div id="market" class="content-area active">
+        <div class="nft-grid" id="market-list"></div>
+    </div>
+
+    <div id="inventory" class="content-area">
+        <div class="nft-grid" id="my-list"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let gameState = {
-            credits: parseFloat(localStorage.getItem('ln_v7_credits')) || 0,
-            levels: JSON.parse(localStorage.getItem('ln_v7_levels')) || { s1:0, s2:0, s3:0, s4:0 }
+        let game = {
+            credits: parseFloat(localStorage.getItem('ln_nft_bal')) || 100,
+            owned: JSON.parse(localStorage.getItem('ln_nft_owned')) || []
         };
 
-        const upgrades = [
-            { id: 's1', name: 'NEURAL LINK', base: 1, grow: 1, val: 5, type: 'tap' },
-            { id: 's2', name: 'CYBER MINER', base: 1, grow: 1, val: 20, type: 'auto' },
-            { id: 's3', name: 'QUANTUM CPU', base: 1, grow: 1, val: 100, type: 'auto' },
-            { id: 's4', name: 'CORE OVERLOAD', base: 1, grow: 1, val: 500, type: 'tap' }
+        // 15+ NFT Kartalar Ma'lumotlar Bazasi
+        const nfts = [
+            { id: 1, name: "Neon Samurai", tier: "rare", power: 15, img: "https://picsum.photos/seed/n1/200/300" },
+            { id: 2, name: "Cyber Monk", tier: "epic", power: 45, img: "https://picsum.photos/seed/n2/200/300" },
+            { id: 3, name: "Star Voyager", tier: "legend", power: 120, img: "https://picsum.photos/seed/n3/200/300" },
+            { id: 4, name: "Data Ghost", tier: "common", power: 5, img: "https://picsum.photos/seed/n4/200/300" },
+            { id: 5, name: "Plasma Queen", tier: "epic", power: 55, img: "https://picsum.photos/seed/n5/200/300" },
+            { id: 6, name: "Void Runner", tier: "rare", power: 25, img: "https://picsum.photos/seed/n6/200/300" },
+            { id: 7, name: "Mecha Titan", tier: "legend", power: 250, img: "https://picsum.photos/seed/n7/200/300" },
+            { id: 8, name: "Binary Witch", tier: "rare", power: 30, img: "https://picsum.photos/seed/n8/200/300" },
+            { id: 9, name: "Giga Bot", tier: "common", power: 8, img: "https://picsum.photos/seed/n9/200/300" },
+            { id: 10, name: "Cyber Dragon", tier: "legend", power: 500, img: "https://picsum.photos/seed/n10/200/300" },
+            { id: 11, name: "Chrome Assassin", tier: "epic", power: 70, img: "https://picsum.photos/seed/n11/200/300" },
+            { id: 12, name: "Solar Pilot", tier: "rare", power: 20, img: "https://picsum.photos/seed/n12/200/300" },
+            { id: 13, name: "Neural Hacker", tier: "epic", power: 90, img: "https://picsum.photos/seed/n13/200/300" },
+            { id: 14, name: "Rusty Android", tier: "common", power: 2, img: "https://picsum.photos/seed/n14/200/300" },
+            { id: 15, name: "Infinite AI", tier: "legend", power: 1000, img: "https://picsum.photos/seed/n15/200/300" },
+            { id: 16, name: "Lava Guardian", tier: "rare", power: 40, img: "https://picsum.photos/seed/n16/200/300" }
         ];
 
-        function getStats() {
-            let tap = 1, auto = 0;
-            upgrades.forEach(u => {
-                let l = gameState.levels[u.id] || 0;
-                if(u.type === 'tap') tap += (l * u.val);
-                if(u.type === 'auto') auto += (l * u.val);
-            });
-            return { tap, auto };
+        function save() {
+            localStorage.setItem('ln_nft_bal', game.credits);
+            localStorage.setItem('ln_nft_owned', JSON.stringify(game.owned));
         }
 
-        function saveGame() {
-            localStorage.setItem('ln_v7_credits', gameState.credits);
-            localStorage.setItem('ln_v7_levels', JSON.stringify(gameState.levels));
+        function tab(t) {
+            document.querySelectorAll('.content-area, .nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(t).classList.add('active');
+            event.currentTarget.classList.add('active');
+            render();
         }
 
-        function renderUI() {
-            const stats = getStats();
-            document.getElementById('balance').innerText = Math.floor(gameState.credits).toLocaleString();
-            document.getElementById('tap-stat').innerText = stats.tap;
-            document.getElementById('auto-stat').innerText = stats.auto;
-
-            const list = document.getElementById('shop-list');
-            list.innerHTML = '';
-            let showNext = true;
-
-            upgrades.forEach(item => {
-                if (!showNext) return;
-                let lvl = gameState.levels[item.id] || 0;
-                // NARX DOIM 1 OCHKO
-                let price = 1; 
-
-                list.innerHTML += `
-                    <div class="upgrade-card">
-                        <div class="upgrade-info">
-                            <h4>${item.name} <span class="lvl-text">LVL ${lvl}/10</span></h4>
-                            <div class="progress-track"><div class="progress-fill" style="width:${lvl*10}%"></div></div>
+        function render() {
+            document.getElementById('balance').innerText = Math.floor(game.credits).toLocaleString();
+            
+            // Market render
+            const marketList = document.getElementById('market-list');
+            marketList.innerHTML = '';
+            nfts.forEach(nft => {
+                const isOwned = game.owned.includes(nft.id);
+                marketList.innerHTML += `
+                    <div class="nft-card">
+                        <img src="${nft.img}" class="nft-img">
+                        ${isOwned ? '<span class="owned-tag">✅</span>' : ''}
+                        <div class="nft-info">
+                            <span class="nft-tier ${nft.tier}">${nft.tier.toUpperCase()}</span>
+                            <h5>${nft.name}</h5>
+                            <div class="nft-power">Auto: +${nft.power}/s</div>
+                            <button class="buy-btn" onclick="buy(${nft.id})" ${isOwned || game.credits < 1 ? 'disabled' : ''}>
+                                ${isOwned ? 'OWNED' : 'BUY (1 CR)'}
+                            </button>
                         </div>
-                        ${lvl < 10 ? 
-                            `<button class="buy-button" onclick="buyItem('${item.id}', ${price})" ${gameState.credits < price ? 'disabled' : ''}>${price}</button>` : 
-                            `<b style="color:var(--pink); font-size:10px; font-family:Orbitron;">MAXED</b>`}
                     </div>
                 `;
-                if(lvl < 10) showNext = false;
             });
-            saveGame();
+
+            // Inventory render
+            const myList = document.getElementById('my-list');
+            myList.innerHTML = '';
+            nfts.filter(n => game.owned.includes(n.id)).forEach(nft => {
+                myList.innerHTML += `
+                    <div class="nft-card">
+                        <img src="${nft.img}" class="nft-img">
+                        <div class="nft-info">
+                            <span class="nft-tier ${nft.tier}">${nft.tier.toUpperCase()}</span>
+                            <h5>${nft.name}</h5>
+                            <div class="nft-power">Producing: ${nft.power}/s</div>
+                        </div>
+                    </div>
+                `;
+            });
+            save();
         }
 
-        window.buyItem = (id, p) => {
-            if(gameState.credits >= p) {
-                gameState.credits -= p;
-                gameState.levels[id]++;
+        window.buy = (id) => {
+            if(game.credits >= 1 && !game.owned.includes(id)) {
+                game.credits -= 1;
+                game.owned.push(id);
                 tg.HapticFeedback.notificationOccurred('success');
-                renderUI();
+                render();
             }
         };
 
-        document.getElementById('core-btn').onclick = (e) => {
-            const s = getStats();
-            gameState.credits += s.tap;
-            const fx = document.createElement('div');
-            fx.className = 'float-text'; fx.innerText = `+${s.tap}`;
-            fx.style.left = e.clientX + 'px'; fx.style.top = e.clientY + 'px';
-            document.body.appendChild(fx);
-            setTimeout(() => fx.remove(), 700);
-            tg.HapticFeedback.impactOccurred('medium');
-            renderUI();
+        document.getElementById('tap-zone').onclick = () => {
+            game.credits += 1;
+            tg.HapticFeedback.impactOccurred('light');
+            render();
         };
 
+        // Avtomatik daromad (NFT power asosida)
         setInterval(() => {
-            const s = getStats();
-            if(s.auto > 0) { gameState.credits += (s.auto / 10); renderUI(); }
+            let totalPower = 0;
+            nfts.filter(n => game.owned.includes(n.id)).forEach(n => totalPower += n.power);
+            if(totalPower > 0) {
+                game.credits += (totalPower / 10);
+                render();
+            }
         }, 100);
 
-        renderUI();
+        render();
     </script>
 </body>
 </html>
