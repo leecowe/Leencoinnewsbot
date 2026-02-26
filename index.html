@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Ultra</title>
+    <title>Aira Protocol | Farm Update</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -37,6 +37,8 @@
             border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 15px;
         }
 
+        .farm-status { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--primary); }
+
         .btn-main {
             background: var(--primary); color: #000; border: none; padding: 15px;
             border-radius: 12px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
@@ -46,6 +48,8 @@
         .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 10px; font-family: 'Orbitron'; }
         .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
+        
+        .level-badge { background: var(--pink); color: white; padding: 2px 8px; border-radius: 5px; font-size: 10px; }
     </style>
 </head>
 <body>
@@ -55,46 +59,67 @@
     <header class="header">
         <div class="bal-val" id="total-bal">0</div>
         <div style="font-family:'Orbitron'; font-size:12px; color:var(--primary); margin-top:5px;">
-            STAKED: <span id="staked-display">0</span>
+            AUTO APS: <span id="aps-display">50</span>/300ms
         </div>
     </header>
 
     <div id="view-hack" class="view-content active">
         <div class="card">
-            <h3 style="font-family:'Orbitron'; color:var(--primary);">ULTRA MINING</h3>
-            <p style="font-size:12px; color:var(--pink)">AUTO: 50 achko / 300ms</p>
+            <h3 style="font-family:'Orbitron'; color:var(--primary);">MINING CORE</h3>
             <div style="font-size:36px; font-family:'Orbitron'; margin:15px 0;" id="current-mining">0</div>
             <button class="btn-main" onclick="claimMining()">ACHKOLARNI YIG'ISH</button>
+        </div>
+    </div>
+
+    <div id="view-farm" class="view-content">
+        <div class="card">
+            <h3 style="font-family:'Orbitron'; color:var(--primary);">FARM UPGRADE</h3>
+            <div class="farm-status">
+                <span>Current Level:</span>
+                <span class="level-badge" id="farm-lvl">LVL 1</span>
+            </div>
+            <p style="font-size: 12px; opacity: 0.7;" id="next-perk">Keyingi daraja: +25 achko/300ms</p>
+            <button class="btn-main" id="upgrade-btn" onclick="upgradeFarm()">LVL UP (<span id="upgrade-cost">5000</span>)</button>
+        </div>
+
+        <div class="card" style="border-color: var(--pink);">
+            <p style="font-size: 11px; color: var(--pink); font-family: 'Orbitron'; margin: 0;">
+                📢 OGOHLANTIRISH: Hozircha maksimal LVL 5. Keyingi yangilanishda yangi darajalar qo'shiladi!
+            </p>
         </div>
     </div>
 
     <div id="view-stake" class="view-content">
         <div class="card">
             <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">STAKING HUB</h2>
-            <p style="font-size:14px; opacity:0.7;">Har 1 daqiqada (60s) +10% foyda</p>
+            <p style="font-size:14px; opacity:0.7;">1 daqiqada +10% foyda</p>
             <div id="timer" style="font-size:32px; color:var(--pink); font-family:'Orbitron'; margin:15px 0;">TAYYOR</div>
-            <button class="btn-main" id="stake-btn" onclick="startStake()">STAKE ALL ASSETS</button>
+            <button class="btn-main" id="stake-btn" onclick="startStake()">STAKE ALL</button>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('hack', this)">CORE</div>
-        <div class="nav-item" onclick="switchTab('stake', this)">STAKING</div>
-        <div class="nav-item" onclick="tg.showAlert('Roadmap: PvP Janglar tez kunda!')">INFO</div>
+        <div class="nav-item" onclick="switchTab('farm', this)">FARM</div>
+        <div class="nav-item" onclick="switchTab('stake', this)">STAKE</div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
     let balance = 0;
-    let stakedCoins = 0;
     let sessionCoins = 0;
+    let farmLevel = 1;
+    let aps = 50; // Achko per 300ms
+    let upgradeCost = 5000;
     let isStaking = false;
 
-    // 1. ULTRA MINING: 300ms da 50 achko
-    setInterval(() => {
-        sessionCoins += 50;
+    // 1. DYNAMIK MINING
+    let miningInterval = setInterval(runMining, 300);
+
+    function runMining() {
+        sessionCoins += aps;
         document.getElementById('current-mining').innerText = sessionCoins;
-    }, 300);
+    }
 
     function claimMining() {
         balance += sessionCoins;
@@ -103,39 +128,62 @@
         tg.HapticFeedback.impactOccurred('heavy');
     }
 
-    // 2. 1 DAQIQA STAKING TIZIMI
+    // 2. FARM UPGRADE SYSTEM (MAX LVL 5)
+    function upgradeFarm() {
+        if (farmLevel >= 5) {
+            tg.showAlert("Hozircha maksimal darajadasiz!");
+            return;
+        }
+
+        if (balance >= upgradeCost) {
+            balance -= upgradeCost;
+            farmLevel++;
+            aps += 25; // Har bir LVL uchun +25 tezlik
+            upgradeCost *= 2; // Narx ikki barobar oshadi
+            
+            updateUI();
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert(`Tabriklaymiz! Ferma LVL ${farmLevel} ga ko'tarildi!`);
+        } else {
+            tg.showAlert("Mablag' yetarli emas!");
+        }
+    }
+
+    // 3. STAKING (1 MINUTE)
     function startStake() {
         if (isStaking || balance <= 0) return;
-
-        stakedCoins = balance;
+        let amount = balance;
         balance = 0;
         isStaking = true;
         updateUI();
 
-        let timeLeft = 60; // 60 soniya
-        const stakeBtn = document.getElementById('stake-btn');
-        stakeBtn.style.opacity = "0.5";
-        
+        let timeLeft = 60;
         const countdown = setInterval(() => {
             timeLeft--;
             document.getElementById('timer').innerText = timeLeft + "s";
-
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                balance += Math.floor(stakedCoins * 1.1); // +10% bonus
-                stakedCoins = 0;
+                balance += Math.floor(amount * 1.1);
                 isStaking = false;
                 document.getElementById('timer').innerText = "TAYYOR";
-                stakeBtn.style.opacity = "1";
                 updateUI();
-                tg.showPopup({ title: "Staking Muvaffaqiyatli!", message: "Foyda hisobingizga qo'shildi." });
+                tg.showPopup({ title: "Foyda!", message: "Staking muvaffaqiyatli yakunlandi." });
             }
         }, 1000);
     }
 
     function updateUI() {
         document.getElementById('total-bal').innerText = Math.floor(balance);
-        document.getElementById('staked-display').innerText = stakedCoins;
+        document.getElementById('aps-display').innerText = aps;
+        document.getElementById('farm-lvl').innerText = "LVL " + farmLevel;
+        document.getElementById('upgrade-cost').innerText = upgradeCost;
+        
+        if (farmLevel >= 5) {
+            document.getElementById('upgrade-btn').innerText = "MAX LEVEL";
+            document.getElementById('next-perk').innerText = "Keyingi yangilanishni kuting...";
+        } else {
+            document.getElementById('next-perk').innerText = `Keyingi daraja: +25 achko/300ms`;
+        }
     }
 
     function switchTab(tab, el) {
