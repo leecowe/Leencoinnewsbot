@@ -3,149 +3,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol V1.0</title>
+    <title>Aira Protocol V1.0 - Ultra Professional</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- CSS ENGINE V4.0 --- */
         :root {
-            --c: #00f2ff;
-            --p: #ff007f;
-            --b: #050a10;
-            --g: rgba(0, 242, 255, 0.15);
+            --cyan: #00f2ff;
+            --pink: #ff007f;
+            --deep-bg: #050a10;
+            --glass: rgba(0, 242, 255, 0.05);
+            --border: rgba(0, 242, 255, 0.2);
+            --neon-shadow: 0 0 25px rgba(0, 242, 255, 0.4);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
-            background: var(--b);
-            color: #fff;
+            background-color: var(--deep-bg);
+            background-image: 
+                radial-gradient(circle at 50% 50%, #0a1a25 0%, #050a10 100%),
+                linear-gradient(rgba(0, 242, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: #ffffff;
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
+            padding: 0;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* STATS HEADER */
-        .h { padding: 45px 20px 20px; text-align: center; }
-        .t { font-family: 'Orbitron'; font-size: 14px; color: var(--c); letter-spacing: 3px; }
-        .v { font-family: 'Orbitron'; font-size: 65px; font-weight: 900; text-shadow: 0 0 20px var(--c); margin: 10px 0; }
-        .s { display: flex; justify-content: center; gap: 20px; font-size: 14px; font-family: 'Orbitron'; }
-
-        /* CORE VIEW */
-        #core { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .o { 
-            width: 260px; height: 260px; border-radius: 50%; border: 3px solid var(--c);
-            background: radial-gradient(circle, #4d8ccf 0%, #1a2a3a 100%); 
-            box-shadow: 0 0 40px var(--g); display: flex; align-items: center; justify-content: center;
-            transition: 0.1s; cursor: pointer;
+        /* Header Stats Section */
+        header {
+            padding: 40px 20px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
         }
-        .o:active { transform: scale(0.94); }
-        .r { width: 100px; height: 70px; background: #1a2a3a; border-radius: 35px 35px 15px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--c); }
-        .e { display: flex; gap: 15px; } .ey { width: 14px; height: 14px; background: var(--c); border-radius: 50%; box-shadow: 0 0 10px var(--c); }
-        .m { width: 35px; height: 4px; background: #000; border-radius: 2px; }
 
-        /* MARKET VIEW */
-        #market, #nft { display: none; flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        .st { font-family: 'Orbitron'; font-size: 26px; text-align: center; color: var(--c); margin-bottom: 25px; }
-        .cd { background: rgba(255,255,255,0.03); border: 1px solid var(--g); border-radius: 15px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: rgba(255,255,255,0.05); border: 1px solid var(--c); color: #fff; padding: 8px 18px; border-radius: 10px; font-family: 'Orbitron'; font-weight: 700; }
+        .system-status {
+            font-family: 'Orbitron';
+            font-size: 11px;
+            letter-spacing: 5px;
+            color: var(--cyan);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
 
-        /* NAVIGATION */
-        .nv { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; border-top: 1px solid var(--g); }
-        .ni { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 11px; transition: 0.3s; }
-        .ni.a { color: var(--c); background: linear-gradient(0deg, rgba(0,242,255,0.1), transparent); border-top: 2px solid var(--c); }
+        .balance-container {
+            margin: 10px 0;
+        }
+
+        .balance-value {
+            font-family: 'Orbitron';
+            font-size: 58px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #fff 0%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(var(--neon-shadow));
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-family: 'Orbitron';
+            font-size: 9px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+        }
+
+        .stat-num {
+            font-family: 'Orbitron';
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stat-num.cyan { color: var(--cyan); }
+        .stat-num.pink { color: var(--pink); }
+
+        /* Navigation System */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
+            background: rgba(5, 10, 16, 0.95);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            width: 80px;
+        }
+
+        .nav-item.active {
+            color: var(--cyan);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-text {
+            font-family: 'Orbitron';
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Main View Container */
+        main {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        /* Clicker Core UI */
+        .clicker-stage {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .core-orb {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .core-orb::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            animation: rotate 10s linear infinite;
+        }
+
+        .core-center {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, #4d8ccf 0%, #1a2a3a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.6), var(--neon-shadow);
+        }
+
+        .robot-svg {
+            width: 110px;
+            filter: drop-shadow(0 0 10px var(--cyan));
+        }
+
+        /* Market Cards */
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-smooth);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .card-content h3 {
+            margin: 0;
+            font-family: 'Orbitron';
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .card-content p {
+            margin: 5px 0 0;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .buy-btn {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: 'Orbitron';
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* Floating Particle Effect */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: fadeUp 1s ease-out forwards;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            color: var(--cyan);
+            z-index: 1000;
+        }
+
+        @keyframes fadeUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="h">
-        <div class="t">AIRA PROTOCOL V1.0</div>
-        <div class="v" id="balance">0</div>
-        <div class="s">
-            <div style="color:var(--c)">TAP: +<span id="tp">1</span></div>
-            <div style="color:var(--p)">AUTO: <span id="ap">0</span>/s</div>
+    <header>
+        <div class="system-status">System Operational</div>
+        <div class="balance-container">
+            <div class="balance-value" id="ui-balance">0</div>
         </div>
-    </div>
-
-    <div id="core" class="active-view">
-        <div class="o" id="c-btn">
-            <div class="r">
-                <div class="e"><div class="ey"></div><div class="ey"></div></div>
-                <div class="m"></div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">Tap Power</span>
+                <span class="stat-num cyan" id="ui-tap">+1</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Auto Mining</span>
+                <span class="stat-num pink" id="ui-auto">0/s</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div id="market">
-        <div class="st">SYSTEM MARKET</div>
-        <div id="m-list"></div>
-    </div>
+    <main>
+        <div id="view-core" class="view active">
+            <div class="clicker-stage">
+                <div class="core-orb" id="main-clicker">
+                    <div class="core-center">
+                        <svg class="robot-svg" viewBox="0 0 100 100">
+                            <path d="M20 40 L80 40 L80 70 L20 70 Z" fill="#1a2a3a" stroke="var(--cyan)" stroke-width="2"/>
+                            <rect x="30" y="48" width="12" height="6" rx="2" fill="var(--cyan)"/>
+                            <rect x="58" y="48" width="12" height="6" rx="2" fill="var(--cyan)"/>
+                            <path d="M40 62 Q50 68 60 62" stroke="var(--cyan)" stroke-width="2" fill="none"/>
+                            <path d="M50 20 L50 40 M40 25 L60 25" stroke="var(--cyan)" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div id="nft">
-        <div class="st" style="color:var(--p)">NFT GEAR</div>
-        <div style="text-align:center; color:#333; margin-top:100px; font-size:24px; font-family:'Orbitron'">COMING SOON</div>
-    </div>
+        <div id="view-market" class="view">
+            <h2 style="font-family:'Orbitron'; text-align:center;">Upgrades</h2>
+            <div id="market-container">
+                </div>
+        </div>
 
-    <div class="nv">
-        <div class="ni a" onclick="sw('core', this)">CORE</div>
-        <div class="ni" onclick="sw('market', this)">MARKET</div>
-        <div class="ni" onclick="sw('nft', this)">NFT</div>
-    </div>
+        <div id="view-nft" class="view">
+            <h2 style="font-family:'Orbitron'; text-align:center; color:var(--pink);">NFT Gear</h2>
+            <div style="text-align:center; margin-top:50px; opacity:0.3;">
+                <p>No NFTs found in your wallet.</p>
+                <div style="font-family:'Orbitron'; font-size:24px;">COMING SOON</div>
+            </div>
+        </div>
+    </main>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    <nav>
+        <div class="nav-item active" onclick="navigate('core', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/></svg>
+            <span class="nav-text">CORE</span>
+        </div>
+        <div class="nav-item" onclick="navigate('market', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L1 21H23L12 2ZM12 6L19.53 19H4.47L12 6Z"/></svg>
+            <span class="nav-text">MARKET</span>
+        </div>
+        <div class="nav-item" onclick="navigate('nft', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z"/></svg>
+            <span class="nav-text">NFT</span>
+        </div>
+    </nav>
 
-    let d = { c: 0, t: 1, a: 0 };
-    let up = {
-        n: { t: "Neural Link", c: 225, p: 2, l: 0 },
-        d: { t: "Aira Drone", c: 750, p: 5, l: 0 },
-        q: { t: "Quantum CPU", c: 2000, p: 20, l: 0 }
-    };
+    <script>
+        // --- GAME ENGINE ---
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    function fmt(n) {
-        if (n < 1000) return n.toFixed(0);
-        return (n/1000).toFixed(1) + 'K';
-    }
+        let gameState = {
+            balance: 0,
+            tapPower: 1,
+            autoPower: 0,
+            upgrades: [
+                { id: 'link', name: 'Neural Link', baseCost: 150, power: 2, level: 0, type: 'tap' },
+                { id: 'drone', name: 'Aira Drone', baseCost: 500, power: 5, level: 0, type: 'auto' },
+                { id: 'cpu', name: 'Quantum CPU', baseCost: 2000, power: 25, level: 0, type: 'auto' },
+                { id: 'server', name: 'Mainframe', baseCost: 10000, power: 100, level: 0, type: 'auto' }
+            ]
+        };
 
-    function refresh() {
-        document.getElementById('balance').innerText = fmt(d.c);
-        document.getElementById('tp').innerText = fmt(d.t);
-        document.getElementById('ap').innerText = fmt(d.a);
-    }
-
-    document.getElementById('c-btn').onpointerdown = () => {
-        d.c += d.t; refresh(); tg.HapticFeedback.impactOccurred('medium');
-    };
-
-    function sw(v, el) {
-        ['core','market','nft'].forEach(x => document.getElementById(x).style.display = 'none');
-        document.querySelectorAll('.ni').forEach(x => x.classList.remove('a'));
-        document.getElementById(v).style.display = (v === 'core') ? 'flex' : 'block';
-        el.classList.add('a');
-        if(v === 'market') renderM();
-    }
-
-    function renderM() {
-        const l = document.getElementById('m-list'); l.innerHTML = '';
-        for(let k in up) {
-            let i = up[k];
-            l.innerHTML += `<div class="cd"><div><b>${i.t}</b><br><small>Lvl ${i.l} | +${i.p}</small></div>
-            <div class="btn" onclick="buy('${k}')">${fmt(i.c)}</div></div>`;
+        // UI Formatter
+        function formatNumber(num) {
+            if (num < 1000) return num.toFixed(0);
+            if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+            if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
+            return (num / 1000000000).toFixed(1) + 'B';
         }
-    }
 
-    window.buy = (k) => {
-        let i = up[k];
-        if(d.c >= i.c) {
-            d.c -= i.c; i.l++;
-            if(k==='n') d.t += i.p; else d.a += i.p;
-            i.c = Math.floor(i.c * 1.6);
-            refresh(); renderM(); tg.HapticFeedback.notificationOccurred('success');
+        // Navigation
+        function navigate(viewId, element) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            element.classList.add('active');
+            if(viewId === 'market') renderMarket();
         }
-    };
 
-    setInterval(() => { if(d.a > 0) { d.c += d.a/10; refresh(); } }, 100);
-</script>
+        // Click Handler
+        const clicker = document.getElementById('main-clicker');
+        clicker.addEventListener('pointerdown', (e) => {
+            gameState.balance += gameState.tapPower;
+            createParticle(e.clientX, e.clientY);
+            updateUI();
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            clicker.style.transform = 'scale(0.92)';
+            setTimeout(() => clicker.style.transform = 'scale(1)', 50);
+        });
+
+        function createParticle(x, y) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            p.innerText = '+' + formatNumber(gameState.tapPower);
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+        }
+
+        // Market Logic
+        function renderMarket() {
+            const container = document.getElementById('market-container');
+            container.innerHTML = '';
+            gameState.upgrades.forEach(u => {
+                const cost = Math.floor(u.baseCost * Math.pow(1.5, u.level));
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-content">
+                        <h3>${u.name}</h3>
+                        <p>Lvl ${u.level} • +${u.power} ${u.type === 'tap' ? 'Tap' : 'Auto'}</p>
+                    </div>
+                    <button class="buy-btn" onclick="buyUpgrade('${u.id}')">${formatNumber(cost)}</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.buyUpgrade = (id) => {
+            const u = gameState.upgrades.find(x => x.id === id);
+            const cost = Math.floor(u.baseCost * Math.pow(1.5, u.level));
+            
+            if (gameState.balance >= cost) {
+                gameState.balance -= cost;
+                u.level++;
+                if (u.type === 'tap') gameState.tapPower += u.power;
+                else gameState.autoPower += u.power;
+                
+                tg.HapticFeedback.notificationOccurred('success');
+                renderMarket();
+                updateUI();
+            } else {
+                tg.HapticFeedback.notificationOccurred('error');
+            }
+        };
+
+        // Global Loop
+        function updateUI() {
+            document.getElementById('ui-balance').innerText = formatNumber(gameState.balance);
+            document.getElementById('ui-tap').innerText = '+' + formatNumber(gameState.tapPower);
+            document.getElementById('ui-auto').innerText = formatNumber(gameState.autoPower) + '/s';
+        }
+
+        setInterval(() => {
+            if (gameState.autoPower > 0) {
+                gameState.balance += gameState.autoPower / 10;
+                updateUI();
+            }
+        }, 100);
+
+        // Initial UI
+        updateUI();
+    </script>
 </body>
 </html>
