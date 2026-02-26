@@ -3,192 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova: Fixed & Pro</title>
+    <title>Leenova Cyberpunk</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #ff007f; --v: #a100ff; --c: #00f2ff; --bg: #000; }
+        :root { --neon-blue: #00f2ff; --neon-purple: #bc00ff; --neon-pink: #ff007f; --dark-bg: #020b16; }
         
         body {
             margin: 0; height: 100vh; display: flex; flex-direction: column;
             font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            background: radial-gradient(circle at center, #1a001a 0%, #000 100%);
+            background: linear-gradient(rgba(2, 11, 22, 0.8), rgba(2, 11, 22, 0.9)), 
+                        url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
+            background-size: cover;
         }
 
-        /* Tepasidagi ochko qismi */
+        /* Top Header Stats */
         .header {
-            padding: 30px 20px; text-align: center;
-            background: rgba(0,0,0,0.5); border-bottom: 2px solid var(--p);
+            padding: 20px; border-bottom: 2px solid var(--neon-blue);
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .score { 
-            font-family: 'Fredoka One', cursive; font-size: 70px; margin: 0;
-            color: #fff; text-shadow: 0 0 20px var(--p);
-        }
-        .stats { font-size: 14px; color: var(--c); font-weight: 700; margin-top: 5px; }
+        .balance-box { flex-grow: 1; text-align: left; }
+        .balance-label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
+        .balance-value { font-family: 'Orbitron', sans-serif; font-size: 28px; text-shadow: 0 0 10px var(--neon-blue); }
 
-        /* Asosiy tugma (Sizning skrinshotdagi yurakcha dizayni) */
+        /* HUD Stats */
+        .hud-stats { display: flex; gap: 10px; margin-top: 5px; }
+        .stat-item { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue); padding: 2px 8px; font-size: 12px; border-radius: 4px; }
+
+        /* Main Game Area */
         .game-zone { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .main-btn {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: #220033; border: 4px solid var(--p);
-            box-shadow: 0 0 60px var(--p), inset 0 0 20px var(--p);
+        .cyber-core {
+            width: 200px; height: 200px; position: relative;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: 0.1s;
         }
-        .main-btn:active { transform: scale(0.92); }
-        .main-btn img { width: 100px; filter: drop-shadow(0 0 10px var(--p)); }
-
-        /* Do'kon paneli */
-        .shop {
-            background: #0a0a0a; border-radius: 40px 40px 0 0;
-            padding: 25px; border-top: 3px solid var(--c);
-            max-height: 40%; overflow-y: auto;
+        .core-circle {
+            position: absolute; width: 100%; height: 100%;
+            border: 2px solid var(--neon-blue); border-radius: 50%;
+            box-shadow: 0 0 30px var(--neon-blue), inset 0 0 20px var(--neon-blue);
+            animation: pulse 2s infinite;
         }
+        .cyber-core img { width: 100px; z-index: 2; filter: drop-shadow(0 0 15px var(--neon-blue)); }
+        .cyber-core:active { transform: scale(0.95); }
+
+        /* Shop Panel - Futurist Style */
+        .shop-panel {
+            background: rgba(2, 11, 22, 0.95); border-top: 3px solid var(--neon-blue);
+            border-radius: 30px 30px 0 0; padding: 20px; max-height: 45%; overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0, 242, 255, 0.2);
+        }
+        .shop-title { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 14px; margin-bottom: 15px; letter-spacing: 3px; }
 
         .upgrade-card {
-            background: rgba(255, 255, 255, 0.05); border-radius: 20px;
-            padding: 15px; margin-bottom: 15px; display: flex;
-            justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,0,127,0.2);
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 15px; margin-bottom: 12px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative; overflow: hidden;
         }
-
-        .info h3 { margin: 0; font-size: 16px; color: var(--c); text-transform: uppercase; }
-        
-        /* Progress Bar */
-        .progress-box { width: 120px; height: 6px; background: #222; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--p); transition: 0.3s; }
+        .card-info h3 { margin: 0; font-size: 16px; color: #fff; text-transform: uppercase; }
+        .progress-container { width: 100px; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
+        .progress-bar { height: 100%; background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); transition: 0.5s; }
 
         .buy-btn {
-            background: linear-gradient(45deg, var(--p), var(--v));
-            border: none; padding: 12px 18px; border-radius: 12px;
-            color: #fff; font-weight: 900; cursor: pointer; min-width: 90px;
+            background: transparent; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); padding: 8px 15px; border-radius: 5px;
+            font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer;
+            transition: 0.3s;
         }
-        .buy-btn:disabled { opacity: 0.3; filter: grayscale(1); }
+        .buy-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
+        .buy-btn:disabled { border-color: #444; color: #444; }
 
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(1); } }
+        
         /* Floating Text */
-        .tap-pop {
-            position: absolute; color: #fff; font-weight: 900; font-size: 32px;
-            pointer-events: none; animation: floatUp 0.7s forwards;
-            text-shadow: 0 0 10px var(--p);
-        }
-        @keyframes floatUp { 0% { opacity:1; } 100% { opacity:0; transform: translateY(-100px) scale(1.5); } }
+        .pop-txt { position: absolute; color: var(--neon-blue); font-weight: 700; font-size: 24px; pointer-events: none; animation: popUp 0.8s forwards; font-family: 'Orbitron'; }
+        @keyframes popUp { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1 class="score" id="balance">0</h1>
-        <div class="stats">TAP: +<span id="t-val">1</span> | AUTO: +<span id="a-val">0</span>/s</div>
+        <div class="balance-box">
+            <div class="balance-label">CREDITS AVAILABLE</div>
+            <div class="balance-value" id="balance">0</div>
+            <div class="hud-stats">
+                <div class="stat-item">T: +<span id="t-stat">1</span></div>
+                <div class="stat-item">A: +<span id="a-stat">0</span>/s</div>
+            </div>
+        </div>
     </div>
 
     <div class="game-zone">
-        <div class="main-btn" id="clicker">
+        <div class="cyber-core" id="core">
+            <div class="core-circle"></div>
             <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
         </div>
     </div>
 
-    <div class="shop" id="shop-ui"></div>
+    <div class="shop-panel" id="shop">
+        <div class="shop-title">SYSTEM UPGRADES</div>
+        <div id="cards-list"></div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. DATA: Xatolikka chidamli xotira
-        let state = {
-            money: parseFloat(localStorage.getItem('ln_money_v4')) || 0,
-            lvls: JSON.parse(localStorage.getItem('ln_lvls_v4')) || { s1:0, s2:0, s3:0, s4:0 }
+        // 1. ETERNAL STORAGE SYSTEM
+        let game = {
+            credits: parseFloat(localStorage.getItem('cyb_cr_v5')) || 0,
+            lvls: JSON.parse(localStorage.getItem('cyb_lv_v5')) || { u1:0, u2:0, u3:0, u4:0 }
         };
 
         const config = [
-            { id: 's1', name: 'Neko Strike', base: 50, grow: 1.7, val: 2, type: 'tap' },
-            { id: 's2', name: 'Kawaii Bot', base: 500, grow: 1.6, val: 15, type: 'auto' },
-            { id: 's3', name: 'Cyber Power', base: 3000, grow: 1.6, val: 100, type: 'auto' },
-            { id: 's4', name: 'God Mode', base: 15000, grow: 1.8, val: 250, type: 'tap' }
+            { id: 'u1', name: 'Neural Link', base: 50, grow: 1.8, val: 2, type: 'tap' },
+            { id: 'u2', name: 'Cyber Miner', base: 500, grow: 1.6, val: 12, type: 'auto' },
+            { id: 'u3', name: 'Quantum CPU', base: 3000, grow: 1.6, val: 100, type: 'auto' },
+            { id: 'u4', name: 'Core Overload', base: 15000, grow: 1.9, val: 200, type: 'tap' }
         ];
 
-        function getStats() {
-            let tap = 1, auto = 0;
+        function getPower() {
+            let t = 1, a = 0;
             config.forEach(c => {
-                let l = state.lvls[c.id] || 0;
-                if(c.type === 'tap') tap += (l * c.val);
-                if(c.type === 'auto') auto += (l * c.val);
+                let l = game.lvls[c.id] || 0;
+                if(c.type === 'tap') t += (l * c.val);
+                if(c.type === 'auto') a += (l * c.val);
             });
-            return { tap, auto };
+            return { t, a };
         }
 
         function save() {
-            localStorage.setItem('ln_money_v4', state.money);
-            localStorage.setItem('ln_lvls_v4', JSON.stringify(state.lvls));
+            localStorage.setItem('cyb_cr_v5', game.credits);
+            localStorage.setItem('cyb_lv_v5', JSON.stringify(game.lvls));
         }
 
-        function updateUI() {
-            const s = getStats();
-            document.getElementById('balance').innerText = Math.floor(state.money).toLocaleString();
-            document.getElementById('t-val').innerText = s.tap;
-            document.getElementById('a-val').innerText = s.auto;
+        function render() {
+            const p = getPower();
+            document.getElementById('balance').innerText = Math.floor(game.credits).toLocaleString();
+            document.getElementById('t-stat').innerText = p.t;
+            document.getElementById('a-stat').innerText = p.a;
 
-            const shop = document.getElementById('shop-ui');
-            shop.innerHTML = '';
+            const list = document.getElementById('cards-list');
+            list.innerHTML = '';
 
             let canShow = true;
             config.forEach(item => {
                 if (!canShow) return;
 
-                let l = state.lvls[item.id] || 0;
+                let l = game.lvls[item.id] || 0;
                 let price = Math.floor(item.base * Math.pow(item.grow, l));
                 let progress = (l / 10) * 100;
 
-                shop.innerHTML += `
+                list.innerHTML += `
                     <div class="upgrade-card">
-                        <div class="info">
-                            <h3>${item.name} (LVL ${l}/10)</h3>
-                            <div class="progress-box"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                        <div class="card-info">
+                            <h3>${item.name} <small style="color:var(--neon-blue)">LVL ${l}/10</small></h3>
+                            <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
                         </div>
                         ${l < 10 ? 
-                            `<button class="buy-btn" onclick="buy('${item.id}', ${price})" ${state.money < price ? 'disabled' : ''}>💰 ${price}</button>` : 
-                            `<b style="color:var(--p)">MAX LEVEL</b>`
+                            `<button class="buy-btn" onclick="buy('${item.id}', ${price})" ${game.credits < price ? 'disabled' : ''}>${price}</button>` : 
+                            `<span style="color:var(--neon-pink); font-size:12px; font-weight:bold;">COMPLETED</span>`
                         }
                     </div>
                 `;
-                // Faqat 10 bo'lganda keyingisini chiqarish
-                if (l < 10) canShow = false;
+                if (l < 10) canShow = false; // Zanjirli ochilish
             });
             save();
         }
 
         window.buy = (id, price) => {
-            if(state.money >= price && state.lvls[id] < 10) {
-                state.money -= price;
-                state.lvls[id]++;
+            if(game.credits >= price && game.lvls[id] < 10) {
+                game.credits -= price;
+                game.lvls[id]++;
                 tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
+                render();
             }
         };
 
-        document.getElementById('clicker').onclick = (e) => {
-            const s = getStats();
-            state.money += s.tap;
+        document.getElementById('core').onclick = (e) => {
+            const p = getPower();
+            game.credits += p.t;
             
-            const p = document.createElement('div');
-            p.className = 'tap-pop'; p.innerText = `+${s.tap}`;
-            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 700);
+            const txt = document.createElement('div');
+            txt.className = 'pop-txt'; txt.innerText = `+${p.t}`;
+            txt.style.left = e.clientX + 'px'; txt.style.top = e.clientY + 'px';
+            document.body.appendChild(txt);
+            setTimeout(() => txt.remove(), 800);
 
-            tg.HapticFeedback.impactOccurred('medium');
-            updateUI();
+            tg.HapticFeedback.impactOccurred('heavy');
+            render();
         };
 
-        // Avtomatik yig'ish (soniyada 10 marta yangilanadi)
         setInterval(() => {
-            const s = getStats();
-            if(s.auto > 0) {
-                state.money += (s.auto / 10);
-                updateUI();
-            }
+            const p = getPower();
+            if(p.a > 0) { game.credits += (p.a / 10); render(); }
         }, 100);
 
-        updateUI();
+        render();
     </script>
 </body>
 </html>
