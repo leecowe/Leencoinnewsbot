@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova: God Mode</title>
+    <title>Leenova Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -11,109 +11,99 @@
 
         body {
             margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            background: linear-gradient(to bottom, rgba(1, 8, 14, 0.8), rgba(1, 8, 14, 0.9)), 
+            background: linear-gradient(rgba(1, 8, 14, 0.85), rgba(1, 8, 14, 0.95)), 
                         url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
             background-size: cover; display: flex; flex-direction: column;
         }
 
-        /* --- CREDITS HUD (Skrinshotingizdagidek) --- */
-        .hud-v2 {
-            padding: 40px 25px 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3);
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-        .label { font-family: 'Orbitron'; font-size: 11px; color: var(--blue); letter-spacing: 2px; opacity: 0.8; }
-        .balance-container { display: flex; align-items: baseline; gap: 10px; margin-top: 5px; }
-        .main-bal { font-family: 'Orbitron'; font-size: 42px; font-weight: 700; text-shadow: 0 0 20px var(--blue); }
-        .stats-mini { display: flex; gap: 15px; margin-top: 10px; }
-        .stat-box { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 4px 10px; border-radius: 5px; font-size: 12px; font-family: 'Orbitron'; }
+        /* HUD - Hisob-kitob paneli */
+        .hud { padding: 40px 25px 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); }
+        .label { font-family: 'Orbitron'; font-size: 11px; color: var(--blue); letter-spacing: 2px; }
+        .balance { font-family: 'Orbitron'; font-size: 42px; font-weight: 700; text-shadow: 0 0 20px var(--blue); margin: 5px 0; }
+        .stats { display: flex; gap: 10px; }
+        .stat-badge { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-family: 'Orbitron'; }
 
-        /* --- NAVIGATSIYA --- */
-        .tabs { display: flex; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-        .tab-btn { flex: 1; padding: 15px; text-align: center; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; color: #666; }
-        .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); background: rgba(0, 242, 255, 0.05); }
+        /* Navigatsiya */
+        .tabs { display: flex; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-top: 1px solid rgba(0, 242, 255, 0.2); }
+        .tab { flex: 1; padding: 15px; text-align: center; font-family: 'Orbitron'; font-size: 10px; color: #555; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: var(--blue); border-bottom: 2px solid var(--blue); background: rgba(0, 242, 255, 0.05); }
 
-        /* --- GAME CORE --- */
+        /* Oyna boshqaruvi */
         .window { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
         .window.active { display: block; }
 
-        .click-area { height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        .core-wrap { position: relative; }
-        
-        /* 3D Core Tugmasi */
-        .core-main {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,242,255,0.2) 0%, transparent 75%);
+        /* CITY - Asosiy Clicker */
+        .click-zone { height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
+        .core {
+            width: 220px; height: 220px; border-radius: 50%;
             border: 3px solid var(--blue); box-shadow: 0 0 30px var(--blue), inset 0 0 20px var(--blue);
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; animation: breathe 4s infinite ease-in-out;
-            transition: transform 0.1s; -webkit-tap-highlight-color: transparent;
+            cursor: pointer; animation: pulse 3s infinite; transition: transform 0.1s;
         }
-        .core-main:active { transform: scale(0.85) rotateX(15deg); }
-        .core-main img { width: 100px; filter: drop-shadow(0 0 10px var(--blue)); pointer-events: none; }
+        .core:active { transform: scale(0.9); }
+        .core img { width: 110px; filter: drop-shadow(0 0 10px var(--blue)); }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 20px var(--blue); } 50% { transform: scale(1.05); box-shadow: 0 0 40px var(--blue); } 100% { transform: scale(1); box-shadow: 0 0 20px var(--blue); } }
 
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 25px var(--blue); }
-            50% { transform: scale(1.05); box-shadow: 0 0 50px var(--blue); }
+        /* UPGRADES - Tizimni kuchaytirish */
+        .up-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.1);
+            border-radius: 12px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .up-name { font-family: 'Orbitron'; font-size: 13px; display: block; }
+        .progress-bg { width: 120px; height: 6px; background: #111; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--blue); transition: 0.3s; }
+        .buy-btn {
+            background: rgba(0, 242, 255, 0.1); border: 1px solid #333; color: #fff;
+            padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 11px;
+        }
+        .buy-btn.active { border-color: var(--blue); background: var(--blue); color: #000; box-shadow: 0 0 15px var(--blue); }
 
-        /* --- NFT MARKET (Skrinshotingizdagidek binafsha dizayn) --- */
+        /* NFT MARKET */
         .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .nft-card {
-            background: rgba(0, 0, 0, 0.7); border: 2px solid var(--purple); border-radius: 15px;
-            padding: 15px; text-align: center; position: relative; transition: 0.3s;
+            background: rgba(0,0,0,0.6); border: 2px solid var(--purple); border-radius: 15px;
+            padding: 15px; text-align: center; transition: 0.3s;
         }
-        .nft-card.owned { border-color: #444; opacity: 0.8; }
-        .nft-img { font-size: 40px; margin-bottom: 10px; display: block; filter: drop-shadow(0 0 10px var(--purple)); }
-        .nft-name { font-family: 'Orbitron'; font-size: 12px; margin-bottom: 5px; color: #fff; display: block; }
-        .nft-power { color: var(--blue); font-size: 11px; margin-bottom: 10px; display: block; }
-        
-        .buy-btn {
-            width: 100%; padding: 8px; border-radius: 8px; border: none;
-            background: linear-gradient(to bottom, #1a1a1a, #000); color: #888;
-            font-family: 'Orbitron'; font-size: 10px; cursor: pointer; border: 1px solid #333;
-        }
-        .buy-btn.active { background: linear-gradient(45deg, var(--purple), #8a00ff); color: #fff; border: none; box-shadow: 0 0 15px var(--purple); }
+        .nft-card.owned { border-color: #333; opacity: 0.6; }
+        .nft-icon { font-size: 35px; margin-bottom: 10px; display: block; }
 
-        /* Floating +1 effect */
-        .tap-fx { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.5); } }
+        /* Effektlar */
+        .tap-pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.6s linear forwards; }
+        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="hud-v2">
+    <div class="hud">
         <div class="label">CREDITS AVAILABLE</div>
-        <div class="balance-container">
-            <div class="main-bal" id="bal">0</div>
-        </div>
-        <div class="stats-mini">
-            <div class="stat-box">T: +<span id="t-pow">1</span></div>
-            <div class="stat-box">A: +<span id="a-pow">0</span>/s</div>
+        <div class="balance" id="balance">0</div>
+        <div class="stats">
+            <div class="stat-badge">T: +<span id="tap-val">1</span></div>
+            <div class="stat-badge">A: +<span id="auto-val">0</span>/s</div>
         </div>
     </div>
 
     <div class="tabs">
-        <div class="tab-btn active" id="btn-city" onclick="openTab('city')">CITY</div>
-        <div class="tab-btn" id="btn-up" onclick="openTab('upgrades')">UPGRADES</div>
-        <div class="tab-btn" id="btn-nft" onclick="openTab('nft')">NFT MARKET</div>
+        <div class="tab active" onclick="show('city', this)">CITY</div>
+        <div class="tab" onclick="show('upgrades', this)">UPGRADES</div>
+        <div class="tab" onclick="show('market', this)">NFT MARKET</div>
     </div>
 
     <div id="city" class="window active">
-        <div class="click-area">
-            <div class="core-wrap">
-                <div class="core-main" id="tap-btn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
-                </div>
+        <div class="click-zone">
+            <div class="core" id="core-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
             </div>
         </div>
     </div>
 
     <div id="upgrades" class="window">
-        <div id="up-container"></div>
+        <div id="up-list"></div>
     </div>
 
-    <div id="nft" class="window">
-        <div class="nft-grid" id="nft-container"></div>
+    <div id="market" class="window">
+        <div class="nft-grid" id="nft-list"></div>
     </div>
 
     <script>
@@ -121,84 +111,101 @@
         tg.expand();
 
         let state = {
-            m: parseFloat(localStorage.getItem('ln_gm_m')) || 0,
-            l: JSON.parse(localStorage.getItem('ln_gm_l')) || {u1:0, u2:0, u3:0, u4:0},
-            n: JSON.parse(localStorage.getItem('ln_gm_n')) || []
+            m: parseFloat(localStorage.getItem('ln_m')) || 0,
+            l: JSON.parse(localStorage.getItem('ln_l')) || {u1:0, u2:0, u3:0, u4:0},
+            n: JSON.parse(localStorage.getItem('ln_n')) || []
         };
 
         const upgrades = [
-            { id: 'u1', name: 'NEURAL LINK', p: 10, v: 2, t: 'tap' },
-            { id: 'u2', name: 'CYBER MINER', p: 100, v: 15, t: 'auto' },
-            { id: 'u3', name: 'QUANTUM CPU', p: 500, v: 50, t: 'auto' },
-            { id: 'u4', name: 'CORE OVERLOAD', p: 2000, v: 100, t: 'auto' }
+            { id: 'u1', name: 'NEURAL LINK', p: 15, v: 2, t: 'tap' },
+            { id: 'u2', name: 'CYBER MINER', p: 100, v: 10, t: 'auto' },
+            { id: 'u3', name: 'QUANTUM CPU', p: 1000, v: 50, t: 'auto' },
+            { id: 'u4', name: 'CORE OVERLOAD', p: 5000, v: 200, t: 'auto' }
         ];
 
-        const nfts = Array.from({length: 8}, (_, i) => ({
-            id: i, name: `KIBER #${i+1}`, cost: (i+1) * 5000, power: (i+1) * 200,
-            icon: ['🤖','🛰️','👽','👾','🐙','🔥','💎','⚡'][i]
-        }));
+        const nfts = [
+            { id: 0, name: 'KIBER #1', cost: 10000, p: 500, icon: '🤖' },
+            { id: 1, name: 'KIBER #2', cost: 25000, p: 1200, icon: '🛰️' },
+            { id: 2, name: 'KIBER #3', cost: 50000, p: 3000, icon: '👾' },
+            { id: 3, name: 'KIBER #4', cost: 100000, p: 8000, icon: '🔥' }
+        ];
 
-        function calc() {
-            let tp = 1, ap = 0;
+        function getStats() {
+            let t = 1, a = 0;
             upgrades.forEach(u => {
-                if(u.t === 'tap') tp += state.l[u.id] * u.v;
-                else ap += state.l[u.id] * u.v;
+                if(u.t === 'tap') t += state.l[u.id] * u.v;
+                else a += state.l[u.id] * u.v;
             });
-            nfts.filter(n => state.n.includes(n.id)).forEach(n => ap += n.power);
-            return { tp, ap };
+            nfts.filter(n => state.n.includes(n.id)).forEach(n => a += n.p);
+            return { t, a };
         }
 
-        function openTab(name) {
-            document.querySelectorAll('.window, .tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(name).classList.add('active');
-            document.getElementById('btn-' + (name==='upgrades'?'up':name==='nft'?'nft':'city')).classList.add('active');
+        function show(id, el) {
+            document.querySelectorAll('.window, .tab').forEach(x => x.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
             render();
         }
 
         function render() {
-            const s = calc();
-            document.getElementById('bal').innerText = Math.floor(state.m).toLocaleString();
-            document.getElementById('t-pow').innerText = s.tp;
-            document.getElementById('a-pow').innerText = s.ap;
+            const s = getStats();
+            document.getElementById('balance').innerText = Math.floor(state.m).toLocaleString();
+            document.getElementById('tap-val').innerText = s.t;
+            document.getElementById('auto-val').innerText = s.a;
 
-            // NFT Render
-            const nc = document.getElementById('nft-container');
-            nc.innerHTML = '';
-            nfts.forEach(n => {
-                const isOwned = state.n.includes(n.id);
-                nc.innerHTML += `
-                    <div class="nft-card ${isOwned ? 'owned' : ''}">
-                        <span class="nft-img">${n.icon}</span>
-                        <span class="nft-name">${n.name}</span>
-                        <span class="nft-power">+${n.power}/s</span>
-                        <button class="buy-btn ${!isOwned && state.m >= n.cost ? 'active' : ''}" 
-                                onclick="buyNft(${n.id}, ${n.cost})" ${isOwned ? 'disabled' : ''}>
-                            ${isOwned ? 'OWNED' : n.cost.toLocaleString()}
+            // Upgrades Render
+            const ul = document.getElementById('up-list');
+            ul.innerHTML = '';
+            upgrades.forEach(u => {
+                const lvl = state.l[u.id];
+                const cost = Math.floor(u.p * Math.pow(1.6, lvl));
+                ul.innerHTML += `
+                    <div class="up-card">
+                        <div>
+                            <span class="up-name">${u.name} (LVL ${lvl})</span>
+                            <div class="progress-bg"><div class="progress-fill" style="width:${lvl*10}%"></div></div>
+                        </div>
+                        <button class="buy-btn ${state.m >= cost ? 'active' : ''}" onclick="buyU('${u.id}', ${cost})">
+                            ${lvl >= 10 ? 'MAX' : cost.toLocaleString()}
                         </button>
                     </div>`;
             });
 
-            localStorage.setItem('ln_gm_m', state.m);
-            localStorage.setItem('ln_gm_l', JSON.stringify(state.l));
-            localStorage.setItem('ln_gm_n', JSON.stringify(state.n));
+            // NFT Render
+            const nl = document.getElementById('nft-list');
+            nl.innerHTML = '';
+            nfts.forEach(n => {
+                const own = state.n.includes(n.id);
+                nl.innerHTML += `
+                    <div class="nft-card ${own ? 'owned' : ''}">
+                        <span class="nft-icon">${n.icon}</span>
+                        <small>${n.name}</small><br>
+                        <b style="color:var(--blue)">+${n.p}/s</b>
+                        <button class="buy-btn ${!own && state.m >= n.cost ? 'active' : ''}" 
+                                style="width:100%;margin-top:10px" 
+                                onclick="buyN(${n.id}, ${n.cost})" ${own ? 'disabled' : ''}>
+                            ${own ? 'SOTIB OLINGAN' : n.cost.toLocaleString()}
+                        </button>
+                    </div>`;
+            });
+
+            localStorage.setItem('ln_m', state.m);
+            localStorage.setItem('ln_l', JSON.stringify(state.l));
+            localStorage.setItem('ln_n', JSON.stringify(state.n));
         }
 
-        window.buyNft = (id, price) => {
-            if(state.m >= price && !state.n.includes(id)) {
-                state.m -= price; state.n.push(id); render();
-                tg.HapticFeedback.notificationOccurred('success');
-            }
+        window.buyU = (id, c) => { if(state.m >= c && state.l[id] < 10) { state.m -= c; state.l[id]++; render(); tg.HapticFeedback.impactOccurred('medium'); } };
+        window.buyN = (id, c) => { if(state.m >= c) { state.m -= c; state.n.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); } };
+
+        document.getElementById('core-btn').onclick = (e) => {
+            const s = getStats(); state.m += s.t;
+            const p = document.createElement('div'); p.className = 'tap-pop';
+            p.innerText = `+${s.t}`; p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+            document.body.appendChild(p); setTimeout(() => p.remove(), 600);
+            render(); tg.HapticFeedback.impactOccurred('light');
         };
 
-        document.getElementById('tap-btn').onclick = (e) => {
-            const s = calc(); state.m += s.tp;
-            const fx = document.createElement('div'); fx.className = 'tap-fx';
-            fx.innerText = `+${s.tp}`; fx.style.left = e.clientX + 'px'; fx.style.top = e.clientY + 'px';
-            document.body.appendChild(fx); setTimeout(() => fx.remove(), 800);
-            tg.HapticFeedback.impactOccurred('medium'); render();
-        };
-
-        setInterval(() => { const s = calc(); if(s.ap > 0) { state.m += s.ap/10; render(); } }, 100);
+        setInterval(() => { const s = getStats(); if(s.a > 0) { state.m += s.a / 10; render(); } }, 100);
         render();
     </script>
 </body>
