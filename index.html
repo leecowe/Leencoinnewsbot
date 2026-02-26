@@ -3,60 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Clicker Tycoon</title>
+    <title>Leenova Clicker Ultra</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { 
-            background: #0a0a0a; color: #fff; text-align: center; font-family: 'Arial', sans-serif; 
+            background: #000; color: #fff; text-align: center; font-family: 'Segoe UI', sans-serif; 
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        .header { padding: 20px; background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid #333; }
-        .score { font-size: 50px; font-weight: bold; color: #ffcc00; margin: 10px 0; }
-        .stats-row { display: flex; justify-content: space-around; font-size: 14px; color: #00ff00; }
+        .header { padding: 25px 20px; background: linear-gradient(to bottom, #1a1a1a, #000); }
+        .score { font-size: 60px; font-weight: bold; color: #ffcc00; text-shadow: 0 0 20px rgba(255, 204, 0, 0.6); margin: 5px 0; }
         
-        .main-game { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        /* Progress Bar */
+        .progress-container { width: 80%; background: #333; height: 10px; border-radius: 5px; margin: 10px auto; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff9900, #ffcc00); transition: width 0.3s; }
+
+        .stats-row { display: flex; justify-content: space-around; font-size: 14px; color: #00ff00; font-weight: bold; }
+        
+        .main-game { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        
+        /* Tanga dizayni */
+        .coin-wrapper { position: relative; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         .coin { 
-            width: 200px; height: 200px; background: radial-gradient(circle, #ffcc00, #ff9900); 
-            border-radius: 50%; box-shadow: 0 0 40px rgba(255, 153, 0, 0.5); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 80px;
-            transition: transform 0.05s; border: 6px solid #e6b800; -webkit-tap-highlight-color: transparent;
+            width: 230px; height: 230px; background: radial-gradient(circle, #ffcc00 30%, #ff9900 100%); 
+            border-radius: 50%; box-shadow: 0 0 60px rgba(255, 153, 0, 0.4), inset 0 0 20px rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center; font-size: 100px;
+            transition: transform 0.05s; border: 10px solid #e6b800;
         }
-        .coin:active { transform: scale(0.9); }
+        .coin:active { transform: scale(0.92); }
         
-        .shop-container { padding: 20px; background: #1a1a1a; border-radius: 20px 20px 0 0; }
+        /* Uchuvchi raqamlar */
+        .tap-anim { position: absolute; color: #fff; font-size: 32px; font-weight: 900; pointer-events: none; animation: fly 0.7s ease-out forwards; text-shadow: 0 0 10px #000; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.5); } }
+        
+        .shop-container { padding: 30px 20px; background: #111; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
         .upgrade-btn {
-            background: #ff9900; color: #000; border: none; padding: 15px 30px; 
-            border-radius: 12px; font-weight: bold; font-size: 16px; width: 100%;
+            background: linear-gradient(45deg, #ff9900, #ffcc00); color: #000; border: none; padding: 18px; 
+            border-radius: 15px; font-weight: 900; font-size: 18px; width: 100%; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
         }
-        .upgrade-btn:disabled { background: #555; color: #888; }
-        
-        .tap-anim { position: absolute; color: #ffcc00; font-weight: bold; pointer-events: none; animation: fly 0.6s linear; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        .upgrade-btn:disabled { background: #333; color: #777; box-shadow: none; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="score" id="score">0</div>
+        <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
         <div class="stats-row">
-            <span id="tap-power">Tap: +1</span>
-            <span id="auto-rate">Avto: +1/sek</span>
+            <span id="tap-power">🚀 TAP: +1</span>
+            <span id="auto-rate">⚙️ AUTO: +1/s</span>
         </div>
     </div>
 
-    <div class="main-game">
-        <div class="coin" id="tap">💰</div>
+    <div class="main-game" id="game-area">
+        <div class="coin-wrapper" id="tap-zone">
+            <div class="coin">💰</div>
+        </div>
     </div>
 
     <div class="shop-container">
-        <button class="upgrade-btn" id="upgrade-btn">Upgrade Tap (Narxi: 100)</button>
-        <p style="font-size: 12px; color: #888; margin-top: 10px;">Keyingi daraja uchun pul yig'ing!</p>
+        <button class="upgrade-btn" id="upgrade-btn">LEVEL UP (Narxi: 100)</button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Ma'lumotlarni yuklash
         let score = parseFloat(localStorage.getItem('score')) || 0;
         let tapPower = parseInt(localStorage.getItem('tapPower')) || 1;
         let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 100;
@@ -64,44 +75,55 @@
         const scoreEl = document.getElementById('score');
         const tapPowerEl = document.getElementById('tap-power');
         const upgradeBtn = document.getElementById('upgrade-btn');
+        const progressBar = document.getElementById('progress');
 
         function updateUI() {
-            scoreEl.innerText = Math.floor(score);
-            tapPowerEl.innerText = `Tap: +${tapPower}`;
-            upgradeBtn.innerText = `Upgrade Tap (Narxi: ${upgradeCost})`;
+            scoreEl.innerText = Math.floor(score).toLocaleString();
+            tapPowerEl.innerText = `🚀 TAP: +${tapPower}`;
+            upgradeBtn.innerText = `LEVEL UP (💰 ${upgradeCost})`;
+            
+            // Progress Bar hisoblash
+            let progress = (score / upgradeCost) * 100;
+            progressBar.style.width = Math.min(progress, 100) + "%";
+            
             upgradeBtn.disabled = score < upgradeCost;
         }
 
-        // Avto-daromad (+1 har soniyada)
+        // Avto-daromad
         setInterval(() => {
             score += 1;
             updateUI();
             localStorage.setItem('score', score);
         }, 1000);
 
-        // Tap funksiyasi
-        document.getElementById('tap').onclick = (e) => {
+        // Effekti bilan Tap
+        document.getElementById('tap-zone').onclick = (e) => {
             score += tapPower;
             updateUI();
             localStorage.setItem('score', score);
-            tg.HapticFeedback.impactOccurred('light');
+            tg.HapticFeedback.impactOccurred('medium');
 
-            // Animatsiya
+            // Uchuvchi raqam animatsiyasi
             const anim = document.createElement('div');
             anim.className = 'tap-anim';
             anim.innerText = `+${tapPower}`;
-            anim.style.left = e.clientX + 'px';
-            anim.style.top = e.clientY + 'px';
-            document.body.appendChild(anim);
-            setTimeout(() => anim.remove(), 600);
+            
+            const x = e.clientX || window.innerWidth / 2;
+            const y = e.clientY || window.innerHeight / 2;
+            
+            anim.style.left = x - 20 + 'px';
+            anim.style.top = y - 50 + 'px';
+            
+            document.getElementById('game-area').appendChild(anim);
+            setTimeout(() => anim.remove(), 700);
         };
 
-        // Upgrade funksiyasi
+        // Upgrade
         upgradeBtn.onclick = () => {
             if (score >= upgradeCost) {
                 score -= upgradeCost;
                 tapPower += 1;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
+                upgradeCost = Math.floor(upgradeCost * 1.8);
                 
                 localStorage.setItem('score', score);
                 localStorage.setItem('tapPower', tapPower);
