@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | High Contrast</title>
+    <title>Aira Protocol | Precision</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -18,57 +18,37 @@
         body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
         .header { padding: 25px 20px; text-align: center; border-bottom: 2px solid var(--border); background: #000; position: relative; }
-        .rank-btn { position: absolute; left: 15px; top: 25px; background: #1a1a1a; border: 2px solid var(--lvl-color); padding: 6px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--lvl-color); cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
-        .bal-val { font-size: 46px; font-weight: 700; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        .career-title { font-size: 12px; text-transform: uppercase; letter-spacing: 3px; color: var(--lvl-color); margin-top: 5px; font-weight: 700; }
+        .rank-btn { position: absolute; left: 15px; top: 25px; background: #1a1a1a; border: 2px solid var(--lvl-color); padding: 6px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--lvl-color); cursor: pointer; }
+        
+        .bal-val { font-size: 46px; font-weight: 700; color: #fff; }
+        .staked-display { font-size: 14px; color: #ffbc00; font-weight: 700; margin-top: 5px; } /* Staked miqdori uchun yozuv */
 
         .view-content { flex: 1; display: none; padding: 15px; overflow-y: auto; }
         .view-content.active { display: flex; flex-direction: column; }
 
-        /* KARTALAR DIZAYNI */
         .glass-card { 
             background: #111; 
             border: 1px solid var(--border); 
             border-left: 5px solid var(--lvl-color);
-            border-radius: 14px; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-radius: 14px; padding: 20px; margin-bottom: 15px; 
         }
 
         .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .info-label { color: #aaa; font-size: 13px; text-transform: uppercase; font-weight: 600; }
-        .info-value { color: #fff; font-size: 18px; font-weight: 700; }
-        
-        /* TUGMALAR VA NARXLAR */
         .cost-tag { color: var(--lvl-color); font-weight: 700; font-size: 14px; margin-bottom: 5px; display: block; text-align: right; }
         
         .btn-main { 
-            background: var(--lvl-color); 
-            color: #000; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            width: 100%; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 14px; 
-            transition: 0.2s;
+            background: var(--lvl-color); color: #000; border: none; padding: 16px; 
+            border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; text-transform: uppercase; 
         }
-        .btn-main:active { transform: scale(0.96); opacity: 0.8; }
-        .btn-main:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+        .btn-main:disabled { background: #333 !important; color: #666 !important; }
 
         .lock-msg { background: rgba(255, 68, 68, 0.1); color: #ff4444; padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; text-align: center; border: 1px solid #ff4444; font-weight: 700; }
 
-        /* NAVIGATSIYA */
         .nav { height: 80px; background: #000; display: flex; border-top: 2px solid var(--border); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .nav-item.active { color: var(--lvl-color); border-top: 3px solid var(--lvl-color); }
 
-        /* MODAL */
         #rank-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1000; padding:25px; flex-direction:column; }
-        .rank-list-item { background: #151515; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
@@ -76,14 +56,15 @@
     <header class="header">
         <div class="rank-btn" onclick="openRank()">RANK</div>
         <div class="bal-val" id="total-bal">0</div>
-        <div class="career-title" id="career-name">BOSHLANG'ICH</div>
+        <div id="staked-info" class="staked-display" style="visibility: hidden;">STAKED: <span id="staked-amt">0</span></div>
+        <div class="career-title" id="career-name" style="font-size:12px; letter-spacing:3px; color:var(--lvl-color); margin-top:5px; font-weight:700;">BOSHLANG'ICH</div>
     </header>
 
     <div id="view-core" class="view-content active">
         <div class="glass-card">
             <div class="info-row">
-                <span class="info-label">Staking LVL: <b id="stake-lvl" style="color:var(--lvl-color)">0</b></span>
-                <span id="stake-timer" style="color:#fff; font-weight:700">TAYYOR</span>
+                <span style="color:#aaa">STAKING LVL: <b id="stake-lvl" style="color:var(--lvl-color)">0</b></span>
+                <span id="stake-timer" style="font-weight:700">TAYYOR</span>
             </div>
             <button class="btn-main" onclick="startStake()" id="stake-btn">STAKE ALL (+%)</button>
             <div style="margin-top:15px">
@@ -95,44 +76,33 @@
 
         <div class="glass-card">
             <div class="info-row">
-                <span class="info-label">Farming LVL: <b id="farm-lvl" style="color:var(--lvl-color)">1</b></span>
-                <span class="info-value"><span id="aps-display">50</span> APS</span>
+                <span style="color:#aaa">FARMING LVL: <b id="farm-lvl" style="color:var(--lvl-color)">1</b></span>
+                <span style="font-weight:700"><span id="aps-display">50</span> APS</span>
             </div>
             <span class="cost-tag" id="farm-cost-tag">Narxi: 5,000</span>
             <button class="btn-main" onclick="upgradeFarm()" id="farm-up-btn">FARMINGNI KUCHAYTIRISH</button>
-            <div id="lock-farm" class="lock-msg" style="display:none"></div>
+            <div id="lock-farm" class="lock-msg" style="display:none">MAX DARADA</div>
         </div>
     </div>
 
     <div id="view-market" class="view-content">
         <div class="glass-card">
             <div style="font-weight:700; font-size:18px; margin-bottom:5px">AUTO-STAKING</div>
-            <p style="font-size:13px; color:#aaa; margin-bottom:15px">Har 10 soniyada avtomatik daromadni ko'paytiradi.</p>
-            <span class="cost-tag">Narxi: 15,000</span>
-            <button class="btn-main" onclick="buyAuto()" id="auto-btn">SOTIB OLISH</button>
+            <p style="font-size:13px; color:#aaa; margin-bottom:15px">Har 5 soniyada avtomatik daromadni ko'paytiradi.</p>
+            <button class="btn-main" onclick="buyAuto()" id="auto-btn">SOTIB OLISH (15,000)</button>
             <div id="lock-auto" class="lock-msg">Qulflangan: Talaba darajasi kerak!</div>
-        </div>
-
-        <div id="card-nft" class="glass-card">
-            <h4 style="text-align:center; margin-top:0">ARIA NFT COLLECTIONS</h4>
-            <div style="background:#000; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border)">
-                <div style="font-weight:700; margin-bottom:10px">ARIA CARD #01</div>
-                <span class="cost-tag" style="text-align:center">100,000 COINS</span>
-                <button class="btn-main" onclick="buyNFT(100000)">SOTIB OLISH</button>
-            </div>
-            <div id="lock-nft" class="lock-msg">Qulflangan: Vazir darajasi kerak!</div>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('market', this)">MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('Roadmap: Klanlar tizimi tez kunda!')">NEWS</div>
+        <div class="nav-item" onclick="tg.showAlert('Tez kunda...')">NEWS</div>
     </nav>
 
     <div id="rank-modal">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
-            <h2 style="margin:0; letter-spacing:1px">GLOBAL RANK</h2>
+            <h2 style="margin:0">GLOBAL RANK</h2>
             <button onclick="closeRank()" style="background:var(--lvl-color); border:none; padding:10px 20px; border-radius:10px; font-weight:900">X</button>
         </div>
         <div id="rank-list"></div>
@@ -146,38 +116,50 @@
     let hasAuto = localStorage.getItem('aira_auto') === 'true';
 
     let isStaking = false;
+    let currentStaked = 0;
     let career = { name: "BOSHLANG'ICH", color: "#00f2ff" };
 
     function checkCareer() {
-        if (balance >= 500000) {
-            career = { name: "VAZIR", color: "#FFD700", fMax: 50, sMax: 8, nft: true, auto: true, stake: true };
-        } else if (balance >= 100000) {
-            career = { name: "MAGISTR", color: "#ff2e2e", fMax: 25, sMax: 7, nft: false, auto: true, stake: true };
-        } else if (balance >= 10000) {
-            career = { name: "TALABA", color: "#26ff26", fMax: 15, sMax: 5, nft: false, auto: true, stake: true };
-        } else if (balance >= 1000) {
-            career = { name: "O'QUVCHI", color: "#ffffff", fMax: 10, sMax: 3, nft: false, auto: false, stake: true };
-        } else {
-            career = { name: "BOSHLANG'ICH", color: "#00f2ff", fMax: 1, sMax: 0, nft: false, auto: false, stake: false };
-        }
+        if (balance + currentStaked >= 500000) career = { name: "VAZIR", color: "#FFD700", fMax: 50, sMax: 8, auto: true, stake: true };
+        else if (balance + currentStaked >= 100000) career = { name: "MAGISTR", color: "#ff2e2e", fMax: 25, sMax: 7, auto: true, stake: true };
+        else if (balance + currentStaked >= 10000) career = { name: "TALABA", color: "#26ff26", fMax: 15, sMax: 5, auto: true, stake: true };
+        else if (balance + currentStaked >= 1000) career = { name: "O'QUVCHI", color: "#ffffff", fMax: 10, sMax: 3, auto: false, stake: true };
+        else career = { name: "BOSHLANG'ICH", color: "#00f2ff", fMax: 1, sMax: 0, auto: false, stake: false };
 
         document.documentElement.style.setProperty('--lvl-color', career.color);
         document.getElementById('career-name').innerText = career.name;
         updateUI();
     }
 
+    // MINING & AUTO-STAKE (5s)
+    let autoTimer = 0;
     setInterval(() => {
         let aps = 50 + (farmLevel - 1) * 30;
         balance += (aps / 3.33);
         document.getElementById('total-bal').innerText = Math.floor(balance).toLocaleString();
         document.getElementById('aps-display').innerText = aps;
+        
+        // Auto-stake har 5 soniyada (5000ms / 300ms = ~16 tick)
+        if(hasAuto && career.auto && !isStaking && balance > 500) {
+            autoTimer++;
+            if(autoTimer >= 16) {
+                startStake();
+                autoTimer = 0;
+            }
+        }
         checkCareer();
-        if(hasAuto && !isStaking && career.auto && balance > 100) startStake();
     }, 300);
 
     function startStake() {
         if (isStaking || balance <= 0 || !career.stake) return;
-        let amount = balance; balance = 0; isStaking = true;
+        currentStaked = balance;
+        balance = 0;
+        isStaking = true;
+        
+        // Staked miqdorini ko'rsatish
+        document.getElementById('staked-info').style.visibility = "visible";
+        document.getElementById('staked-amt').innerText = Math.floor(currentStaked).toLocaleString();
+
         let timeLeft = 10;
         const timer = document.getElementById('stake-timer');
         const countdown = setInterval(() => {
@@ -185,8 +167,10 @@
             timer.innerText = timeLeft + "S";
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                balance += Math.floor(amount * (1.05 + (stakeLevel * 0.05)));
+                balance += Math.floor(currentStaked * (1.05 + (stakeLevel * 0.05)));
+                currentStaked = 0;
                 isStaking = false;
+                document.getElementById('staked-info').style.visibility = "hidden";
                 timer.innerText = "TAYYOR";
                 save();
             }
@@ -196,62 +180,34 @@
     function upgradeStake() {
         let cost = (stakeLevel + 1) * 5000;
         if (balance >= cost && stakeLevel < career.sMax) {
-            balance -= cost; stakeLevel++; save(); checkCareer();
-            tg.HapticFeedback.notificationOccurred('success');
-        } else { tg.showAlert("Mablag' yetarli emas!"); }
+            balance -= cost; stakeLevel++; save();
+        }
     }
 
     function upgradeFarm() {
         let cost = 5000 * farmLevel;
         if (balance >= cost && farmLevel < career.fMax) {
-            balance -= cost; farmLevel++; save(); checkCareer();
-            tg.HapticFeedback.notificationOccurred('success');
-        } else { tg.showAlert("Mablag' yetarli emas!"); }
+            balance -= cost; farmLevel++; save();
+        }
     }
 
     function updateUI() {
-        // Narxlarni yangilash
         document.getElementById('farm-cost-tag').innerText = "Narxi: " + (5000 * farmLevel).toLocaleString();
         document.getElementById('stake-cost-tag').innerText = "Narxi: " + ((stakeLevel + 1) * 5000).toLocaleString();
         document.getElementById('farm-lvl').innerText = farmLevel;
         document.getElementById('stake-lvl').innerText = stakeLevel;
 
-        // Qulflarni tekshirish
-        document.getElementById('stake-btn').disabled = !career.stake;
-        document.getElementById('stake-up-btn').disabled = !career.stake || stakeLevel >= career.sMax;
+        document.getElementById('stake-btn').disabled = isStaking || !career.stake;
         document.getElementById('lock-stake').style.display = career.stake ? "none" : "block";
-        
-        document.getElementById('farm-up-btn').disabled = farmLevel >= career.fMax;
-        document.getElementById('lock-farm').style.display = farmLevel >= career.fMax ? "block" : "none";
-        document.getElementById('lock-farm').innerText = "MAX DARADA: " + career.name;
-
+        document.getElementById('lock-auto').style.display = career.auto ? "none" : "block";
         document.getElementById('auto-btn').disabled = !career.auto || hasAuto;
         if(hasAuto) document.getElementById('auto-btn').innerText = "SOTIB OLINGAN";
-        document.getElementById('lock-auto').style.display = career.auto ? "none" : "block";
-        document.getElementById('lock-nft').style.display = career.nft ? "none" : "block";
     }
 
-    function openRank() {
-        const list = document.getElementById('rank-list');
-        document.getElementById('rank-modal').style.display = "flex";
-        let users = [
-            { name: "Siz*", bal: balance, lvl: career.name },
-            { name: "Sardor*", bal: 1200000, lvl: "VAZIR" },
-            { name: "Bekru*", bal: 850000, lvl: "VAZIR" },
-            { name: "Dmitr*", bal: 120000, lvl: "MAGISTR" }
-        ].sort((a,b) => b.bal - a.bal);
-        list.innerHTML = users.map(u => `
-            <div class="rank-list-item">
-                <div style="font-weight:700">${u.name}<br><small style="color:var(--lvl-color)">${u.lvl}</small></div>
-                <div style="color:#fff">${Math.floor(u.bal).toLocaleString()}</div>
-            </div>
-        `).join('');
-    }
-
-    function closeRank() { document.getElementById('rank-modal').style.display = "none"; }
-    function buyAuto() { if (balance >= 15000) { balance -= 15000; hasAuto = true; localStorage.setItem('aira_auto', 'true'); save(); checkCareer(); } }
-    function buyNFT(p) { if (balance >= p) { balance -= p; save(); tg.showAlert("NFT Sotib olindi!"); } }
     function save() { localStorage.setItem('aira_bal', balance); localStorage.setItem('aira_farm', farmLevel); localStorage.setItem('aira_stake', stakeLevel); }
+    function openRank() { document.getElementById('rank-modal').style.display = "flex"; }
+    function closeRank() { document.getElementById('rank-modal').style.display = "none"; }
+    function buyAuto() { if (balance >= 15000) { balance -= 15000; hasAuto = true; localStorage.setItem('aira_auto', 'true'); save(); } }
     function switchTab(tab, el) {
         document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
