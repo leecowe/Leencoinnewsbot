@@ -27,31 +27,33 @@
             overflow: hidden;
         }
 
-        /* Ambient Glow Background */
         .ambient-glow {
             position: fixed; width: 150vw; height: 150vw;
             background: radial-gradient(circle, rgba(255, 0, 122, 0.08) 0%, transparent 70%);
             top: -50%; left: -25%; z-index: 0; animation: drift 15s infinite alternate;
             pointer-events: none;
         }
-
         @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(10%, 10%); } }
 
         #bg-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-        /* AI Hologram Effect */
+        /* Full Screen Tap Zone */
+        #tap-master {
+            position: fixed; inset: 0; z-index: 5;
+            cursor: pointer;
+        }
+
         .ai-status-bar {
-            position: fixed; top: 120px; left: 50%; transform: translateX(-50%);
+            position: fixed; top: 140px; left: 50%; transform: translateX(-50%);
             width: 80%; text-align: center; z-index: 100; pointer-events: none;
         }
         #ai-thought {
-            font-size: 10px; color: var(--secondary); text-transform: uppercase;
-            letter-spacing: 2px; font-weight: 800; opacity: 0; transition: 1s;
-            text-shadow: 0 0 15px var(--secondary);
+            font-size: 9px; color: var(--secondary); text-transform: uppercase;
+            letter-spacing: 2px; font-weight: 800; opacity: 0.7;
+            text-shadow: 0 0 10px var(--secondary);
             font-family: 'Syncopate';
         }
 
-        /* UI Wrapper */
         .ui-wrapper { 
             position: relative; z-index: 10; height: 100vh; 
             display: flex; flex-direction: column; 
@@ -60,80 +62,78 @@
         }
         .ui-wrapper * { pointer-events: auto; }
 
-        /* Header Chips */
         .header { display: flex; justify-content: space-between; align-items: center; }
         .chip {
             background: var(--glass); border: 1px solid var(--border);
-            padding: 10px 18px; border-radius: 100px; font-size: 10px;
-            backdrop-filter: blur(25px); display: flex; align-items: center; gap: 8px;
-            font-weight: 700; letter-spacing: 1px;
+            padding: 10px 18px; border-radius: 100px; font-size: 9px;
+            backdrop-filter: blur(25px); font-weight: 700; letter-spacing: 1px;
         }
 
-        /* Balance Section */
-        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15vh; }
+        .hero { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10vh; pointer-events: none; }
         .balance-main { 
-            font-family: 'Syncopate', sans-serif; font-size: 58px; font-weight: 700;
+            font-family: 'Syncopate', sans-serif; font-size: 48px; font-weight: 700;
             background: linear-gradient(180deg, #ffffff 0%, #888888 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 2px; letter-spacing: -3px;
+            margin-bottom: 2px; letter-spacing: -2px;
         }
+        .income-tag { font-size: 10px; color: var(--secondary); opacity: 0.8; font-weight: 600; }
 
-        /* HUD Footer */
         .hud-glass {
             background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
             border-radius: 30px; padding: 22px; backdrop-filter: blur(30px);
-            margin-bottom: 85px;
+            margin-bottom: 85px; pointer-events: auto;
         }
-        .track { height: 10px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 10px; }
-        .fill { height: 100%; border-radius: 20px; transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .track { height: 8px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden; margin-top: 8px; }
+        .fill { height: 100%; border-radius: 20px; transition: width 0.3s ease; }
 
-        /* Upgrade Cards with Rotating Border */
-        .up-card {
-            background: rgba(10, 10, 15, 0.8); border: 1px solid var(--border);
-            padding: 22px 15px; border-radius: 28px; text-align: center;
-            position: relative; overflow: hidden; z-index: 1;
+        /* Panels */
+        .side-panel {
+            position: fixed; bottom: -110%; left: 0; width: 100%; height: 85vh;
+            background: #08080c; border-top: 2px solid var(--accent);
+            border-radius: 40px 40px 0 0; z-index: 1100; padding: 30px 20px;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden; display: flex; flex-direction: column;
         }
-        .up-card::before {
+        .side-panel.active { bottom: 0; }
+        
+        .tab-content { overflow-y: auto; flex-grow: 1; padding-bottom: 40px; }
+        .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .up-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 18px 12px; border-radius: 24px; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .up-card::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: conic-gradient(transparent, var(--accent), transparent 30%);
-            animation: rotate-border 4s linear infinite; opacity: 0.3; z-index: -1;
+            animation: rotate-border 6s linear infinite; opacity: 0.1; z-index: -1;
         }
         @keyframes rotate-border { 100% { transform: rotate(360deg); } }
 
-        .up-card h4 { font-size: 12px; opacity: 0.6; margin-bottom: 5px; }
-        .up-card p { font-size: 16px; font-weight: 800; color: var(--secondary); margin-bottom: 12px; }
+        .up-card h4 { font-size: 10px; opacity: 0.5; margin-bottom: 4px; text-transform: uppercase; }
+        .up-card p { font-size: 13px; font-weight: 800; color: var(--secondary); margin-bottom: 10px; }
         
-        .price-tag {
-            background: #fff; color: #000; padding: 10px; border-radius: 15px;
-            font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.3s;
+        .price-btn {
+            width: 100%; background: #fff; color: #000; padding: 10px; border-radius: 12px;
+            font-weight: 900; font-size: 11px; cursor: pointer; border: none;
         }
-        .price-tag.disabled { background: #222; color: #555; }
+        .price-btn.disabled { background: #222; color: #555; }
 
-        /* Navigation */
         .dock {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 92%; background: rgba(10, 10, 15, 0.9);
+            width: 92%; background: rgba(10, 10, 15, 0.95);
             border: 1px solid var(--border); border-radius: 28px;
-            padding: 8px; display: flex; gap: 8px; z-index: 1000;
+            padding: 8px; display: flex; gap: 8px; z-index: 1000; pointer-events: auto;
         }
-        .dock-item { flex: 1; padding: 14px; border-radius: 22px; border: none; background: transparent; color: #555; font-weight: 700; }
+        .dock-item { flex: 1; padding: 14px; border-radius: 22px; border: none; background: transparent; color: #555; font-weight: 700; font-size: 12px; }
         .dock-item.active { background: var(--glass); color: #fff; border: 1px solid var(--border); }
 
-        .side-panel {
-            position: fixed; bottom: -110%; left: 0; width: 100%; height: 82vh;
-            background: #08080c; border-top: 2px solid var(--accent);
-            border-radius: 40px 40px 0 0; z-index: 1100; padding: 35px 25px;
-            transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .side-panel.active { bottom: 0; }
-        .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; overflow-y: auto; height: 75%; }
-
         .float-val {
-            position: fixed; pointer-events: none; font-weight: 900;
-            color: #fff; z-index: 2000; animation: rise 0.8s forwards;
-            text-shadow: var(--neon-shadow); font-family: 'Syncopate';
+            position: fixed; pointer-events: none; font-weight: 900; color: #fff;
+            z-index: 2000; animation: rise 0.8s forwards; font-family: 'Syncopate'; font-size: 18px;
         }
-        @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
+        @keyframes rise { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
@@ -141,162 +141,221 @@
     <div class="ambient-glow"></div>
     <canvas id="bg-canvas"></canvas>
 
-    <div class="ai-status-bar">
-        <div id="ai-thought">SYSTEM INITIALIZING...</div>
-    </div>
+    <div id="tap-master"></div>
 
-    <div id="tap-target" style="position:fixed; inset:0; z-index:5;"></div>
+    <div class="ai-status-bar">
+        <div id="ai-thought">CORE SYNCED</div>
+    </div>
 
     <div class="ui-wrapper">
         <div class="header">
-            <div class="chip">NEURAL LINK</div>
-            <div class="chip" style="color: var(--secondary);">DNA x<span id="mult-ui">1.0</span></div>
+            <div class="chip">NODE: STABLE</div>
+            <div class="chip" style="color: var(--secondary); border-color: var(--secondary);">FPS: 60</div>
         </div>
 
         <div class="hero">
             <h1 class="balance-main" id="bal-ui">0.00</h1>
-            <p style="font-size:11px; color:var(--secondary); letter-spacing:5px;">$ARIAI ASSETS</p>
+            <div class="income-tag">AUTO-FARMING: +<span id="pps-ui">0.0</span>/s</div>
         </div>
 
         <div class="hud-glass">
-            <div>PLASMA <span id="mana-text" style="float:right">1000/1000</span></div>
-            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%;"></div></div>
-            <div style="margin-top:15px">EVOLUTION <span id="lvl-text" style="float:right">LVL 1</span></div>
-            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%;"></div></div>
+            <div style="font-size: 11px; letter-spacing: 1px;">ENERGY <span id="mana-text" style="float:right">1000/1000</span></div>
+            <div class="track"><div class="fill" id="mana-fill" style="background: var(--secondary); width: 100%; box-shadow: 0 0 10px var(--secondary);"></div></div>
+            
+            <div style="font-size: 11px; letter-spacing: 1px; margin-top: 15px;">EVOLUTION <span id="lvl-text" style="float:right">LVL 1</span></div>
+            <div class="track"><div class="fill" id="xp-fill" style="background: var(--accent); width: 0%; box-shadow: 0 0 10px var(--accent);"></div></div>
         </div>
     </div>
 
-    <div class="side-panel" id="panel-dna">
-        <h2 style="margin-bottom:25px; font-family:'Syncopate'">UPGRADES</h2>
-        <div class="upgrades-grid" id="upgrade-container"></div>
-        <button onclick="toggleMenu(false)" style="width:100%; margin-top:20px; padding:15px; border-radius:20px; background:var(--glass); border:1px solid var(--border); color:#fff;">CLOSE</button>
+    <div class="side-panel" id="side-panel">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h2 id="panel-title" style="font-family:'Syncopate'; font-size: 18px;">UPGRADES</h2>
+            <button onclick="togglePanel(false)" style="background:none; border:none; color:#555; font-size:20px;">✕</button>
+        </div>
+        
+        <div class="tab-content" id="panel-content">
+            <div class="upgrades-grid" id="grid-container"></div>
+        </div>
     </div>
 
     <nav class="dock">
-        <button class="dock-item active" id="nav-core" onclick="toggleMenu(false)">CORE</button>
-        <button class="dock-item" id="nav-dna" onclick="toggleMenu(true)">GENOMES</button>
+        <button class="dock-item active" id="nav-core" onclick="togglePanel(false)">CORE</button>
+        <button class="dock-item" id="nav-up" onclick="openTab('upgrades')">TAP</button>
+        <button class="dock-item" id="nav-farm" onclick="openTab('farming')">FARM</button>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let state = JSON.parse(localStorage.getItem('ariai_v6')) || {
-            bal: 0, pwr: 1.0, mana: 1000, maxMana: 1000, lvl: 1, xp: 0
+        let state = JSON.parse(localStorage.getItem('ariai_v7')) || {
+            bal: 0, 
+            pwr: 1.0, 
+            pps: 0.0, // Passive Profit per Second
+            mana: 1000, 
+            maxMana: 1000, 
+            lvl: 1, 
+            xp: 0,
+            upgrades: {},
+            farmNodes: {}
         };
 
-        const thoughts = [
-            "Analyzing neural pathways...",
-            "DNA synchronization active",
-            "Optimizing evolution speed",
-            "Plasma levels stable",
-            "Detecting new mutations...",
-            "AI consciousness expanding"
+        const farmData = [
+            { id: 'f1', name: 'Neural Ant', pps: 0.5, price: 150 },
+            { id: 'f2', name: 'Data Hive', pps: 2.5, price: 800 },
+            { id: 'f3', name: 'Logic Farm', pps: 12.0, price: 4500 },
+            { id: 'f4', name: 'Core Miner', pps: 55.0, price: 25000 },
         ];
 
-        function rotateAIThoughts() {
-            const el = document.getElementById('ai-thought');
-            setInterval(() => {
-                el.style.opacity = 0;
-                setTimeout(() => {
-                    el.innerText = thoughts[Math.floor(Math.random() * thoughts.length)];
-                    el.style.opacity = 1;
-                }, 1000);
-            }, 5000);
-        }
+        const tapData = [
+            { id: 't1', name: 'Nano Tips', pwr: 0.5, price: 100 },
+            { id: 't2', name: 'Force Link', pwr: 2.0, price: 650 },
+            { id: 't3', name: 'Bio Sync', pwr: 8.0, price: 3200 },
+        ];
 
         // 3D Engine
         let scene, camera, renderer, crystal;
-        function initEngine() {
+        function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            const geo = new THREE.OctahedronGeometry(2, 0);
+            const geo = new THREE.IcosahedronGeometry(2, 0);
             const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
             crystal = new THREE.Mesh(geo, mat);
             scene.add(crystal);
-            scene.add(new THREE.PointLight(0xff007a, 2, 10), new THREE.AmbientLight(0xffffff, 0.2));
+            scene.add(new THREE.PointLight(0xff007a, 2, 20), new THREE.AmbientLight(0xffffff, 0.1));
             camera.position.z = 6;
 
-            function loop() {
-                requestAnimationFrame(loop);
-                crystal.rotation.y += 0.01;
+            function anim() {
+                requestAnimationFrame(anim);
+                crystal.rotation.y += 0.005;
+                crystal.rotation.z += 0.002;
                 renderer.render(scene, camera);
             }
-            loop();
+            anim();
         }
 
-        document.getElementById('tap-target').addEventListener('touchstart', (e) => {
-            if (state.mana < 2) return;
-            const t = e.touches[0];
-            const fx = document.createElement('div');
-            fx.className = 'float-val';
-            fx.innerText = `+${state.pwr.toFixed(1)}`;
-            fx.style.left = `${t.clientX}px`; fx.style.top = `${t.clientY}px`;
-            document.body.appendChild(fx);
-            setTimeout(() => fx.remove(), 800);
+        // Tap Logic
+        document.getElementById('tap-master').addEventListener('touchstart', (e) => {
+            if (state.mana < 1) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
+            }
+            const touch = e.touches[0];
+            showFx(touch.clientX, touch.clientY, state.pwr);
 
             state.bal += state.pwr;
-            state.mana -= 2;
-            state.xp += 20;
+            state.mana -= 1.5;
+            state.xp += 10;
 
-            if (state.xp >= state.lvl * 1000) {
-                state.lvl++; state.xp = 0; state.pwr += 0.5;
+            if (state.xp >= state.lvl * 800) {
+                state.lvl++; state.xp = 0;
                 tg.HapticFeedback.notificationOccurred('success');
             }
             tg.HapticFeedback.impactOccurred('light');
             updateUI();
         });
 
-        function updateUI() {
-            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
-            document.getElementById('mult-ui').innerText = state.pwr.toFixed(1);
-            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)}/1000`;
-            document.getElementById('mana-fill').style.width = `${state.mana/10}%`;
-            document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
-            document.getElementById('xp-fill').style.width = `${state.xp/(state.lvl*10)}%`;
-            localStorage.setItem('ariai_v6', JSON.stringify(state));
+        function showFx(x, y, val) {
+            const el = document.createElement('div');
+            el.className = 'float-val';
+            el.innerHTML = `+${val.toFixed(1)}`;
+            el.style.left = `${x - 20}px`; el.style.top = `${y - 20}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+            crystal.scale.set(1.1, 1.1, 1.1);
+            setTimeout(() => crystal.scale.set(1, 1, 1), 50);
         }
 
-        function toggleMenu(show) {
-            document.getElementById('panel-dna').classList.toggle('active', show);
+        function updateUI() {
+            document.getElementById('bal-ui').innerText = state.bal.toFixed(2);
+            document.getElementById('pps-ui').innerText = state.pps.toFixed(1);
+            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)}/1000`;
+            document.getElementById('mana-fill').style.width = `${(state.mana/10)}%`;
+            document.getElementById('lvl-text').innerText = `LVL ${state.lvl}`;
+            document.getElementById('xp-fill').style.width = `${(state.xp/(state.lvl*8))}%`;
+            localStorage.setItem('ariai_v7', JSON.stringify(state));
+        }
+
+        function togglePanel(show) {
+            document.getElementById('side-panel').classList.toggle('active', show);
             document.getElementById('nav-core').classList.toggle('active', !show);
-            document.getElementById('nav-dna').classList.toggle('active', show);
-            if(show) {
-                const container = document.getElementById('upgrade-container');
-                container.innerHTML = '';
-                for(let i=1; i<=6; i++) {
-                    const price = i * 500;
+        }
+
+        function openTab(tab) {
+            togglePanel(true);
+            const container = document.getElementById('grid-container');
+            const title = document.getElementById('panel-title');
+            container.innerHTML = '';
+            
+            document.querySelectorAll('.dock-item').forEach(i => i.classList.remove('active'));
+            
+            if (tab === 'upgrades') {
+                title.innerText = "TAP SYSTEM";
+                document.getElementById('nav-up').classList.add('active');
+                tapData.forEach(item => {
+                    const count = state.upgrades[item.id] || 0;
+                    const price = Math.floor(item.price * Math.pow(1.5, count));
                     const canBuy = state.bal >= price;
-                    container.innerHTML += `
-                        <div class="up-card">
-                            <h4>MODULE ${i}</h4>
-                            <p>+${(i*0.5).toFixed(1)} PWR</p>
-                            <div class="price-tag ${canBuy?'':'disabled'}" onclick="buy(${i}, ${price})">
-                                ${canBuy ? 'SYNC '+price : 'LOCKED'}
-                            </div>
-                        </div>
-                    `;
-                }
+                    container.innerHTML += createCard(item.name, `+${item.pwr} PWR`, price, canBuy, `buyTap('${item.id}', ${item.pwr}, ${price})`);
+                });
+            } else {
+                title.innerText = "AUTO FARMING";
+                document.getElementById('nav-farm').classList.add('active');
+                farmData.forEach(item => {
+                    const count = state.farmNodes[item.id] || 0;
+                    const price = Math.floor(item.price * Math.pow(1.4, count));
+                    const canBuy = state.bal >= price;
+                    container.innerHTML += createCard(item.name, `+${item.pps}/s`, price, canBuy, `buyFarm('${item.id}', ${item.pps}, ${price})`);
+                });
             }
         }
 
-        window.buy = (i, price) => {
-            if(state.bal >= price) {
+        function createCard(name, benefit, price, canBuy, func) {
+            return `
+                <div class="up-card">
+                    <h4>${name}</h4>
+                    <p>${benefit}</p>
+                    <button class="price-btn ${canBuy?'':'disabled'}" onclick="${func}">${price}</button>
+                </div>
+            `;
+        }
+
+        window.buyTap = (id, pwr, price) => {
+            if (state.bal >= price) {
                 state.bal -= price;
-                state.pwr += (i * 0.5);
-                updateUI(); toggleMenu(true);
+                state.pwr += pwr;
+                state.upgrades[id] = (state.upgrades[id] || 0) + 1;
+                openTab('upgrades'); updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
             }
         };
 
-        setInterval(() => {
-            if(state.mana < 1000) { state.mana = Math.min(1000, state.mana + 1.5); updateUI(); }
-        }, 1000);
+        window.buyFarm = (id, pps, price) => {
+            if (state.bal >= price) {
+                state.bal -= price;
+                state.pps += pps;
+                state.farmNodes[id] = (state.farmNodes[id] || 0) + 1;
+                openTab('farming'); updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        };
 
-        window.onload = () => { initEngine(); updateUI(); rotateAIThoughts(); };
+        // Passive Income Heartbeat
+        setInterval(() => {
+            if (state.pps > 0) {
+                state.bal += (state.pps / 10);
+                updateUI();
+            }
+            if (state.mana < 1000) {
+                state.mana = Math.min(1000, state.mana + 1.2);
+                updateUI();
+            }
+        }, 100);
+
+        window.onload = () => { init3D(); updateUI(); };
     </script>
 </body>
 </html>
