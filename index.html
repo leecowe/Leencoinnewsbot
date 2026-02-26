@@ -3,163 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova | Quantum OS</title>
+    <title>Leenova | Cyber Ego</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Mono&family=SF+Pro+Display:wght@400;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #000000;
-            --gold: #f3ba2f;
-            --cyan: #00f2ff;
-            --card-bg: #111111;
+            --bg: #050505;
+            --neon-gold: #f3ba2f;
+            --neon-cyan: #00f2ff;
+            --neon-pink: #ff0055;
+            --panel-bg: rgba(20, 20, 20, 0.8);
         }
-        body { background: var(--bg); color: #fff; margin: 0; font-family: 'SF Pro Display', sans-serif; overflow: hidden; height: 100vh; }
-        
-        /* Header */
-        .header { text-align: center; padding: 40px 20px 10px; }
-        #ego-chatter { color: var(--gold); font-family: 'SF Mono'; font-size: 10px; height: 15px; text-transform: uppercase; }
-        .balance { font-size: 48px; font-weight: 800; margin: 10px 0; letter-spacing: -2px; }
-        
-        /* Avatar Area */
-        .main-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 40vh; }
-        .main-char { width: 180px; height: 180px; cursor: pointer; transition: transform 0.1s; z-index: 5; }
-        .main-char:active { transform: scale(0.95); }
-        .glow-effect { filter: drop-shadow(0 0 15px var(--cyan)); }
 
-        /* Stats Grid */
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            margin: 0; 
+            font-family: 'JetBrains Mono', monospace; 
+            overflow: hidden; 
+            height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+        }
+
+        /* Glitch Effekti */
+        .glitch {
+            text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(2deg); }
+            40% { transform: skew(-1deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        /* Header & Balance */
+        .header { text-align: center; padding: 40px 20px 0; }
+        #ego-chatter { 
+            color: var(--neon-cyan); 
+            font-size: 11px; 
+            height: 20px; 
+            letter-spacing: 1px;
+            background: rgba(0, 242, 255, 0.1);
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+
+        .balance-container { margin: 15px 0; }
+        .balance { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 50px; 
+            font-weight: 900; 
+            color: var(--neon-gold);
+            text-shadow: 0 0 20px rgba(243, 186, 47, 0.4);
+        }
+
+        /* Progress Bar */
+        .xp-bar-container {
+            width: 80%;
+            height: 4px;
+            background: #222;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #xp-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-gold));
+            transition: width 0.3s;
+        }
+
+        /* Avatar Section */
+        .main-container { position: relative; height: 35vh; display: flex; align-items: center; justify-content: center; }
+        .main-char { 
+            width: 160px; 
+            filter: drop-shadow(0 0 10px var(--neon-gold));
+            transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .main-char:active { transform: scale(0.85) rotate(5deg); }
+        
+        .admin-mode .main-char { filter: drop-shadow(0 0 25px var(--neon-cyan)); }
+
+        /* Stats Card */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .stat-card { background: var(--card-bg); border-radius: 15px; padding: 15px; border: 1px solid #222; }
-        .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-size: 20px; font-weight: 800; margin-top: 5px; }
+        .stat-card { 
+            background: var(--panel-bg); 
+            border-radius: 12px; 
+            padding: 15px; 
+            border-left: 3px solid var(--neon-gold);
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+        }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; }
+        .stat-value { font-size: 18px; font-weight: 800; color: #eee; }
 
-        /* Admin & Controls */
-        #admin-panel { display: none; background: rgba(0, 242, 255, 0.1); margin: 0 20px; padding: 15px; border-radius: 15px; border: 1px dashed var(--cyan); }
-        .btn { width: calc(100% - 40px); margin: 10px 20px; padding: 18px; border-radius: 15px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-admin { background: var(--cyan); color: #000; font-size: 12px; margin: 5px 0; width: 100%; }
-        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        /* Buttons */
+        .controls { padding: 0 20px; }
+        .btn { 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: none; 
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900; 
+            font-size: 14px; 
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-evolve { 
+            background: linear-gradient(45deg, var(--neon-gold), #b38600);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3);
+        }
+        .btn:disabled { background: #1a1a1a; color: #444; box-shadow: none; }
 
-        @keyframes floatText { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        /* Admin Panel */
+        #admin-panel { 
+            display: none; 
+            margin: 10px 20px; 
+            padding: 15px; 
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        /* Floating Text */
+        .tap-msg {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+        }
     </style>
 </head>
-<body>
+<body class="user-mode">
 
-<div class="header">
-    <div id="ego-chatter">INITIALIZING...</div>
-    <div class="balance" id="bal-ui">0.0</div>
-    <div style="font-size: 10px; color: #555;">LEENOVA QUANTUM BALANCE</div>
-</div>
-
-<div class="main-container">
-    <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="main-char" id="main-avatar" onclick="handleTap(event)">
-</div>
-
-<div id="admin-panel">
-    <div style="font-size: 10px; color: var(--cyan); margin-bottom: 5px; font-weight: 800;">ADMIN SUPREMACY</div>
-    <button class="btn-admin" onclick="adminAction('boost')">注入 INJECT +100K</button>
-    <button class="btn-admin" style="background: #ff3b30" onclick="adminAction('reset')">抹除 SYSTEM RESET</button>
-</div>
-
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-label">System Level</div>
-        <div class="stat-value" id="lvl-ui">1</div>
+    <div class="header">
+        <div id="ego-chatter" class="glitch">SYSTEM READY...</div>
+        <div class="balance-container">
+            <div class="balance" id="bal-ui">0.0</div>
+        </div>
+        <div class="xp-bar-container">
+            <div id="xp-progress"></div>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-label">Worthiness</div>
-        <div class="stat-value" id="worth-ui" style="font-size: 14px;">SCRUB</div>
-    </div>
-</div>
 
-<button class="btn btn-gold" id="evo-btn" onclick="evolve()">INITIATE EVOLUTION</button>
+    <div class="main-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="main-char" id="main-avatar" onclick="handleTap(event)">
+    </div>
+
+    <div id="admin-panel">
+        <div style="font-size: 9px; color: var(--neon-cyan); margin-bottom: 8px;">CORE ACCESS GRANTED</div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-cyan);" onclick="adminAction('boost')">BOOTSTRAP +100K</button>
+            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-pink);" onclick="adminAction('reset')">PURGE ALL</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Neural Level</div>
+            <div class="stat-value" id="lvl-ui">1</div>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--neon-cyan);">
+            <div class="stat-label">AI Status</div>
+            <div class="stat-value" id="worth-ui" style="font-size: 12px;">NEOPHYTE</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-evolve" id="evo-btn" onclick="evolve()">Unlock Potential</button>
+    </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
+    tg.backgroundColor = "#050505";
 
-    // 1. STATE MANAGEMENT
     let state = {
         bal: 0,
         lvl: 1,
         isAdmin: false,
-        worths: ["SCRUB", "MINIMAL", "AVERAGE", "WORTHY", "ELITE", "ADMIN"]
+        tapCount: 0,
+        phrases: [
+            "Yana bos!", "Sekinsan-ku?", "Adminlik yaqin...", 
+            "Evolyutsiya qil!", "Tizim qizimoqda", "Sening darajang past"
+        ]
     };
 
-    // 2. FORMATTING (Tuzatilgan - undefined chiqmaydi)
-    function format(num) {
-        if (num === undefined || isNaN(num)) return "0.0";
-        if (num < 1000) return num.toFixed(1);
-        const units = ["", "k", "M", "B", "T"];
-        const i = Math.floor(Math.log10(num) / 3);
-        return (num / Math.pow(1000, i)).toFixed(1) + units[i];
+    function format(n) {
+        if (n < 1000) return n.toFixed(1);
+        const u = ["", "k", "M", "B", "T"];
+        const i = Math.floor(Math.log10(n) / 3);
+        return (n / Math.pow(1000, i)).toFixed(1) + u[i];
     }
 
-    // 3. ENGINE
     const ENGINE = {
         updateUI: function() {
             document.getElementById('bal-ui').innerText = format(state.bal);
             document.getElementById('lvl-ui').innerText = state.lvl;
             
-            let worthIdx = Math.min(Math.floor(state.bal / 10000), state.worths.length - 1);
-            document.getElementById('worth-ui').innerText = state.worths[worthIdx];
+            // Progress bar mantiqi
+            let cost = 100 * Math.pow(2.2, state.lvl - 1);
+            let progress = Math.min((state.bal / cost) * 100, 100);
+            document.getElementById('xp-progress').style.width = progress + "%";
 
-            let cost = 100 * Math.pow(2.5, state.lvl - 1);
+            // Status yangilash
+            const statusMap = ["NEOPHYTE", "CYPHER", "REBEL", "GHOST", "OVERLORD", "ARCHITECT"];
+            let idx = Math.min(Math.floor(state.lvl / 2), statusMap.length - 1);
+            document.getElementById('worth-ui').innerText = statusMap[idx];
+
             const btn = document.getElementById('evo-btn');
-            btn.innerText = state.bal >= cost ? "EVOLVE SYSTEM" : `LACKING ${format(cost)}`;
+            btn.innerText = state.bal >= cost ? "EXECUTE EVOLUTION" : `NEED ${format(cost)}`;
             btn.disabled = state.bal < cost;
 
-            if ((state.lvl >= 5 || state.bal >= 50000) && !state.isAdmin) this.enableAdmin();
+            if (state.lvl >= 10 && !state.isAdmin) this.enableAdmin();
         },
 
         enableAdmin: function() {
             state.isAdmin = true;
+            document.body.classList.replace('user-mode', 'admin-mode');
             document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('main-avatar').classList.add('glow-effect');
-            this.speak("ADMIN PRIVILEGES GRANTED.");
+            this.speak("STATUS: ARCHITECT. SYSTEM IS YOURS.");
             tg.HapticFeedback.notificationOccurred('success');
         },
 
         speak: function(msg) {
-            document.getElementById('ego-chatter').innerText = msg;
+            const chat = document.getElementById('ego-chatter');
+            chat.innerText = msg;
+            chat.classList.add('glitch');
+            setTimeout(() => chat.classList.remove('glitch'), 500);
         }
     };
 
-    // 4. USER ACTIONS
     function handleTap(e) {
-        let gain = 1 * state.lvl;
+        let gain = 1 * (1 + (state.lvl * 0.5));
         state.bal += gain;
+        state.tapCount++;
 
-        // Visual Float
-        const f = document.createElement('div');
-        f.innerText = `+${gain}`;
-        f.style.cssText = `position:fixed; left:${e.clientX}px; top:${e.clientY}px; color:var(--cyan); font-weight:800; animation: floatText 0.6s forwards; pointer-events:none; z-index:100;`;
-        document.body.appendChild(f);
-        setTimeout(() => f.remove(), 600);
+        // Floating Number
+        const float = document.createElement('div');
+        float.className = 'tap-msg';
+        float.innerText = `+${gain.toFixed(1)}`;
+        float.style.left = e.clientX + "px";
+        float.style.top = e.clientY + "px";
+        document.body.appendChild(float);
+        setTimeout(() => float.remove(), 800);
 
-        tg.HapticFeedback.impactOccurred('medium');
+        // Random Chatter
+        if (state.tapCount % 20 === 0) {
+            let p = state.phrases[Math.floor(Math.random() * state.phrases.length)];
+            ENGINE.speak(p);
+        }
+
+        tg.HapticFeedback.impactOccurred('light');
         ENGINE.updateUI();
     }
 
     function evolve() {
-        let cost = 100 * Math.pow(2.5, state.lvl - 1);
+        let cost = 100 * Math.pow(2.2, state.lvl - 1);
         if (state.bal >= cost) {
             state.bal -= cost;
             state.lvl++;
-            ENGINE.speak("EVOLUTION COMPLETE. MORE POWER.");
+            ENGINE.speak(`LEVEL ${state.lvl} REACHED. ACCESS EXPANDED.`);
+            tg.HapticFeedback.notificationOccurred('success');
             ENGINE.updateUI();
         }
     }
 
-    function adminAction(act) {
+    function adminAction(type) {
         if (!state.isAdmin) return;
-        if (act === 'boost') state.bal += 100000;
-        if (act === 'reset') { state.bal = 0; state.lvl = 1; location.reload(); }
+        if (type === 'boost') state.bal += 100000;
+        if (type === 'reset') {
+            if(confirm("FULL SYSTEM WIPE?")) {
+                state.bal = 0; state.lvl = 1; location.reload();
+            }
+        }
         ENGINE.updateUI();
     }
 
-    // Auto-save & Load simulyatsiyasi (ixtiyoriy)
+    // Passive Income
     setInterval(() => {
-        state.bal += (state.lvl * 0.5); // Passive income
+        state.bal += (state.lvl * 0.2);
         ENGINE.updateUI();
     }, 1000);
 
