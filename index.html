@@ -3,72 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Clicker Pro</title>
+    <title>Leenova Clicker Tycoon</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { 
-            background: radial-gradient(circle, #1a1a1a, #000); 
-            color: #fff; text-align: center; font-family: sans-serif; 
-            margin: 0; height: 100vh; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; overflow: hidden; user-select: none;
+            background: #0a0a0a; color: #fff; text-align: center; font-family: 'Arial', sans-serif; 
+            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        .score-container { font-size: 60px; font-weight: bold; color: #ffcc00; margin: 0; }
-        .auto-rate { font-size: 18px; color: #00ff00; margin-bottom: 20px; font-weight: bold; }
+        .header { padding: 20px; background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid #333; }
+        .score { font-size: 50px; font-weight: bold; color: #ffcc00; margin: 10px 0; }
+        .stats-row { display: flex; justify-content: space-around; font-size: 14px; color: #00ff00; }
+        
+        .main-game { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .coin { 
-            width: 220px; height: 220px; background: radial-gradient(circle, #ffcc00, #ff9900); 
-            border-radius: 50%; box-shadow: 0 0 50px #ff9900; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 90px;
-            transition: transform 0.05s; -webkit-tap-highlight-color: transparent;
-            border: 8px solid #e6b800;
+            width: 200px; height: 200px; background: radial-gradient(circle, #ffcc00, #ff9900); 
+            border-radius: 50%; box-shadow: 0 0 40px rgba(255, 153, 0, 0.5); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 80px;
+            transition: transform 0.05s; border: 6px solid #e6b800; -webkit-tap-highlight-color: transparent;
         }
-        .coin:active { transform: scale(0.92); }
-        .tap-effect { position: absolute; color: #ffcc00; font-size: 26px; font-weight: bold; pointer-events: none; animation: fly 0.6s ease-out forwards; }
-        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
+        .coin:active { transform: scale(0.9); }
+        
+        .shop-container { padding: 20px; background: #1a1a1a; border-radius: 20px 20px 0 0; }
+        .upgrade-btn {
+            background: #ff9900; color: #000; border: none; padding: 15px 30px; 
+            border-radius: 12px; font-weight: bold; font-size: 16px; width: 100%;
+        }
+        .upgrade-btn:disabled { background: #555; color: #888; }
+        
+        .tap-anim { position: absolute; color: #ffcc00; font-weight: bold; pointer-events: none; animation: fly 0.6s linear; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
-    <div class="score-container" id="score">0</div>
-    <div class="auto-rate" id="rate">Daromad: +1/sek</div>
-    <div class="coin" id="tap">💰</div>
-    <p style="margin-top: 25px; color: #888;">Avtomatik yig'ilmoqda...</p>
+    <div class="header">
+        <div class="score" id="score">0</div>
+        <div class="stats-row">
+            <span id="tap-power">Tap: +1</span>
+            <span id="auto-rate">Avto: +1/sek</span>
+        </div>
+    </div>
+
+    <div class="main-game">
+        <div class="coin" id="tap">💰</div>
+    </div>
+
+    <div class="shop-container">
+        <button class="upgrade-btn" id="upgrade-btn">Upgrade Tap (Narxi: 100)</button>
+        <p style="font-size: 12px; color: #888; margin-top: 10px;">Keyingi daraja uchun pul yig'ing!</p>
+    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let score = parseFloat(localStorage.getItem('userScore')) || 0;
         tg.expand();
 
-        const scoreDisplay = document.getElementById('score');
-        
-        // Ochkoni ekranda yangilash funksiyasi
-        function updateDisplay() {
-            scoreDisplay.innerText = Math.floor(score);
+        // Ma'lumotlarni yuklash
+        let score = parseFloat(localStorage.getItem('score')) || 0;
+        let tapPower = parseInt(localStorage.getItem('tapPower')) || 1;
+        let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 100;
+
+        const scoreEl = document.getElementById('score');
+        const tapPowerEl = document.getElementById('tap-power');
+        const upgradeBtn = document.getElementById('upgrade-btn');
+
+        function updateUI() {
+            scoreEl.innerText = Math.floor(score);
+            tapPowerEl.innerText = `Tap: +${tapPower}`;
+            upgradeBtn.innerText = `Upgrade Tap (Narxi: ${upgradeCost})`;
+            upgradeBtn.disabled = score < upgradeCost;
         }
 
-        updateDisplay();
-
-        // AVTO-CLICKER: Har soniyada 1 ochko qo'shish
+        // Avto-daromad (+1 har soniyada)
         setInterval(() => {
             score += 1;
-            updateDisplay();
-            localStorage.setItem('userScore', score);
+            updateUI();
+            localStorage.setItem('score', score);
         }, 1000);
 
-        // TAP: Bosganda ochko qo'shish
+        // Tap funksiyasi
         document.getElementById('tap').onclick = (e) => {
-            score++;
-            updateDisplay();
-            localStorage.setItem('userScore', score);
-            tg.HapticFeedback.impactOccurred('medium');
+            score += tapPower;
+            updateUI();
+            localStorage.setItem('score', score);
+            tg.HapticFeedback.impactOccurred('light');
 
-            // +1 effekti
-            const effect = document.createElement('div');
-            effect.innerText = '+1';
-            effect.className = 'tap-effect';
-            effect.style.left = (e.clientX || window.innerWidth/2) + 'px';
-            effect.style.top = (e.clientY || window.innerHeight/2) + 'px';
-            document.body.appendChild(effect);
-            setTimeout(() => effect.remove(), 600);
+            // Animatsiya
+            const anim = document.createElement('div');
+            anim.className = 'tap-anim';
+            anim.innerText = `+${tapPower}`;
+            anim.style.left = e.clientX + 'px';
+            anim.style.top = e.clientY + 'px';
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 600);
         };
+
+        // Upgrade funksiyasi
+        upgradeBtn.onclick = () => {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                tapPower += 1;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                
+                localStorage.setItem('score', score);
+                localStorage.setItem('tapPower', tapPower);
+                localStorage.setItem('upgradeCost', upgradeCost);
+                
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        };
+
+        updateUI();
     </script>
 </body>
 </html>
