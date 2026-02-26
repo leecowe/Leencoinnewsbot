@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Professional Edition</title>
+    <title>Aira Protocol | Farm & Stake</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -13,197 +13,139 @@
             --bg: #050a10;
             --glass: rgba(0, 242, 255, 0.07);
             --border: rgba(0, 242, 255, 0.2);
-            --glow: 0 0 15px rgba(0, 242, 255, 0.4);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif;
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-            background-image: radial-gradient(circle at 50% 10%, #0a1a25 0%, #050a10 80%);
         }
 
-        /* ⚠️ TEST MODE BANNER */
         .test-banner {
-            background: linear-gradient(90deg, transparent, rgba(255, 0, 127, 0.2), transparent);
-            color: var(--pink); text-align: center; font-family: 'Orbitron';
-            font-size: 9px; padding: 10px; border-bottom: 1px solid rgba(255, 0, 127, 0.3);
-            letter-spacing: 1px; animation: pulse 2s infinite;
+            background: rgba(255, 0, 127, 0.2); color: var(--pink); text-align: center;
+            font-family: 'Orbitron'; font-size: 9px; padding: 10px; border-bottom: 1px solid var(--pink);
         }
-        @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
-        /* HEADER & STATS */
-        .header { padding: 30px 20px 10px; text-align: center; }
-        .bal-val { font-family: 'Orbitron'; font-size: 48px; font-weight: 900; text-shadow: var(--glow); margin: 0; }
-        .sub-stat { font-size: 12px; color: var(--primary); font-family: 'Orbitron'; opacity: 0.8; margin-top: 5px; }
+        .header { padding: 20px; text-align: center; }
+        .bal-val { font-family: 'Orbitron'; font-size: 40px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
 
-        /* VIEWS CONTROL */
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; }
-        .view-content.active { display: flex; flex-direction: column; align-items: center; }
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; align-items: center; flex-direction: column; }
+        .view-content.active { display: flex; }
 
-        /* HACK GRID */
-        .grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            width: 100%; max-width: 300px; padding: 15px;
-            background: var(--glass); border: 1px solid var(--border); border-radius: 24px;
-            backdrop-filter: blur(10px);
-        }
-        .node {
-            aspect-ratio: 1; background: rgba(255, 255, 255, 0.03); border: 1.5px solid var(--border);
-            border-radius: 15px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .node.active { background: var(--primary); border-color: #fff; box-shadow: 0 0 25px var(--primary); }
-
-        /* STAKING CARD */
-        .card {
+        /* MINING FARM STYLE */
+        .farm-card {
             width: 100%; background: var(--glass); border: 1px solid var(--border);
-            border-radius: 20px; padding: 20px; margin-bottom: 15px; text-align: center;
-            backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 15px; margin-bottom: 10px; display: flex;
+            justify-content: space-between; align-items: center;
         }
+
         .btn-action {
-            background: var(--primary); color: #000; border: none; padding: 14px 30px;
-            border-radius: 12px; font-family: 'Orbitron'; font-weight: 900;
-            width: 100%; margin-top: 15px; box-shadow: var(--glow); cursor: pointer;
+            background: var(--primary); color: #000; border: none; padding: 12px;
+            border-radius: 10px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
         }
 
-        /* NAVIGATION */
-        .nav { height: 85px; background: rgba(0,0,0,0.9); display: flex; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: linear-gradient(0deg, rgba(0,242,255,0.05), transparent); }
-
-        /* MODALS */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center;
-        }
-        .modal-body {
-            background: #0a1a25; border: 2px solid var(--primary); border-radius: 25px;
-            padding: 30px; width: 85%; max-width: 320px; text-align: center;
-        }
+        .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #555; font-size: 10px; font-family: 'Orbitron'; }
+        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="test-banner">
-        ⚠️ TEST REJIMI: Ma'lumotlar saqlanib qolmaydi!
-    </div>
+    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANMAYDI!</div>
 
     <header class="header">
-        <div class="bal-val" id="main-score">0</div>
-        <div class="sub-stat" id="staked-info">STAKED: 0.00</div>
+        <div class="bal-val" id="total-balance">0</div>
+        <div style="font-size: 12px; color: var(--primary); font-family: 'Orbitron';">AUTO MINING: <span id="aps">0.0</span>/s</div>
     </header>
 
     <div id="view-hack" class="view-content active">
-        <div class="grid" id="game-board"></div>
-        <div id="status-msg" style="margin-top:25px; font-family:'Orbitron'; color:var(--primary); font-size:12px; letter-spacing:2px;">TIZIMNI TANLANG...</div>
+        <div id="status-msg" style="margin-bottom:20px; font-family:'Orbitron'; color:var(--primary);">MININGNI BOSHLANG</div>
+        <button class="btn-action" onclick="claimMining()" id="mining-btn">MININGNI YIG'ISH (0)</button>
     </div>
 
     <div id="view-stake" class="view-content">
-        <div class="card">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">STAKING HUB</h2>
-            <p style="font-size:14px; opacity:0.7;">Har 24 soatda +10% daromad oling</p>
-            <div style="font-size:32px; font-family:'Orbitron'; margin:15px 0;" id="st-display">0</div>
-            <button class="btn-action" onclick="processStaking()">STAKE ALL ASSETS</button>
-        </div>
-        <div class="card" style="border-color: var(--pink);">
-            <h3 style="font-family:'Orbitron'; color:var(--pink); font-size:14px;">ROADMAP V4.0 (COMING SOON)</h3>
-            <p style="font-size:12px; opacity:0.6;">PvP Janglar • NFT Bozor • AI Shaxsiy Bot</p>
+        <div class="farm-card" style="flex-direction: column; gap: 10px;">
+            <h3 style="margin:0; font-family:'Orbitron'; color:var(--primary);">1 DAQIQA STAKING</h3>
+            <p style="font-size:12px; margin:0;">Tikilgan summa 1 daqiqadan so'ng +10% bo'ladi.</p>
+            <div id="stake-timer" style="color: var(--pink); font-family: 'Orbitron';">TAYYOR</div>
+            <button class="btn-action" onclick="startOneMinStake()">STAKE ALL</button>
         </div>
     </div>
 
-    <div class="modal" id="win-modal">
-        <div class="modal-body">
-            <h2 style="font-family:'Orbitron'; color:var(--primary);">HACK SUCCESS!</h2>
-            <p>Qaysi mukofotni tanlaysiz?</p>
-            <button class="btn-action" onclick="claimReward(500)">+500 DATA COINS</button>
-            <button class="btn-action" style="background:var(--pink)" onclick="claimReward(1000)">+1000 (TEST REKLAMA)</button>
+    <div id="view-farm" class="view-content">
+        <div class="farm-card">
+            <div>
+                <b style="color:var(--primary)">GPU UNIT V1</b><br>
+                <small>+0.5/s mining</small>
+            </div>
+            <button onclick="buyFarm(1000, 0.5)" style="background:var(--pink); color:#fff; border:none; padding:8px; border-radius:5px;">1000 COINS</button>
         </div>
     </div>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="switchTab('hack', this)">HACK</div>
+        <div class="nav-item active" onclick="switchTab('hack', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('stake', this)">STAKING</div>
-        <div class="nav-item" onclick="showRoadmap()">INFO</div>
+        <div class="nav-item" onclick="switchTab('farm', this)">FARM</div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    let balance = 0;
+    let farmAPS = 0; // Auto per second
+    let currentMining = 0;
+    let isStaking = false;
 
-    let score = 0;
-    let staked = 0;
-    let sequence = [];
-    let userStep = 0;
-    let isPlaying = false;
+    // 1. MINING FERMA TIZIMI
+    setInterval(() => {
+        currentMining += farmAPS / 10;
+        document.getElementById('mining-btn').innerText = `MININGNI YIG'ISH (${currentMining.toFixed(1)})`;
+        document.getElementById('aps').innerText = farmAPS.toFixed(1);
+    }, 100);
 
-    function initBoard() {
-        const board = document.getElementById('game-board');
-        board.innerHTML = '';
-        for(let i=0; i<9; i++) {
-            let n = document.createElement('div');
-            n.className = 'node';
-            n.onclick = () => handleInput(i, n);
-            board.appendChild(n);
-        }
-        setTimeout(startSequence, 1000);
+    function claimMining() {
+        balance += currentMining;
+        currentMining = 0;
+        updateUI();
+        tg.HapticFeedback.impactOccurred('light');
     }
 
-    function startSequence() {
-        isPlaying = false;
-        sequence = [Math.floor(Math.random()*9), Math.floor(Math.random()*9)];
-        userStep = 0;
-        document.getElementById('status-msg').innerText = "ESLAB QOLING...";
-        
-        let i = 0;
-        const interval = setInterval(() => {
-            const nodes = document.querySelectorAll('.node');
-            nodes[sequence[i]].classList.add('active');
-            setTimeout(() => nodes[sequence[i-1] || sequence[i]].classList.remove('active'), 800);
-            i++;
-            if(i >= sequence.length) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    document.getElementById('status-msg').innerText = "QAYTARING!";
-                    isPlaying = true;
-                }, 1000);
-            }
-        }, 1500);
-    }
-
-    function handleInput(id, el) {
-        if(!isPlaying) return;
-        if(id === sequence[userStep]) {
-            el.classList.add('active');
-            setTimeout(() => el.classList.remove('active'), 300);
-            userStep++;
-            if(userStep === sequence.length) {
-                isPlaying = false;
-                tg.HapticFeedback.notificationOccurred('success');
-                document.getElementById('win-modal').style.display = 'flex';
-            }
+    function buyFarm(cost, power) {
+        if(balance >= cost) {
+            balance -= cost;
+            farmAPS += power;
+            updateUI();
+            tg.showAlert("Ferma darajasi oshirildi!");
         } else {
-            tg.HapticFeedback.notificationOccurred('error');
-            document.getElementById('status-msg').innerText = "XATO! QAYTADAN...";
-            startSequence();
+            tg.showAlert("Mablag' yetarli emas!");
         }
     }
 
-    function claimReward(val) {
-        score += val;
-        document.getElementById('main-score').innerText = score;
-        document.getElementById('win-modal').style.display = 'none';
-        startSequence();
+    // 2. 1 DAQIQA STAKING TIZIMI
+    function startOneMinStake() {
+        if(isStaking || balance <= 0) return;
+        
+        let amount = balance;
+        balance = 0;
+        isStaking = true;
+        updateUI();
+
+        let seconds = 60;
+        const timer = setInterval(() => {
+            seconds--;
+            document.getElementById('stake-timer').innerText = seconds + "s";
+            if(seconds <= 0) {
+                clearInterval(timer);
+                balance += amount * 1.1; // +10% foyda
+                isStaking = false;
+                document.getElementById('stake-timer').innerText = "TAYYOR";
+                updateUI();
+                tg.showPopup({title: "Staking tugadi", message: "Foyda yig'ildi!"});
+            }
+        }, 1000);
     }
 
-    function processStaking() {
-        if(score > 0) {
-            staked += score;
-            score = 0;
-            document.getElementById('main-score').innerText = score;
-            document.getElementById('staked-info').innerText = "STAKED: " + staked;
-            document.getElementById('st-display').innerText = staked;
-            tg.showPopup({ message: "Barcha mablag'lar stakingga yo'naltirildi!" });
-        }
+    function updateUI() {
+        document.getElementById('total-balance').innerText = Math.floor(balance);
     }
 
     function switchTab(tab, el) {
@@ -213,11 +155,7 @@
         el.classList.add('active');
     }
 
-    function showRoadmap() {
-        tg.showAlert("V4.0 Yangilanishi: PvP Rejim, Klanlar urushi va NFT savdolari tez kunda!");
-    }
-
-    initBoard();
+    updateUI();
 </script>
 </body>
 </html>
