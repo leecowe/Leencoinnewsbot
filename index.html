@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova | Frieren Journey</title>
+    <title>Frieren | Sky Magic Journey</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --frieren-gold: #e5c17d;
-            --mana-cyan: #9de7ff;
-            --magic-purple: #a682ac;
-            --bg-dark: #07090c;
+            --sky-blue: #00d2ff;
+            --azure: #0072ff;
+            --mana-glow: rgba(0, 210, 255, 0.4);
+            --bg-dark: #050a12;
+            --card-glass: rgba(255, 255, 255, 0.05);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -27,118 +28,132 @@
             flex-direction: column;
         }
 
-        /* Sehrli Fon */
+        /* Sehrli Osmon Fon */
         .magic-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #111822 0%, #07090c 100%);
+            background: radial-gradient(circle at 50% 10%, #0a192f 0%, #050a12 100%);
             z-index: -1;
         }
 
-        /* Aylana Sehrli Doira */
-        .magic-circle {
+        .aura-ring {
             position: absolute;
             top: 45%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 320px; height: 320px;
-            border: 1px solid rgba(157, 231, 255, 0.1);
+            width: 300px; height: 300px;
+            background: var(--mana-glow);
+            filter: blur(80px);
             border-radius: 50%;
-            animation: rotateCircle 60s linear infinite;
+            animation: pulseAura 4s ease-in-out infinite;
+            z-index: 1;
         }
 
-        @keyframes rotateCircle { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes pulseAura {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
+        }
 
-        /* Yuqori panel */
-        .header { padding: 50px 20px 10px; display: flex; justify-content: space-between; position: relative; z-index: 100; }
+        .header { padding: 45px 20px 10px; display: flex; justify-content: space-between; position: relative; z-index: 100; }
         .badge { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid var(--frieren-gold); 
-            border-radius: 12px; 
-            padding: 5px 12px; 
+            background: var(--card-glass); 
+            border: 1px solid var(--sky-blue); 
+            border-radius: 15px; 
+            padding: 6px 14px; 
             font-family: 'Cinzel'; 
-            font-size: 10px; 
-            color: var(--frieren-gold);
-            text-transform: uppercase;
+            font-size: 11px; 
+            color: var(--sky-blue);
+            backdrop-filter: blur(5px);
         }
 
-        /* O'yin maydoni */
-        .game-area { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .game-area { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 5; }
 
         .balance-txt { 
             font-family: 'Cinzel'; 
-            font-size: 48px; 
+            font-size: 52px; 
             font-weight: 700; 
-            text-shadow: 0 0 20px var(--mana-cyan); 
-            margin-bottom: 20px; 
+            color: #fff;
+            text-shadow: 0 0 25px var(--sky-blue);
+            margin-bottom: 10px;
         }
 
-        .frieren-box { position: relative; cursor: pointer; transition: transform 0.1s; }
-        .frieren-box:active { transform: scale(0.95); }
-
+        .frieren-box { position: relative; cursor: pointer; transition: transform 0.1s; z-index: 10; touch-action: none; }
         .frieren-avatar {
-            width: 250px; height: 250px;
+            width: 260px; height: 260px;
             object-fit: contain;
-            filter: drop-shadow(0 0 30px rgba(157, 231, 255, 0.4));
-            z-index: 10;
+            filter: drop-shadow(0 0 20px var(--sky-blue));
+            pointer-events: none;
         }
 
-        /* Mana Progress */
-        .hud { width: 85%; margin-top: 30px; }
-        .hud-label { display: flex; justify-content: space-between; font-family: 'Cinzel'; font-size: 10px; color: var(--mana-cyan); margin-bottom: 8px; }
-        .bar-outer { height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-        .bar-inner { height: 100%; background: linear-gradient(90deg, #5ecfff, #a682ac); box-shadow: 0 0 10px #5ecfff; transition: width 0.3s; }
+        .hud { width: 80%; margin-top: 25px; }
+        .hud-label { display: flex; justify-content: space-between; font-family: 'Cinzel'; font-size: 10px; color: var(--sky-blue); margin-bottom: 6px; letter-spacing: 1px;}
+        .bar-outer { height: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(0,210,255,0.2); overflow: hidden; }
+        .bar-inner { height: 100%; background: linear-gradient(90deg, var(--azure), var(--sky-blue)); box-shadow: 0 0 15px var(--sky-blue); transition: width 0.1s linear; }
 
-        /* Effektlar */
-        .magic-particle {
-            position: fixed; pointer-events: none;
-            font-family: 'Cinzel'; font-weight: 700;
-            color: var(--mana-cyan); text-shadow: 0 0 10px var(--mana-cyan);
-            animation: magicRise 0.8s ease-out forwards;
+        .shop-panel {
+            position: absolute;
+            bottom: -100%;
+            left: 0; width: 100%;
+            background: rgba(10, 25, 47, 0.98);
+            backdrop-filter: blur(25px);
+            border-top: 2px solid var(--sky-blue);
+            border-radius: 30px 30px 0 0;
+            padding: 25px 25px 120px;
+            transition: bottom 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             z-index: 1000;
         }
+        .shop-panel.active { bottom: 0; }
 
-        @keyframes magicRise {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.6); opacity: 0; }
-        }
-
-        /* Pastki Menyu */
-        .nav {
-            background: rgba(10, 14, 20, 0.98);
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            padding: 15px 10px 35px;
-            border-top: 1px solid rgba(229, 193, 125, 0.2);
-        }
-
-        .nav-btn { display: flex; flex-direction: column; align-items: center; opacity: 0.4; transition: 0.3s; color: #fff; background: none; border: none; cursor: pointer; }
-        .nav-btn.active { opacity: 1; color: var(--mana-cyan); }
-        .nav-btn span { font-size: 9px; font-family: 'Cinzel'; margin-top: 5px; }
-
-        /* Do'kon oynasi */
-        .screen { display: none; position: fixed; inset: 0; background: #07090c; z-index: 500; padding: 60px 20px; }
-        .screen.active { display: block; }
         .upgrade-card { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--frieren-gold); 
-            padding: 15px; border-radius: 15px; margin-bottom: 10px;
+            background: var(--card-glass); border: 1px solid rgba(0,210,255,0.2); 
+            padding: 20px; border-radius: 20px;
             display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
         }
+        .up-btn {
+            background: var(--sky-blue); color: #000; border: none; 
+            padding: 10px 20px; border-radius: 12px; font-weight: 800; font-family: 'Quicksand';
+            box-shadow: 0 4px 10px rgba(0, 210, 255, 0.3);
+        }
+        .up-btn:active { transform: scale(0.95); }
+        .up-btn:disabled { background: #333; color: #666; box-shadow: none; }
+
+        .nav {
+            background: rgba(5, 10, 18, 0.95);
+            display: flex; justify-content: space-around;
+            padding: 15px 10px 35px;
+            border-top: 1px solid rgba(0,210,255,0.1);
+            position: fixed; bottom: 0; width: 100%; z-index: 1100;
+        }
+
+        .nav-btn { display: flex; flex-direction: column; align-items: center; opacity: 0.4; transition: 0.3s; color: #fff; background: none; border: none; flex: 1; }
+        .nav-btn.active { opacity: 1; color: var(--sky-blue); }
+        .nav-btn span { font-size: 10px; font-family: 'Cinzel'; margin-top: 4px; }
+
+        .particle {
+            position: fixed; pointer-events: none;
+            font-family: 'Cinzel'; font-weight: 700; color: var(--sky-blue);
+            text-shadow: 0 0 10px var(--sky-blue);
+            animation: rise 0.8s ease-out forwards;
+            z-index: 2000;
+        }
+        @keyframes rise { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.6); } }
     </style>
 </head>
 <body>
 
     <div class="magic-bg"></div>
-    <div class="magic-circle"></div>
+    <div class="aura-ring"></div>
 
     <div class="header">
-        <div class="badge" id="lvl-txt">LVL 1 MAGE</div>
-        <div class="badge" id="rank-txt" style="border-color: #a682ac; color: #a682ac;">Apprentice</div>
+        <div class="badge" id="lvl-txt">MAGE LVL 1</div>
+        <div class="badge" id="rank-txt" style="color: #fff;">APPRENTICE</div>
     </div>
 
-    <div class="game-area" id="main-area">
+    <div class="game-area">
         <div class="balance-txt" id="bal-ui">0.0</div>
         
         <div class="frieren-box" id="tap-target">
-            <img src="https://files.catbox.moe/0v9j6z.png" class="frieren-avatar" id="frieren-img">
+            <img src="https://i.ibb.co/YBJm8YV/frieren-standing.png" class="frieren-avatar" id="frieren-img">
         </div>
 
         <div class="hud">
@@ -152,32 +167,35 @@
         </div>
     </div>
 
-    <div id="shop-screen" class="screen">
-        <h2 style="font-family: 'Cinzel'; color: var(--frieren-gold); margin-bottom: 20px;">Magic Grimoires</h2>
+    <div id="shop-panel" class="shop-panel">
+        <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: -10px auto 20px;"></div>
+        <h2 style="font-family: 'Cinzel'; color: var(--sky-blue); margin-top: 0;">Sky Upgrades</h2>
         
         <div class="upgrade-card">
             <div>
-                <div style="font-weight: bold; font-family: 'Cinzel';">Zoltraak Power</div>
-                <div style="font-size: 11px; color: #aaa;">Har bir tap uchun +1 kuch</div>
+                <div style="font-weight: bold; font-family: 'Cinzel'; font-size: 16px;">Zoltraak Flux</div>
+                <div style="font-size: 12px; color: #8a99ae;">Power per cast: +<span id="power-val">1.0</span></div>
             </div>
-            <button onclick="buyUpgrade()" style="background: var(--frieren-gold); border:none; padding: 8px 15px; border-radius: 8px; font-weight: bold;" id="upgrade-btn">100</button>
+            <button class="up-btn" onclick="buyUpgrade()" id="up-btn">100</button>
         </div>
 
-        <button onclick="toggleShop(false)" style="margin-top: 30px; width: 100%; padding: 15px; background: none; border: 1px solid var(--frieren-gold); color: #fff; font-family: 'Cinzel'; border-radius: 10px;">Back to Journey</button>
+        <div class="upgrade-card">
+            <div>
+                <div style="font-weight: bold; font-family: 'Cinzel'; font-size: 16px;">Mana Well</div>
+                <div style="font-size: 12px; color: #8a99ae;">Max Mana: +200</div>
+            </div>
+            <button class="up-btn" onclick="buyManaUpgrade()" id="mana-up-btn">250</button>
+        </div>
     </div>
 
     <nav class="nav">
-        <button class="nav-btn active" id="btn-cast" onclick="toggleShop(false)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+        <button class="nav-btn active" id="nav-cast" onclick="toggleShop(false)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
             <span>CAST</span>
         </button>
-        <button class="nav-btn" id="btn-shop" onclick="toggleShop(true)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-            <span>SHOP</span>
-        </button>
-        <button class="nav-btn" onclick="tg.close()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
-            <span>EXIT</span>
+        <button class="nav-btn" id="nav-shop" onclick="toggleShop(true)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 12c-2.7 0-5.8-1.28-6-3 1.1-1.22 2.6-2 4.3-2 1.7 0 3.2.78 4.3 2-.2 1.72-3.3 3-6 3z"/></svg>
+            <span>UPGRADES</span>
         </button>
     </nav>
 
@@ -185,32 +203,46 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // O'yin ma'lumotlari
-        let state = {
+        // Ma'lumotlarni yuklash
+        let state = JSON.parse(localStorage.getItem('frieren_state')) || {
             bal: 0,
             mana: 1000,
             maxMana: 1000,
             power: 1,
             lvl: 1,
-            upgradeCost: 100
+            upCost: 100,
+            manaUpCost: 250
         };
 
-        // UI-ni yangilash funksiyasi
-        function updateUI() {
-            document.getElementById('bal-ui').innerText = state.bal.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
-            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / ${state.maxMana}`;
-            document.getElementById('mana-bar').style.width = (state.mana / state.maxMana * 100) + "%";
-            document.getElementById('lvl-txt').innerText = `Mage LVL ${state.lvl}`;
-            document.getElementById('upgrade-btn').innerText = Math.round(state.upgradeCost);
-            
-            const rankTxt = document.getElementById('rank-txt');
-            if (state.lvl < 5) rankTxt.innerText = "Apprentice";
-            else if (state.lvl < 15) rankTxt.innerText = "Mage";
-            else rankTxt.innerText = "Great Sage";
+        function saveGame() {
+            localStorage.setItem('frieren_state', JSON.stringify(state));
         }
 
-        // Tap qilish
+        function updateUI() {
+            document.getElementById('bal-ui').innerText = Math.floor(state.bal).toLocaleString();
+            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / ${state.maxMana}`;
+            document.getElementById('mana-bar').style.width = (state.mana / state.maxMana * 100) + "%";
+            document.getElementById('lvl-txt').innerText = `MAGE LVL ${state.lvl}`;
+            document.getElementById('power-val').innerText = state.power.toFixed(1);
+            
+            const upBtn = document.getElementById('up-btn');
+            upBtn.innerText = Math.round(state.upCost);
+            upBtn.disabled = state.bal < state.upCost;
+
+            const mUpBtn = document.getElementById('mana-up-btn');
+            mUpBtn.innerText = Math.round(state.manaUpCost);
+            mUpBtn.disabled = state.bal < state.manaUpCost;
+
+            const rankTxt = document.getElementById('rank-txt');
+            if (state.lvl < 10) rankTxt.innerText = "APPRENTICE";
+            else if (state.lvl < 30) rankTxt.innerText = "MAGE";
+            else if (state.lvl < 60) rankTxt.innerText = "HIGH MAGE";
+            else rankTxt.innerText = "SKY SAGE";
+        }
+
         const target = document.getElementById('tap-target');
+        const frierenImg = document.getElementById('frieren-img');
+
         target.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touches = e.changedTouches;
@@ -219,56 +251,83 @@
                 if (state.mana >= 1) {
                     state.mana -= 1;
                     state.bal += state.power;
-                    
                     createParticle(touches[i].clientX, touches[i].clientY);
-                    tg.HapticFeedback.impactOccurred('medium');
+                    
+                    // Visual feedback
+                    frierenImg.style.transform = "scale(0.95)";
+                    setTimeout(() => frierenImg.style.transform = "scale(1)", 50);
+                    
+                    tg.HapticFeedback.impactOccurred('light');
                 } else {
                     tg.HapticFeedback.notificationOccurred('warning');
                 }
             }
             updateUI();
+            saveGame();
         });
 
         function createParticle(x, y) {
             const p = document.createElement('div');
-            p.className = 'magic-particle';
+            p.className = 'particle';
             p.innerText = "✧ +" + state.power.toFixed(1);
-            p.style.left = x + 'px';
-            p.style.top = y + 'px';
+            p.style.left = (x - 20) + 'px';
+            p.style.top = (y - 20) + 'px';
             document.body.appendChild(p);
             setTimeout(() => p.remove(), 800);
         }
 
-        // Do'kon mantiqi
         function toggleShop(show) {
-            document.getElementById('shop-screen').classList.toggle('active', show);
-            document.getElementById('btn-shop').classList.toggle('active', show);
-            document.getElementById('btn-cast').classList.toggle('active', !show);
+            const panel = document.getElementById('shop-panel');
+            const navShop = document.getElementById('nav-shop');
+            const navCast = document.getElementById('nav-cast');
+            
+            if (show) {
+                panel.classList.add('active');
+                navShop.classList.add('active');
+                navCast.classList.remove('active');
+            } else {
+                panel.classList.remove('active');
+                navShop.classList.remove('active');
+                navCast.classList.add('active');
+            }
             tg.HapticFeedback.selectionChanged();
         }
 
         function buyUpgrade() {
-            if (state.bal >= state.upgradeCost) {
-                state.bal -= state.upgradeCost;
+            if (state.bal >= state.upCost) {
+                state.bal -= state.upCost;
                 state.power += 0.5;
                 state.lvl += 1;
-                state.upgradeCost *= 1.6;
+                state.upCost = Math.round(state.upCost * 1.6);
                 tg.HapticFeedback.notificationOccurred('success');
                 updateUI();
-            } else {
-                tg.HapticFeedback.notificationOccurred('error');
+                saveGame();
             }
         }
 
-        // Mana tiklanishi
+        function buyManaUpgrade() {
+            if (state.bal >= state.manaUpCost) {
+                state.bal -= state.manaUpCost;
+                state.maxMana += 200;
+                state.mana = state.maxMana;
+                state.manaUpCost = Math.round(state.manaUpCost * 1.8);
+                tg.HapticFeedback.notificationOccurred('success');
+                updateUI();
+                saveGame();
+            }
+        }
+
+        // Mana Regeneratsiyasi (Har soniyada 0.5% tiklanadi)
         setInterval(() => {
             if (state.mana < state.maxMana) {
-                state.mana = Math.min(state.maxMana, state.mana + 2);
+                state.mana = Math.min(state.maxMana, state.mana + (state.maxMana * 0.005));
                 updateUI();
             }
         }, 1000);
 
-        // Boshlash
+        // Avtomatik saqlash
+        setInterval(saveGame, 5000);
+
         updateUI();
     </script>
 </body>
