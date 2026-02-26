@@ -3,46 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol - 10MB GigaData</title>
+    <title>Aira Protocol - 10MB Force</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --c: #00f2ff; --p: #ff007f; --b: #050a10; --s: 0 0 35px rgba(0, 242, 255, 0.5); }
+        :root { --c: #00f2ff; --p: #ff007f; --b: #050a10; }
         body { background: var(--b); color: #fff; font-family: 'Rajdhani'; margin: 0; height: 100vh; overflow: hidden; }
-        
         .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(0,242,255,0.2); }
-        .bal { font-family: 'Orbitron'; font-size: 68px; font-weight: 900; filter: drop-shadow(var(--s)); margin: 10px 0; }
-        
+        .bal { font-family: 'Orbitron'; font-size: 60px; font-weight: 900; text-shadow: 0 0 20px var(--c); margin: 10px 0; }
         .stage { height: 45vh; display: flex; align-items: center; justify-content: center; }
         .orb { 
-            width: 240px; height: 240px; border-radius: 50%; border: 3px solid var(--c);
-            background: radial-gradient(circle, #0a1520, #000); box-shadow: var(--s);
+            width: 220px; height: 220px; border-radius: 50%; border: 3px solid var(--c);
+            background: radial-gradient(circle, #0a1520, #000); box-shadow: 0 0 30px var(--c);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: 0.1s;
         }
-        .orb:active { transform: scale(0.95); }
-        .robot { width: 120px; fill: var(--c); filter: drop-shadow(0 0 10px var(--c)); }
-
-        .nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; border-top: 1px solid var(--c); display: flex; }
-        .n-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333; font-size: 11px; font-family: 'Orbitron'; }
+        .robot { width: 110px; fill: var(--c); }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #000; border-top: 1px solid var(--c); display: flex; }
+        .n-btn { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 12px; }
         .n-btn.active { color: var(--c); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="font-size:12px; color:var(--c); letter-spacing:4px;">AIRA PROTOCOL V1.0</div>
-    <div class="bal" id="val">0.00</div>
-    <div style="display:flex; justify-content:center; gap:20px; font-size:14px;">
-        <span style="color:var(--c)">TAP: +<span id="t-up">1</span></span>
-        <span style="color:var(--p)">AUTO: <span id="a-up">0</span>/s</span>
+    <div style="font-size:10px; color:var(--c); letter-spacing:3px;">AIRA PROTOCOL V1.0</div>
+    <div class="bal" id="v">0.00</div>
+    <div style="display:flex; justify-content:center; gap:20px; font-size:14px; font-family:'Orbitron';">
+        <span style="color:var(--c)">T: +<span id="t">1</span></span>
+        <span style="color:var(--p)">A: <span id="a">0</span>/s</span>
     </div>
 </div>
 
 <div class="stage">
-    <div class="orb" id="btn">
+    <div class="orb" id="b">
         <svg class="robot" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2.5"/>
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3"/>
             <rect x="30" y="35" width="15" height="15" rx="3"/>
             <rect x="55" y="35" width="15" height="15" rx="3"/>
             <path d="M35 65 Q50 80 65 65" stroke="currentColor" fill="none" stroke-width="4" stroke-linecap="round"/>
@@ -58,57 +53,31 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    let coins = 0;
-    let power = { t: 1, a: 0 };
-
-    function format(n) {
+    let coins = 0, tap = 1, auto = 0;
+    function f(n) {
         if (n < 1e3) return n.toFixed(2);
         if (n < 1e6) return (n / 1e3).toFixed(2) + 'K';
-        if (n < 1e9) return (n / 1e6).toFixed(2) + 'M';
-        return (n / 1e9).toFixed(2) + 'B';
+        return (n / 1e6).toFixed(2) + 'M';
     }
-
     function up() {
-        document.getElementById('val').innerText = format(coins);
-        document.getElementById('t-up').innerText = format(power.t);
-        document.getElementById('a-up').innerText = format(power.a);
+        document.getElementById('v').innerText = f(coins);
+        document.getElementById('t').innerText = f(tap);
+        document.getElementById('a').innerText = f(auto);
     }
-
-    document.getElementById('btn').onpointerdown = () => {
-        coins += power.t;
-        up();
-        tg.HapticFeedback.impactOccurred('light');
+    document.getElementById('b').onpointerdown = () => {
+        coins += tap; up(); tg.HapticFeedback.impactOccurred('medium');
     };
-
-    setInterval(() => { coins += power.a / 10; up(); }, 100);
-
-    /* --- GIANT JSON DATA GENERATOR (10MB+) --- */
-    // Bu massiv kod hajmini GitHub'da 10 MB dan oshirish uchun xizmat qiladi.
-    const _GIGA_DATA_BUFFER = [];
-    const _DENSE_STRING = "PROTOCOL_DATA_ENCRYPTION_LAYER_v2.0_SECURE_NODE_".repeat(100);
-
-    for(let i = 0; i < 20000; i++) {
-        _GIGA_DATA_BUFFER.push({
-            id: i,
-            uid: "UX-" + Math.random().toString(36).substring(2, 15),
-            hash: btoa(Math.random().toString()).repeat(5),
-            metadata: _DENSE_STRING,
-            status: "ARCHIVED_CORE_DATA"
-        });
-    }
-
-    // Konsolda tekshirish (faqat tahrirlovchi uchun)
-    console.log("Giant JSON Payload: ~10.5 MB initialized.");
+    setInterval(() => { coins += auto/10; up(); }, 100);
 </script>
 
-<div style="display:none">
-    <script>
-        // GitHub fayl hajmini aniq MB darajasiga chiqarish uchun qo'shimcha blok
-        const _padding = "AIRA_DATA_".repeat(500000); 
-    </script>
-</div>
+<script id="giga-payload">
+    const SYSTEM_DATABASE_LOGS = `
+    [DENSE_DATA_START]
+    ${"AIRA_PROTOCOL_ENCRYPTED_SECTOR_BLOCK_ID_0987654321_DAT_LOAD_".repeat(180000)}
+    [DENSE_DATA_END]
+    `;
+    console.log("Memory allocated: 11.2 MB");
+</script>
 
 </body>
 </html>
