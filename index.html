@@ -10,285 +10,234 @@
         :root {
             --bg-color: #000000;
             --panel-color: #1c1f24;
+            --accent-yellow: #f5bb5f;
             --text-main: #ffffff;
             --text-sub: #85827d;
-            --accent-yellow: #f5bb5f;
-            --energy-color: #fffb12;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
-        
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            font-family: 'Roboto', sans-serif; 
-            height: 100vh; 
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        body { background: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* Top Bar */
-        .header {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(to bottom, #24282f, transparent);
-        }
-        .user-avatar {
-            width: 40px; height: 40px;
-            background: var(--accent-yellow);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #000;
-        }
-        .user-info { flex-grow: 1; }
-        .user-name { font-size: 14px; font-weight: 700; }
-        .rank-info { font-size: 12px; color: var(--accent-yellow); display: flex; align-items: center; gap: 5px; }
+        /* HEADER */
+        .header { padding: 15px; display: flex; align-items: center; gap: 10px; background: #1c1f24; border-bottom: 1px solid #32363c; }
+        .avatar-box { width: 45px; height: 45px; background: #f5bb5f; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; }
+        .user-meta { flex-grow: 1; }
+        .user-meta h4 { font-size: 14px; }
+        .rank-text { font-size: 12px; color: var(--accent-yellow); }
 
-        /* Stats Cards */
-        .stats-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            padding: 0 15px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: var(--panel-color);
-            padding: 8px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #32363c;
-        }
-        .stat-label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
-        .stat-value { font-size: 11px; font-weight: 700; color: #4ade80; }
+        /* TOP STATS */
+        .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 15px; }
+        .stat-item { background: var(--panel-color); padding: 8px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+        .stat-label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; }
+        .stat-value { font-size: 11px; font-weight: 700; display: block; }
 
-        /* Main Balance */
-        .main-balance {
-            text-align: center;
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .coin-icon { width: 45px; height: 45px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 20px rgba(245, 187, 95, 0.4); }
-        .balance-amount { font-size: 42px; font-weight: 900; }
+        /* VIEW PORT (Bo'limlar almashadigan joy) */
+        .view-port { flex-grow: 1; overflow-y: auto; padding-bottom: 80px; }
+        .section { display: none; padding: 20px; }
+        .section.active { display: block; }
 
-        /* Clicker Area */
-        .clicker-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .circle-outer {
-            width: 280px; height: 280px;
-            background: radial-gradient(circle, #32363c 0%, #111111 100%);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-        }
-        .avatar-main {
-            width: 240px; height: 240px;
-            background: url('https://api.dicebear.com/7.x/bottts/svg?seed=Hamster') center/cover;
-            border-radius: 50%;
-            transition: transform 0.1s;
-        }
-        .avatar-main:active { transform: scale(0.95); }
+        /* EXCHANGE SECTION */
+        .balance-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 30px 0; font-size: 48px; font-weight: 900; }
+        .coin-img { width: 50px; height: 50px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 20px rgba(245,187,95,0.4); }
+        .clicker-box { display: flex; justify-content: center; margin-top: 20px; }
+        .main-button { width: 280px; height: 280px; background: radial-gradient(circle, #32363c, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 8px solid #1c1f24; transition: transform 0.1s; }
+        .main-button:active { transform: scale(0.95); }
+        .robot-img { width: 200px; height: 200px; background: #5a6b75; clip-path: circle(); position: relative; }
 
-        /* Progress Bottom */
-        .bottom-hud { padding: 20px; }
-        .energy-bar-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
-        .energy-bar-bg { height: 12px; background: #32363c; border-radius: 10px; overflow: hidden; }
-        .energy-bar-fill { height: 100%; background: linear-gradient(90deg, #fffb12, #f5bb5f); width: 100%; transition: width 0.2s; }
+        /* MINE/CARDS SECTION */
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background: var(--panel-color); padding: 15px; border-radius: 16px; border: 1px solid #333; }
+        .card-name { font-size: 14px; margin-bottom: 5px; }
+        .card-profit { color: #4ade80; font-size: 12px; margin-bottom: 10px; }
+        .buy-btn { width: 100%; background: #32363c; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; }
+        .buy-btn.active { background: var(--accent-yellow); color: black; }
 
-        /* Navbar */
-        .navbar {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            background: #272a30;
-            padding: 10px 5px;
-            padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
-        }
-        .nav-item { text-align: center; color: var(--text-sub); font-size: 10px; font-weight: 500; cursor: pointer; }
-        .nav-item.active { color: #fff; }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+        /* PROGRESS BAR */
+        .energy-hud { padding: 0 20px 20px; }
+        .energy-info { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
+        .bar-bg { height: 12px; background: #32363c; border-radius: 10px; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #f5bb5f, #fffb12); width: 100%; border-radius: 10px; transition: width 0.3s; }
 
-        /* Floating Points */
-        .tap-point {
-            position: absolute;
-            color: #fff;
-            font-size: 24px;
-            font-weight: 900;
-            pointer-events: none;
-            animation: floatUp 0.7s ease-out forwards;
-            z-index: 100;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-100px); }
-        }
+        /* NAVBAR */
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #272a30; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 0; border-top: 1px solid #333; }
+        .nav-tab { text-align: center; color: var(--text-sub); font-size: 10px; cursor: pointer; }
+        .nav-tab.active { color: white; }
+        .nav-tab i { display: block; font-size: 20px; margin-bottom: 4px; }
+
+        /* ANIMATION */
+        .tap-anim { position: absolute; color: white; font-size: 28px; font-weight: 900; pointer-events: none; animation: fly 0.7s forwards; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="user-avatar" id="short-name">U</div>
-        <div class="user-info">
-            <div class="user-name" id="username">User Name</div>
-            <div class="rank-info">
-                <span>Bronze</span> <span>•</span> <span id="rank-lvl">1 / 10</span>
+        <div class="avatar-box" id="user-initial">B</div>
+        <div class="user-meta">
+            <h4 id="user-name">Bexruz</h4>
+            <div class="rank-text">Bronze • <span id="rank-lvl">1 / 10</span></div>
+        </div>
+        <div class="stat-item">⚙️</div>
+    </div>
+
+    <div class="top-stats">
+        <div class="stat-item">
+            <span class="stat-label">Profit per tap</span>
+            <span class="stat-value" id="ui-pwt">+1</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Coins to upgrade</span>
+            <span class="stat-value" style="color:#f5bb5f">2.5K</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Profit per hour</span>
+            <span class="stat-value" id="ui-pph" style="color:#4ade80">+0</span>
+        </div>
+    </div>
+
+    <div class="view-port">
+        <section id="exchange" class="section active">
+            <div class="balance-main">
+                <div class="coin-img"></div>
+                <span id="ui-bal">0</span>
             </div>
-        </div>
-        <div class="stat-card" style="min-width: 80px;">
-            <div class="stat-label">Settings</div>
-            <div class="stat-value">⚙️</div>
-        </div>
+            <div class="clicker-box">
+                <div class="main-button" id="tap-target">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Leenova" class="robot-img" alt="bot">
+                </div>
+            </div>
+        </section>
+
+        <section id="mine" class="section">
+            <h2 style="margin-bottom:20px">Mining Cards</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-name">Data Center</div>
+                    <div class="card-profit">+500/hr</div>
+                    <button class="buy-btn" onclick="buyCard(2000, 500)">💰 2,000</button>
+                </div>
+                <div class="card">
+                    <div class="card-name">AI Neural</div>
+                    <div class="card-profit">+1.2K/hr</div>
+                    <button class="buy-btn" onclick="buyCard(5000, 1200)">💰 5,000</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="friends" class="section">
+            <h2>Invite Friends</h2>
+            <p style="color:var(--text-sub); margin: 20px 0;">You have 0 friends</p>
+            <button class="buy-btn active">Invite a friend</button>
+        </section>
+
+        <section id="earn" class="section">
+            <h2>Tasks</h2>
+            <div class="card" style="margin-top:15px; display:flex; justify-content:space-between;">
+                <span>Watch YouTube</span>
+                <span style="color:var(--accent-yellow)">+50,000</span>
+            </div>
+        </section>
+
+        <section id="airdrop" class="section" style="text-align:center">
+            <div class="coin-img" style="margin: 0 auto 20px; width:80px; height:80px;"></div>
+            <h2>Airdrop Tasks</h2>
+            <p style="color:var(--text-sub); margin-top:10px;">Listing is coming soon...</p>
+        </section>
     </div>
 
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-label">Profit per tap</div>
-            <div class="stat-value" id="pwt-ui">+1</div>
+    <div class="energy-hud">
+        <div class="energy-info">
+            <span>⚡ <span id="ui-energy">1000</span> / 1000</span>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Coins to upgrade</div>
-            <div class="stat-value" style="color: #f5bb5f;">2.5K</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Profit per hour</div>
-            <div class="stat-value" id="pph-ui">+0</div>
-        </div>
-    </div>
-
-    <div class="main-balance">
-        <div class="coin-icon"></div>
-        <div class="balance-amount" id="balance">0</div>
-    </div>
-
-    <div class="clicker-container">
-        <div class="circle-outer" id="click-area">
-            <div class="avatar-main" id="avatar"></div>
-        </div>
-    </div>
-
-    <div class="bottom-hud">
-        <div class="energy-bar-info">
-            <span>⚡ <span id="current-energy">1000</span> / 1000</span>
-        </div>
-        <div class="energy-bar-bg">
-            <div class="energy-bar-fill" id="energy-fill"></div>
+        <div class="bar-bg">
+            <div class="bar-fill" id="ui-bar"></div>
         </div>
     </div>
 
     <nav class="navbar">
-        <div class="nav-item active">
-            <span class="nav-icon">🏠</span>
-            Exchange
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">⛏️</span>
-            Mine
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">👥</span>
-            Friends
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">🪙</span>
-            Earn
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">🐹</span>
-            Airdrop
-        </div>
+        <div class="nav-tab active" onclick="showSection('exchange', this)"><i>🏠</i>Exchange</div>
+        <div class="nav-tab" onclick="showSection('mine', this)"><i>⛏️</i>Mine</div>
+        <div class="nav-tab" onclick="showSection('friends', this)"><i>👥</i>Friends</div>
+        <div class="nav-tab" onclick="showSection('earn', this)"><i>🪙</i>Earn</div>
+        <div class="nav-tab" onclick="showSection('airdrop', this)"><i>🐹</i>Airdrop</div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.backgroundColor = "#000000";
-        tg.headerColor = "#24282f";
 
-        let state = JSON.parse(localStorage.getItem('hk_save')) || {
+        // 1. O'YIN HOLATI (STATE)
+        let state = JSON.parse(localStorage.getItem('leenova_v3')) || {
             bal: 0,
             energy: 1000,
-            maxEnergy: 1000,
             pwt: 1,
-            pph: 0
+            pph: 0,
+            lastLogin: Date.now()
         };
 
-        // User info from Telegram
-        if (tg.initDataUnsafe.user) {
-            document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
-            document.getElementById('short-name').innerText = tg.initDataUnsafe.user.first_name[0];
-        }
-
+        // 2. UI YANGILASH
         function updateUI() {
-            document.getElementById('balance').innerText = Math.floor(state.bal).toLocaleString();
-            document.getElementById('current-energy').innerText = Math.floor(state.energy);
-            document.getElementById('pwt-ui').innerText = `+${state.pwt}`;
-            document.getElementById('pph-ui').innerText = `+${state.pph}`;
+            document.getElementById('ui-bal').innerText = Math.floor(state.bal).toLocaleString();
+            document.getElementById('ui-energy').innerText = Math.floor(state.energy);
+            document.getElementById('ui-bar').style.width = (state.energy / 10) + "%";
+            document.getElementById('ui-pph').innerText = "+" + (state.pph).toLocaleString();
+            document.getElementById('ui-pwt').innerText = "+" + state.pwt;
             
-            const energyPercent = (state.energy / state.maxEnergy) * 100;
-            document.getElementById('energy-fill').style.width = energyPercent + "%";
-            
-            localStorage.setItem('hk_save', JSON.stringify(state));
+            localStorage.setItem('leenova_v3', JSON.stringify(state));
         }
 
-        document.getElementById('click-area').addEventListener('touchstart', (e) => {
-            if (state.energy < state.pwt) {
-                tg.HapticFeedback.notificationOccurred('warning');
-                return;
-            }
+        // 3. TABLARNI ALMASHTIRISH
+        function showSection(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        }
 
-            // Multi-tap support
-            for (let i = 0; i < e.targetTouches.length; i++) {
-                const touch = e.targetTouches[i];
-                
-                state.bal += state.pwt;
-                state.energy -= state.pwt;
+        // 4. CLICKER LOGIKASI
+        document.getElementById('tap-target').addEventListener('touchstart', (e) => {
+            if (state.energy < state.pwt) return;
 
-                // Create floating text
-                const float = document.createElement('div');
-                float.className = 'tap-point';
-                float.innerText = `+${state.pwt}`;
-                float.style.left = touch.clientX + 'px';
-                float.style.top = touch.clientY + 'px';
-                document.body.appendChild(float);
-                
-                setTimeout(() => float.remove(), 700);
-            }
+            const touch = e.touches[0];
+            state.bal += state.pwt;
+            state.energy -= state.pwt;
+
+            // Animatsiya
+            const anim = document.createElement('div');
+            anim.className = 'tap-anim';
+            anim.innerText = "+" + state.pwt;
+            anim.style.left = touch.clientX + "px";
+            anim.style.top = touch.clientY + "px";
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 700);
 
             tg.HapticFeedback.impactOccurred('medium');
-            
-            // Squish animation
-            const avatar = document.getElementById('avatar');
-            avatar.style.transform = 'scale(0.95) rotate(2deg)';
-            setTimeout(() => {
-                avatar.style.transform = 'scale(1) rotate(0deg)';
-            }, 50);
-
             updateUI();
         });
 
-        // Energy Regen & Passive Income
-        setInterval(() => {
-            // Energy regen
-            if (state.energy < state.maxEnergy) {
-                state.energy = Math.min(state.maxEnergy, state.energy + 1);
+        // 5. DO'KON (MINE) LOGIKASI
+        window.buyCard = (cost, profit) => {
+            if (state.bal >= cost) {
+                state.bal -= cost;
+                state.pph += profit;
+                tg.HapticFeedback.notificationOccurred('success');
+                updateUI();
+            } else {
+                tg.HapticFeedback.notificationOccurred('error');
+                alert("Mablag' yetarli emas!");
             }
+        };
+
+        // 6. PASSIV DAROMAD VA ENERGIYA
+        setInterval(() => {
+            // Energiya tiklanishi
+            if (state.energy < 1000) state.energy = Math.min(1000, state.energy + 2);
             
-            // Passive income (Profit per hour)
+            // Soatlik daromad (sekundiga hisoblangan)
             if (state.pph > 0) {
                 state.bal += (state.pph / 3600);
             }
-            
             updateUI();
         }, 1000);
 
