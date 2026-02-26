@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Vision UI</title>
+    <title>Aira Protocol | Cyber Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -11,11 +11,12 @@
             --primary: #00f2ff;
             --accent: #7000ff;
             --bg: #0a0b10;
-            --card-bg: #161821;
+            --card-bg: rgba(22, 24, 33, 0.8);
             --text-main: #ffffff;
             --text-dim: #a0a0b0;
             --border-color: rgba(255, 255, 255, 0.08);
             --gold: #ffcf4b;
+            --success: #4cd137;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -31,10 +32,11 @@
             flex-direction: column; 
         }
 
+        /* 1. Futuristic Header */
         .header { 
-            padding: 40px 20px 25px; 
+            padding: 45px 20px 30px; 
             text-align: center; 
-            background: radial-gradient(circle at top, #1a1c2c 0%, var(--bg) 100%);
+            background: radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.15) 0%, var(--bg) 80%);
             border-bottom: 1px solid var(--border-color);
             position: relative;
         }
@@ -46,28 +48,32 @@
             color: var(--primary);
             text-transform: uppercase;
             background: rgba(0, 242, 255, 0.1);
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 30px;
             display: inline-block;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
         }
 
-        .bal-container { margin: 5px 0; }
-        .bal-val { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+        .bal-container { margin: 10px 0; }
+        .bal-val { font-size: 48px; font-weight: 800; letter-spacing: -1px; text-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
 
         .profit-box {
             position: absolute;
-            top: 35px;
+            top: 40px;
             right: 20px;
             font-size: 11px;
-            color: #4cd137;
+            color: var(--success);
             font-weight: 700;
             background: rgba(76, 209, 55, 0.1);
-            padding: 5px 12px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
+            padding: 6px 12px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(76, 209, 55, 0.2);
         }
 
+        /* 2. Scrollable Content Area */
         .view-content { 
             flex: 1; 
             display: none; 
@@ -75,50 +81,57 @@
             overflow-y: auto; 
             -webkit-overflow-scrolling: touch;
         }
-        .view-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .view-content.active { display: block; animation: slideUp 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* 3. Cards & Glassmorphism */
         .glass-card { 
             background: var(--card-bg); 
             border: 1px solid var(--border-color); 
-            border-radius: 24px; 
+            border-radius: 28px; 
             padding: 24px; 
-            margin-bottom: 16px; 
+            margin-bottom: 20px; 
+            backdrop-filter: blur(15px);
         }
 
         .label-dim { color: var(--text-dim); font-size: 13px; font-weight: 500; }
         .val-highlight { color: var(--primary); font-weight: 700; }
 
+        /* 4. Interactive Buttons */
         .btn-primary { 
             background: var(--primary); 
             color: #000; 
             border: none; 
             padding: 18px; 
-            border-radius: 16px; 
+            border-radius: 18px; 
             font-weight: 800; 
             width: 100%; 
             cursor: pointer; 
             text-transform: uppercase; 
             font-size: 13px;
-            transition: 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0, 242, 255, 0.2);
         }
-        .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
-        .btn-primary:disabled { background: #222533 !important; color: #555 !important; cursor: not-allowed; }
+        .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+        .btn-primary:disabled { background: #1d1f2a !important; color: #444 !important; cursor: not-allowed; box-shadow: none; }
 
         .btn-outline {
             background: transparent;
             border: 1.5px solid var(--primary);
             color: var(--primary);
-            margin-top: 12px;
+            margin-top: 15px;
+            box-shadow: none;
         }
 
+        /* 5. Bottom Navigation */
         .nav { 
-            height: 80px; 
-            background: #0d0f17; 
+            height: 85px; 
+            background: rgba(13, 15, 23, 0.95); 
             display: flex; 
             border-top: 1px solid var(--border-color); 
             padding-bottom: env(safe-area-inset-bottom);
+            backdrop-filter: blur(10px);
         }
         .nav-item { 
             flex: 1; 
@@ -130,22 +143,37 @@
             font-size: 10px; 
             font-weight: 700; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            transition: 0.3s;
         }
-        .nav-item svg { margin-bottom: 6px; transition: 0.3s; }
+        .nav-item svg { margin-bottom: 6px; fill: #4e5471; transition: 0.3s; }
         .nav-item.active { color: var(--primary); }
-        .nav-item.active svg { fill: var(--primary); transform: translateY(-2px); }
+        .nav-item.active svg { fill: var(--primary); transform: translateY(-3px); filter: drop-shadow(0 0 5px var(--primary)); }
 
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding-bottom: 20px; }
+        /* 6. Assets Grid */
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-bottom: 20px; }
         .nft-card { 
             background: var(--card-bg); 
             border: 1px solid var(--border-color);
-            border-radius: 20px; 
-            padding: 20px; 
+            border-radius: 24px; 
+            padding: 24px 15px; 
             text-align: center;
-            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        .nft-card.owned { border-color: var(--gold); background: rgba(255, 207, 75, 0.05); }
+        .nft-card.owned { border-color: var(--gold); background: rgba(255, 207, 75, 0.03); }
+        .nft-card.owned::after {
+            content: "OWNED";
+            position: absolute;
+            top: 10px;
+            left: -20px;
+            background: var(--gold);
+            color: #000;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 20px;
+            transform: rotate(-45deg);
+        }
 
         ::-webkit-scrollbar { width: 0; }
     </style>
@@ -158,21 +186,21 @@
         <div class="bal-container">
             <span class="bal-val" id="total-bal">0</span>
         </div>
-        <div id="staked-info" style="color: var(--gold); font-size: 12px; font-weight: 700; visibility: hidden; margin-top: 5px;">
-            STAKED: <span id="staked-amt">0</span>
+        <div id="staked-info" style="color: var(--gold); font-size: 12px; font-weight: 800; visibility: hidden; margin-top: 8px;">
+            <span style="opacity: 0.7;">STAKED:</span> <span id="staked-amt">0</span>
         </div>
     </header>
 
     <div id="view-core" class="view-content active">
         <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <span class="label-dim">STAKING <span class="val-highlight" id="stake-lvl">LVL 0</span></span>
-                <span id="stake-timer" style="font-weight:800; font-size:12px; color: var(--primary)">READY</span>
+                <span id="stake-timer" style="font-weight:800; font-size:12px; color: var(--primary); letter-spacing: 1px;">READY</span>
             </div>
             <button class="btn-primary" onclick="startStake()" id="stake-btn">STAKE ALL BALANCE</button>
             
-            <div style="border-top: 1px solid var(--border-color); margin-top:20px; padding-top:20px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+            <div style="border-top: 1px solid var(--border-color); margin-top:24px; padding-top:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px">
                     <span class="label-dim">Profit Multiplier</span>
                     <span class="val-highlight" id="next-multiplier">+5%</span>
                 </div>
@@ -183,9 +211,9 @@
         </div>
 
         <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <span class="label-dim">FARMING <span class="val-highlight" id="farm-lvl">LVL 1</span></span>
-                <span id="aps-ui" style="font-weight:800; color: #4cd137;">50/s</span>
+                <span id="aps-ui" style="font-weight:800; color: var(--success); text-shadow: 0 0 10px rgba(76, 209, 55, 0.2);">50/s</span>
             </div>
             <button class="btn-primary" onclick="upgradeFarm()" id="farm-up-btn">
                 UPGRADE FARM <span id="farm-cost-tag">(500)</span>
@@ -194,35 +222,35 @@
     </div>
 
     <div id="view-collection" class="view-content">
-        <h3 style="font-weight:800; margin: 0 0 20px 5px; letter-spacing: -0.5px;">MY COLLECTION</h3>
+        <h3 style="font-weight:800; margin: 0 0 25px 5px; letter-spacing: -0.5px;">MY COLLECTION</h3>
         <div class="nft-grid" id="nft-list"></div>
-        <button id="load-more" class="btn-primary btn-outline" style="margin-bottom: 30px;" onclick="loadMoreNFTs()">LOAD MORE</button>
+        <button id="load-more" class="btn-primary btn-outline" style="margin-bottom: 40px;" onclick="loadMoreNFTs()">DISCOVER MORE</button>
     </div>
 
     <div id="view-market" class="view-content">
+        <h3 style="font-weight:800; margin: 0 0 25px 5px;">MARKETPLACE</h3>
         <div class="glass-card">
-            <h3 style="margin:0 0 15px 0">BOOSTERS</h3>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <div style="font-weight:700; font-size:15px">Auto-Staking Bot</div>
+                    <div style="font-weight:800; font-size:16px; margin-bottom: 4px;">Auto-Staking Bot</div>
                     <div class="label-dim">Auto-stake every 30s</div>
                 </div>
-                <button class="btn-primary" style="width:auto; padding: 12px 25px;" onclick="buyAuto()" id="auto-btn">15k</button>
+                <button class="btn-primary" style="width:auto; padding: 12px 28px;" onclick="buyAuto()" id="auto-btn">15k</button>
             </div>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4e5471"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-            Core
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+            Terminal
         </div>
         <div class="nav-item" onclick="switchTab('collection', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4e5471"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
             Assets
         </div>
         <div class="nav-item" onclick="switchTab('market', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4e5471"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 5h6v2H9V5z"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 5h6v2H9V5z"/></svg>
             Market
         </div>
     </nav>
@@ -230,8 +258,9 @@
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
+    tg.enableClosingConfirmation();
 
-    // Ma'lumotlarni yuklash (undefined xatoligini oldini olish uchun default qiymatlar)
+    // --- State Management ---
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
     let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
@@ -243,22 +272,24 @@
     let autoTimer = 0;
     let nftPage = 1;
 
-    // Sonlarni chiroyli formatlash (1.2k, 5.0m)
+    // --- Core Logic ---
     function f(n) {
         if (n === undefined || isNaN(n)) return "0";
         if (n < 1000) return Math.floor(n).toString();
-        const s = ["", "k", "m", "b", "t"];
+        const s = ["", "K", "M", "B", "T"];
         const e = Math.floor(Math.log10(n) / 3);
-        return (n / Math.pow(1000, e)).toFixed(1) + s[e];
+        const val = n / Math.pow(1000, e);
+        return (val < 10 ? val.toFixed(2) : val.toFixed(1)) + s[e];
     }
 
     function checkCareer() {
         let total = balance + currentStaked;
         let c = { name: "BOSHLANG'ICH", color: "#00f2ff" };
         
-        if (total >= 500000) c = { name: "VAZIR", color: "#ffcf4b" };
-        else if (total >= 100000) c = { name: "MAGISTR", color: "#ff4757" };
-        else if (total >= 10000) c = { name: "TALABA", color: "#2ed573" };
+        if (total >= 10000000) c = { name: "IMPERATOR", color: "#ff00ff" };
+        else if (total >= 1000000) c = { name: "VAZIR", color: "#ffcf4b" };
+        else if (total >= 250000) c = { name: "MAGISTR", color: "#ff4757" };
+        else if (total >= 50000) c = { name: "TALABA", color: "#2ed573" };
 
         document.documentElement.style.setProperty('--primary', c.color);
         document.getElementById('career-name').innerText = c.name;
@@ -267,38 +298,38 @@
         if(hasAuto) {
             autoBtn.disabled = true;
             autoBtn.innerText = "OWNED";
+            autoBtn.style.background = "rgba(255,255,255,0.05)";
         }
     }
 
-    // Asosiy Loop (Farming)
+    // --- Game Loop (10 FPS for performance) ---
     setInterval(() => {
         let aps = 50 * Math.pow(1.15, farmLevel - 1);
-        balance += (aps / 10); // Har 100ms da bir marta qo'shiladi
+        balance += (aps / 10);
         
         document.getElementById('total-bal').innerText = f(balance);
         document.getElementById('profit-val').innerText = "+" + f(aps) + "/s";
         document.getElementById('aps-ui').innerText = f(aps) + "/s";
 
-        // Auto-staking logikasi
-        if(hasAuto && !isStaking && balance > 100) {
+        if(hasAuto && !isStaking && balance >= (aps * 5)) { // Smart auto-stake
             autoTimer++;
-            if(autoTimer >= 300) { // 30 soniya
+            if(autoTimer >= 300) { 
                 startStake();
                 autoTimer = 0;
             }
         }
     }, 100);
 
-    // Staking funksiyasi
     function startStake() {
         if (isStaking || balance < 1) return;
         
-        tg.HapticFeedback.impactOccurred('medium');
+        tg.HapticFeedback.impactOccurred('heavy');
         currentStaked = balance; 
         balance = 0; 
         isStaking = true;
         
-        document.getElementById('staked-info').style.visibility = "visible";
+        const sInfo = document.getElementById('staked-info');
+        sInfo.style.visibility = "visible";
         document.getElementById('staked-amt').innerText = f(currentStaked);
         document.getElementById('stake-btn').disabled = true;
 
@@ -312,16 +343,17 @@
                 balance += Math.floor(currentStaked * bonus);
                 currentStaked = 0; 
                 isStaking = false;
-                document.getElementById('staked-info').style.visibility = "hidden";
+                sInfo.style.visibility = "hidden";
                 document.getElementById('stake-timer').innerText = "READY";
                 document.getElementById('stake-btn').disabled = false;
                 save();
+                tg.HapticFeedback.notificationOccurred('success');
             }
         }, 1000);
     }
 
     function upgradeFarm() {
-        let cost = 500 * Math.pow(1.15, farmLevel - 1);
+        let cost = 500 * Math.pow(1.18, farmLevel - 1);
         if (balance >= cost) { 
             balance -= cost; 
             farmLevel++; 
@@ -330,11 +362,12 @@
             save();
         } else {
             tg.HapticFeedback.notificationOccurred('error');
+            tg.showAlert("Mablag' yetarli emas! SIZGA: " + f(cost) + " kerak.");
         }
     }
 
     function upgradeStake() {
-        let cost = 500 * Math.pow(1.15, stakeLevel);
+        let cost = 500 * Math.pow(1.2, stakeLevel);
         if (balance >= cost) { 
             balance -= cost; 
             stakeLevel++; 
@@ -347,8 +380,8 @@
     }
 
     function updatePrices() {
-        document.getElementById('farm-cost-tag').innerText = "(" + f(500 * Math.pow(1.15, farmLevel - 1)) + ")";
-        document.getElementById('stake-cost-tag').innerText = "(" + f(500 * Math.pow(1.15, stakeLevel)) + ")";
+        document.getElementById('farm-cost-tag').innerText = "(" + f(500 * Math.pow(1.18, farmLevel - 1)) + ")";
+        document.getElementById('stake-cost-tag').innerText = "(" + f(500 * Math.pow(1.2, stakeLevel)) + ")";
         document.getElementById('farm-lvl').innerText = "LVL " + farmLevel;
         document.getElementById('stake-lvl').innerText = "LVL " + stakeLevel;
         document.getElementById('next-multiplier').innerText = "+" + (5 + (stakeLevel * 2)) + "%";
@@ -362,21 +395,24 @@
         let end = nftPage * 6;
         
         for(let i=start; i<=end; i++) {
-            let price = 100000 * Math.pow(1.25, i - 1);
+            let price = 100000 * Math.pow(1.4, i - 1);
             let isOwned = ownedNFTs.includes(i);
-            let emoji = ['🛸','💎','🧬','👾','👑', '⚡️'][i % 6];
+            let emojis = ['🛸','💎','🧬','👾','👑', '⚡️', '🌟', '🔥', '🪐', '🛡️'];
+            let emoji = emojis[i % emojis.length];
+            
             html += `
                 <div class="nft-card ${isOwned ? 'owned' : ''}" id="nft-${i}">
-                    <div style="font-size:32px; margin-bottom:12px;">${emoji}</div>
-                    <div style="font-size:12px; font-weight:800; margin-bottom:4px">TITAN #${i}</div>
-                    <div style="color:var(--gold); font-size:13px; font-weight:800; margin-bottom:15px">${f(price)}</div>
-                    <button class="btn-primary" style="padding:10px; font-size:10px;" 
+                    <div style="font-size:38px; margin-bottom:15px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));">${emoji}</div>
+                    <div style="font-size:11px; font-weight:800; opacity: 0.6; margin-bottom:4px">SERIES ${Math.ceil(i/10)}</div>
+                    <div style="font-size:14px; font-weight:800; margin-bottom:12px">TITAN #${i}</div>
+                    <div style="color:var(--gold); font-size:14px; font-weight:900; margin-bottom:15px">${f(price)}</div>
+                    <button class="btn-primary" style="padding:12px; font-size:10px; border-radius:12px;" 
                         onclick="buyNFT(${price}, ${i})" ${isOwned ? 'disabled' : ''}>
-                        ${isOwned ? 'OWNED' : 'BUY'}
+                        ${isOwned ? 'COLLECTED' : 'ACQUIRE'}
                     </button>
                 </div>`;
         }
-        list.innerHTML += html;
+        list.insertAdjacentHTML('beforeend', html);
         nftPage++;
     }
 
@@ -386,13 +422,15 @@
             ownedNFTs.push(id);
             localStorage.setItem('aira_nfts', JSON.stringify(ownedNFTs));
             save();
-            const btn = document.querySelector(`#nft-${id} button`);
-            btn.innerText = "OWNED";
+            const card = document.getElementById(`nft-${id}`);
+            card.classList.add('owned');
+            const btn = card.querySelector('button');
+            btn.innerText = "COLLECTED";
             btn.disabled = true;
-            document.getElementById(`nft-${id}`).classList.add('owned');
             tg.HapticFeedback.notificationOccurred('success');
         } else {
-            tg.showAlert("Mablag' yetarli emas!");
+            tg.HapticFeedback.notificationOccurred('error');
+            tg.showAlert("NFT sotib olish uchun mablag' yetarli emas!");
         }
     }
 
@@ -404,7 +442,9 @@
             save(); 
             checkCareer(); 
             tg.HapticFeedback.notificationOccurred('success');
-        } 
+        } else {
+            tg.showAlert("Bot sotib olish uchun 15k kerak!");
+        }
     }
 
     function save() { 
@@ -413,9 +453,6 @@
         localStorage.setItem('aira_stake', stakeLevel); 
     }
     
-    // Har 5 soniyada avtomatik saqlash
-    setInterval(save, 5000);
-
     function switchTab(tab, el) {
         tg.HapticFeedback.impactOccurred('light');
         document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
@@ -425,9 +462,13 @@
         if(tab === 'collection' && nftPage === 1) loadMoreNFTs();
     }
 
-    // Initial Start
-    updatePrices();
-    checkCareer();
+    window.onload = () => {
+        updatePrices();
+        checkCareer();
+        // Birinchi marta kirganda animatsiya uchun
+        document.body.style.opacity = "0";
+        setTimeout(() => { document.body.style.transition = "opacity 0.5s"; document.body.style.opacity = "1"; }, 100);
+    };
 </script>
 </body>
 </html>
