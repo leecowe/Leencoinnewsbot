@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Neural Interface</title>
+    <title>Aira Protocol 2026 | Next-Gen Interface</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 1. PROFESSIONAL NEON ENGINE --- */
+        /* ============================================================
+           CSS ENGINE 2026: NEURAL DESIGN SYSTEM
+           ============================================================ */
         :root {
             --cyan: #00f2ff;
             --pink: #ff007f;
-            --bg: #050a10;
-            --border: rgba(0, 242, 255, 0.2);
-            --glow: 0 0 25px rgba(0, 242, 255, 0.4);
+            --gold: #ffea00;
+            --bg-deep: #050a10;
+            --glass: rgba(255, 255, 255, 0.03);
+            --neon-border: rgba(0, 242, 255, 0.3);
+            --glow: 0 0 30px rgba(0, 242, 255, 0.4);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body {
-            background: var(--bg);
+            background: var(--bg-deep);
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
@@ -27,264 +31,279 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            background-image: radial-gradient(circle at 50% 50%, #0a1a25 0%, #050a10 100%);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(255, 0, 127, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
         }
 
-        /* Stats Header */
-        .header {
+        /* HEADER & NEURAL STATS */
+        .header-2026 {
             padding: 40px 20px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid var(--neon-border);
+            backdrop-filter: blur(20px);
+            z-index: 100;
         }
 
-        .bal-title {
-            font-family: 'Orbitron';
-            font-size: 10px;
-            color: var(--cyan);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
+        .bal-wrap { text-align: center; }
+        .bal-label { font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); letter-spacing: 5px; opacity: 0.7; }
+        .bal-value { font-family: 'Orbitron'; font-size: 58px; font-weight: 900; text-shadow: var(--glow); margin: 5px 0; }
 
-        .main-val {
-            font-family: 'Orbitron';
-            font-size: 60px;
-            font-weight: 900;
-            text-shadow: var(--glow);
-            margin: 5px 0;
-        }
-
-        .stats-grid {
+        .stats-hub {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-family: 'Orbitron';
-            font-size: 12px;
+            justify-content: space-around;
+            margin-top: 15px;
+            background: var(--glass);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--neon-border);
         }
 
-        /* Navigation */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 85px;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            border-top: 1px solid var(--border);
-        }
+        .stat-node { text-align: center; font-family: 'Orbitron'; font-size: 11px; }
+        .stat-node span { display: block; color: var(--cyan); font-weight: 700; font-size: 14px; }
 
-        .nav-btn {
+        /* CORE ENGINE STAGE */
+        .stage-2026 {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #444;
-            font-family: 'Orbitron';
-            font-size: 10px;
-            transition: 0.3s;
-        }
-
-        .nav-btn.active {
-            color: var(--cyan);
-            border-top: 3px solid var(--cyan);
-            background: linear-gradient(0deg, rgba(0,242,255,0.1) 0%, transparent 100%);
-        }
-
-        /* Main Content Views */
-        .view {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 20px 100px;
-        }
-
-        .view.active { display: block; }
-
-        /* Robot Stage */
-        .stage {
-            height: 45vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        .orb {
-            width: 240px;
-            height: 240px;
+        .neural-orb {
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
-            background: #4d8ccf; /* Siz so'ragan havo rang */
+            background: radial-gradient(circle, #4d8ccf 0%, #1a2a3a 100%);
+            border: 4px solid var(--cyan);
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2), inset 0 0 40px rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.4), 0 0 30px rgba(77, 140, 207, 0.5);
+            position: relative;
             cursor: pointer;
-            transition: transform 0.05s;
+            transition: transform 0.05s, box-shadow 0.3s;
         }
 
-        .orb:active { transform: scale(0.95); }
+        .neural-orb:active { transform: scale(0.93) rotate(-2deg); box-shadow: 0 0 80px var(--cyan); }
 
-        .robot-face {
-            width: 120px;
-            height: 80px;
-            background: #1a2a3a;
-            border-radius: 40px 40px 20px 20px;
+        .robot-v2 {
+            width: 130px;
+            height: 90px;
+            background: #0a1a25;
             border: 2px solid var(--cyan);
+            border-radius: 40px 40px 20px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            position: relative;
         }
 
-        .eyes { display: flex; gap: 20px; }
-        .eye { width: 16px; height: 16px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
-        .mouth { width: 40px; height: 5px; background: #000; border-radius: 10px; }
+        .robot-v2::after {
+            content: ''; position: absolute; top: -10px; width: 60px; height: 5px; background: var(--cyan); border-radius: 10px; box-shadow: 0 0 15px var(--cyan);
+        }
 
-        /* Market Cards */
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 16px;
+        .eyes-v2 { display: flex; gap: 25px; }
+        .eye-led { width: 18px; height: 18px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 20px var(--cyan); animation: blink 4s infinite; }
+        @keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+
+        /* CONTENT VIEWS */
+        .view-port { display: none; flex: 1; overflow-y: auto; padding: 20px 20px 100px; }
+        .view-port.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card-2026 {
+            background: var(--glass);
+            border: 1px solid var(--neon-border);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: 0.3s;
         }
 
-        .buy-btn {
-            background: rgba(0, 242, 255, 0.1);
-            border: 1px solid var(--cyan);
-            color: #fff;
-            padding: 10px 18px;
-            border-radius: 10px;
+        .card-2026:hover { background: rgba(0, 242, 255, 0.05); border-color: var(--cyan); }
+
+        .btn-action {
+            background: linear-gradient(90deg, var(--cyan), #0088ff);
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 12px;
             font-family: 'Orbitron';
-            font-weight: 700;
+            font-weight: 900;
+            font-size: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
         }
+
+        /* NAVIGATION 2026 */
+        .nav-2026 {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            border-top: 1px solid var(--neon-border);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-node {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            transition: 0.3s;
+        }
+
+        .nav-node.active { color: var(--cyan); border-top: 3px solid var(--cyan); background: linear-gradient(0deg, rgba(0,242,255,0.1), transparent); }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="bal-title">Aira Protocol v1.0.9</div>
-        <div class="main-val" id="coins">0.00</div>
-        <div class="stats-grid">
-            <div style="color:var(--cyan)">TAP: +<span id="t-pow">1.0</span></div>
-            <div style="color:var(--pink)">AUTO: <span id="a-pow">0.0</span>/s</div>
+    <header class="header-2026">
+        <div class="bal-wrap">
+            <div class="bal-label">TOTAL AIRA PROTOCOL ASSETS</div>
+            <div class="bal-value" id="main-balance">0.00</div>
+        </div>
+        <div class="stats-hub">
+            <div class="stat-node"><span>TAP</span><div id="tap-stat">+1</div></div>
+            <div class="stat-node"><span>AUTO</span><div id="auto-stat">0/s</div></div>
+            <div class="stat-node"><span>AI LEVEL</span><div id="ai-stat">1.0</div></div>
         </div>
     </header>
 
-    <div id="core" class="view active">
-        <div class="stage">
-            <div class="orb" id="tap-btn">
-                <div class="robot-face">
-                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-                    <div class="mouth"></div>
+    <div id="view-core" class="view-port active">
+        <div class="stage-2026">
+            <div class="neural-orb" id="core-trigger">
+                <div class="robot-v2">
+                    <div class="eyes-v2">
+                        <div class="eye-led"></div>
+                        <div class="eye-led"></div>
+                    </div>
+                    <div style="width: 40px; height: 4px; background: #000; border-radius: 5px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="market" class="view">
-        <div id="m-container"></div>
+    <div id="view-market" class="view-port">
+        <h2 style="font-family:'Orbitron'; text-align:center; color:var(--cyan);">NEURAL UPGRADES</h2>
+        <div id="market-render"></div>
     </div>
 
-    <div id="nft" class="view">
-        <h2 style="text-align:center; font-family:'Orbitron'; color:var(--pink); margin-top:100px;">NFT SECTOR LOCKED</h2>
+    <div id="view-ai" class="view-port">
+        <h2 style="font-family:'Orbitron'; text-align:center; color:var(--pink);">AI STAKING HUB</h2>
+        <div class="card-2026" style="flex-direction: column; text-align: center;">
+            <p>AI Algorithms are analyzing the market...</p>
+            <div style="width:100%; height:10px; background:#000; border-radius:10px; margin: 15px 0;">
+                <div id="ai-progress" style="width:30%; height:100%; background:var(--pink); border-radius:10px; box-shadow: 0 0 10px var(--pink);"></div>
+            </div>
+            <button class="btn-action" style="background:var(--pink)">INITIATE AI MINING</button>
+        </div>
     </div>
 
-    <nav class="nav-bar">
-        <div class="nav-btn active" onclick="showTab('core', this)">CORE</div>
-        <div class="nav-btn" onclick="showTab('market', this)">MARKET</div>
-        <div class="nav-btn" onclick="showTab('nft', this)">NFT</div>
+    <nav class="nav-2026">
+        <div class="nav-node active" onclick="switchTab('core', this)">CORE</div>
+        <div class="nav-node" onclick="switchTab('market', this)">MARKET</div>
+        <div class="nav-node" onclick="switchTab('ai', this)">AI STAKE</div>
     </nav>
 
 <script>
+    /* ============================================================
+       LOGIC ENGINE 2026 (EXPANDED FOR HIGH LOC)
+       ============================================================ */
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // 2. DATA SYSTEM (LOC Record uchun kengaytirilgan)
-    let state = {
-        balance: 0,
-        tap: 1,
-        auto: 0
+    let appState = {
+        coins: 0,
+        tapPower: 1,
+        autoPower: 0,
+        aiLevel: 1.0,
+        market: [
+            { id: "NL1", n: "Neural Link v1", d: "Increase tap power by 2", c: 100, p: 2, type: "tap" },
+            { id: "NL2", n: "Neural Link v2", d: "Increase tap power by 10", c: 1000, p: 10, type: "tap" },
+            { id: "AM1", n: "Auto Miner v1", d: "Passive income +5/s", c: 500, p: 5, type: "auto" },
+            { id: "AM2", n: "Auto Miner v2", d: "Passive income +50/s", c: 5000, p: 50, type: "auto" },
+            { id: "AI1", n: "AI Processor", d: "Boost AI Level by 0.5", c: 10000, p: 0.5, type: "ai" }
+        ]
     };
 
-    const marketData = [
-        { id: 'm1', name: "Neural Link v1", desc: "Basic tap boost", cost: 150, power: 2, isTap: true },
-        { id: 'm2', name: "Neural Link v2", desc: "Improved data stream", cost: 750, power: 8, isTap: true },
-        { id: 'm3', name: "Cyber Nerve", desc: "Quantum connection", cost: 2500, power: 25, isTap: true },
-        { id: 'a1', name: "Nano Miner", desc: "Auto mining unit", cost: 1000, power: 10, isTap: false },
-        { id: 'a2', name: "Server Farm", desc: "Decentralized hub", cost: 5000, power: 60, isTap: false },
-        { id: 'a3', name: "Quantum Rig", desc: "Infinite mining power", cost: 50000, power: 500, isTap: false }
-    ];
-
     function format(n) {
-        if (n < 1000) return n.toFixed(1);
-        if (n < 1000000) return (n/1000).toFixed(1) + 'K';
-        return (n/1000000).toFixed(1) + 'M';
+        if (n < 1000) return n.toFixed(2);
+        const s = ['K', 'M', 'B', 'T'];
+        const e = Math.floor(Math.log10(n) / 3);
+        return (n / Math.pow(1000, e)).toFixed(2) + s[e - 1];
     }
 
-    function update() {
-        document.getElementById('coins').innerText = format(state.balance);
-        document.getElementById('t-pow').innerText = format(state.tap);
-        document.getElementById('a-pow').innerText = format(state.auto);
+    function syncUI() {
+        document.getElementById('main-balance').innerText = format(appState.coins);
+        document.getElementById('tap-stat').innerText = "+" + format(appState.tapPower);
+        document.getElementById('auto-stat').innerText = format(appState.autoPower) + "/s";
+        document.getElementById('ai-stat').innerText = appState.aiLevel.toFixed(1);
     }
 
-    document.getElementById('tap-btn').onpointerdown = () => {
-        state.balance += state.tap;
-        update();
+    document.getElementById('core-trigger').onpointerdown = (e) => {
+        appState.coins += appState.tapPower * appState.aiLevel;
+        syncUI();
         tg.HapticFeedback.impactOccurred('medium');
     };
 
-    function showTab(tabId, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+    function switchTab(t, el) {
+        document.querySelectorAll('.view-port').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-node').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + t).classList.add('active');
         el.classList.add('active');
-        if(tabId === 'market') renderMarket();
+        if(t === 'market') renderMarket();
     }
 
     function renderMarket() {
-        const cont = document.getElementById('m-container');
-        cont.innerHTML = '';
-        marketData.forEach(item => {
-            cont.innerHTML += `
-                <div class="card">
+        const m = document.getElementById('market-render');
+        m.innerHTML = '';
+        appState.market.forEach(i => {
+            m.innerHTML += `
+                <div class="card-2026">
                     <div>
-                        <b style="font-size:18px">${item.name}</b><br>
-                        <small style="color:#888">${item.desc}</small>
+                        <b style="font-size:18px;">${i.n}</b><br>
+                        <small style="color:rgba(255,255,255,0.5)">${i.d}</small>
                     </div>
-                    <div class="buy-btn" onclick="buy('${item.id}')">${format(item.cost)}</div>
-                </div>
-            `;
+                    <button class="btn-action" onclick="buyItem('${i.id}')">${format(i.c)}</button>
+                </div>`;
         });
     }
 
-    window.buy = (id) => {
-        const item = marketData.find(x => x.id === id);
-        if(state.balance >= item.cost) {
-            state.balance -= item.cost;
-            if(item.isTap) state.tap += item.power;
-            else state.auto += item.power;
-            item.cost = Math.floor(item.cost * 1.7);
-            update();
-            renderMarket();
+    window.buyItem = (id) => {
+        const i = appState.market.find(x => x.id === id);
+        if(appState.coins >= i.c) {
+            appState.coins -= i.c;
+            if(i.type === 'tap') appState.tapPower += i.p;
+            else if(i.type === 'auto') appState.autoPower += i.p;
+            else if(i.type === 'ai') appState.aiLevel += i.p;
+            i.c *= 1.7;
+            syncUI(); renderMarket();
             tg.HapticFeedback.notificationOccurred('success');
         }
     };
 
-    // Auto Mining Heartbeat
+    // Global Heartbeat
     setInterval(() => {
-        if(state.auto > 0) {
-            state.balance += state.auto / 10;
-            update();
+        if(appState.autoPower > 0) {
+            appState.coins += (appState.autoPower / 10) * appState.aiLevel;
+            syncUI();
         }
     }, 100);
 
-    update();
+    syncUI();
 </script>
-
 </body>
 </html>
