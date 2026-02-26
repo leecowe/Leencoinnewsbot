@@ -1,345 +1,91 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Astral Sehrgar | Koinot Sayohati</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --astral-purple: #9d50bb;
-            --astral-blue: #6e48aa;
-            --neon-cyan: #00f2ff;
-            --deep-void: #020408;
-            --gold: #ffcc33;
-        }
+const ray = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
-
-        body {
-            background: var(--deep-void);
-            color: #fff;
-            font-family: 'Quicksand', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Orqa fon - Koinot */
-        .void-bg {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 50% 50%, #120b21 0%, #020408 100%);
-            z-index: -1;
-        }
-
-        .stars-overlay {
-            position: absolute;
-            width: 100%; height: 100%;
-            background-image: radial-gradient(white 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.15;
-            animation: moveStars 120s linear infinite;
-        }
-
-        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
-
-        /* Yuqori Panel */
-        .header { padding: 50px 20px 10px; display: flex; justify-content: space-between; z-index: 100; }
-        .badge {
-            background: rgba(110, 72, 170, 0.2);
-            border: 1px solid var(--neon-cyan);
-            border-radius: 15px;
-            padding: 10px 18px;
-            font-family: 'Cinzel';
-            font-size: 11px;
-            backdrop-filter: blur(10px);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        /* Balans */
-        .score-section { text-align: center; margin-top: 15px; z-index: 10; }
-        .score-label { font-size: 11px; font-family: 'Cinzel'; letter-spacing: 3px; color: #a29bfe; }
-        .main-balance {
-            font-family: 'Cinzel';
-            font-size: 55px;
-            font-weight: 900;
-            background: linear-gradient(to bottom, #fff, var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.4));
-        }
-
-        /* PERSONAJ MAYDONI */
-        .char-area {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .magic-seal {
-            position: absolute;
-            width: 340px; height: 340px;
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            border-radius: 50%;
-            box-shadow: inset 0 0 50px rgba(157, 80, 187, 0.2);
-            animation: rotateSeal 20s linear infinite;
-        }
-
-        @keyframes rotateSeal { to { transform: rotate(360deg); } }
-
-        .mage-container {
-            position: relative;
-            width: 250px; height: 250px;
-            z-index: 20;
-            cursor: pointer;
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .mage-container:active { transform: scale(0.92); }
-
-        .mage-sprite {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 30px rgba(157, 80, 187, 0.6));
-            animation: mageFloat 4s ease-in-out infinite;
-        }
-
-        @keyframes mageFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        /* Mana HUD */
-        .mana-hud { width: 85%; margin: 0 auto 110px; z-index: 10; }
-        .mana-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-family: 'Cinzel'; font-size: 10px; color: var(--neon-cyan); }
-        .track { height: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.1); overflow: hidden; }
-        .fill { height: 100%; background: linear-gradient(90deg, var(--astral-purple), var(--neon-cyan)); box-shadow: 0 0 20px var(--neon-cyan); width: 100%; transition: width 0.3s ease; }
-
-        /* Do'kon Paneli */
-        .bottom-sheet {
-            position: fixed;
-            bottom: -100%; left: 0; width: 100%;
-            background: rgba(5, 7, 12, 0.98);
-            backdrop-filter: blur(25px);
-            border-top: 1px solid var(--astral-purple);
-            border-radius: 35px 35px 0 0;
-            padding: 30px 25px 120px;
-            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-        }
-        .bottom-sheet.active { bottom: 0; }
-
-        .item {
-            background: rgba(255,255,255,0.02);
-            border-radius: 20px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border: 1px solid rgba(157, 80, 187, 0.1);
-        }
-        .item-title { font-family: 'Cinzel'; font-size: 14px; color: var(--neon-cyan); }
-        
-        .action-btn {
-            background: linear-gradient(135deg, var(--astral-purple), var(--astral-blue));
-            color: #fff; font-weight: 800; border: none; padding: 12px 25px; border-radius: 15px; font-size: 13px;
-        }
-        .action-btn:disabled { background: #1a1a1a; color: #444; }
-
-        /* Pastki Navigatsiya */
-        .tab-bar {
-            position: fixed; bottom: 0; width: 100%;
-            display: flex; justify-content: space-around;
-            padding: 20px 10px 45px;
-            background: linear-gradient(to top, #000 70%, transparent);
-            z-index: 1100;
-        }
-        .tab { background: none; border: none; color: #fff; opacity: 0.3; display: flex; flex-direction: column; align-items: center; }
-        .tab.active { opacity: 1; color: var(--neon-cyan); }
-        .tab span { font-size: 10px; font-family: 'Cinzel'; margin-top: 8px; }
-
-        /* Click Effekti */
-        .pulse-text {
-            position: fixed; pointer-events: none; color: #fff; font-family: 'Cinzel'; font-weight: 900;
-            text-shadow: 0 0 15px var(--neon-cyan); animation: pulseOut 0.7s ease-out forwards; z-index: 2000;
-        }
-        @keyframes pulseOut {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-130px) scale(1.6); opacity: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="void-bg">
-        <div class="stars-overlay"></div>
-    </div>
-
-    <div class="header">
-        <div class="badge" id="lvl-txt">ARCHMAGE I</div>
-        <div class="badge" id="rank-txt" style="border-color: var(--gold); color: var(--gold);">VOID WALKER</div>
-    </div>
-
-    <div class="score-section">
-        <p class="score-label">TO'PLANGAN ENERGIYA</p>
-        <h1 class="main-balance" id="bal-ui">0</h1>
-    </div>
-
-    <div class="char-area">
-        <div class="magic-seal"></div>
-        <div class="mage-container" id="tap-target">
-            <img src="https://www.rpgmakerweb.com/wp-content/uploads/2021/01/MZ_Mage_Side.png" 
-                 onerror="this.src='https://files.catbox.moe/p4m9h7.png'" 
-                 class="mage-sprite" id="mage-img">
-        </div>
-    </div>
-
-    <div class="mana-hud">
-        <div class="mana-info">
-            <span>ASTRAL ENERGIYA</span>
-            <span id="mana-val">1000 / 1000</span>
-        </div>
-        <div class="track">
-            <div class="fill" id="mana-bar"></div>
-        </div>
-    </div>
-
-    <div class="bottom-sheet" id="shop">
-        <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 30px;"></div>
-        <h2 style="font-family: 'Cinzel'; margin-bottom: 25px; text-align: center; color: var(--neon-cyan);">Sehr Kitobi</h2>
-        
-        <div class="item">
-            <div>
-                <p class="item-title">Void Zarba</p>
-                <p style="font-size: 11px; color: #778899;">Kuch: +<span id="pwr-stat">1.0</span></p>
-            </div>
-            <button class="action-btn" id="buy-pwr" onclick="purchase('pwr')">100</button>
-        </div>
-
-        <div class="item">
-            <div>
-                <p class="item-title">Yulduz Yadrosi</p>
-                <p style="font-size: 11px; color: #778899;">Maks Mana: +250</p>
-            </div>
-            <button class="action-btn" id="buy-mana" onclick="purchase('mana')">250</button>
-        </div>
-    </div>
-
-    <nav class="tab-bar">
-        <button class="tab active" id="tab-cast" onclick="view('cast')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            <span>SEHR</span>
-        </button>
-        <button class="tab" id="tab-shop" onclick="view('shop')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-            <span>KITOBLAR</span>
-        </button>
-    </nav>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.backgroundColor = "#020408";
-        tg.headerColor = "#020408";
-
-        let db = JSON.parse(localStorage.getItem('astral_mage_save_v2')) || {
-            bal: 0,
-            mana: 1000,
-            max: 1000,
-            pwr: 1,
-            lvl: 1,
-            cP: 100,
-            cM: 250
-        };
-
-        function sync() {
-            document.getElementById('bal-ui').innerText = Math.floor(db.bal).toLocaleString();
-            document.getElementById('mana-val').innerText = `${Math.floor(db.mana)} / ${db.max}`;
-            document.getElementById('mana-bar').style.width = (db.mana / db.max * 100) + "%";
-            document.getElementById('lvl-txt').innerText = `ARCHMAGE ${db.lvl}`;
-            document.getElementById('pwr-stat').innerText = db.pwr.toFixed(1);
-            
-            document.getElementById('buy-pwr').innerText = Math.round(db.cP);
-            document.getElementById('buy-pwr').disabled = db.bal < db.cP;
-
-            document.getElementById('buy-mana').innerText = Math.round(db.cM);
-            document.getElementById('buy-mana').disabled = db.bal < db.cM;
-
-            localStorage.setItem('astral_mage_save_v2', JSON.stringify(db));
-        }
-
-        const tapTarget = document.getElementById('tap-target');
-        tapTarget.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            [...e.changedTouches].forEach(t => {
-                if(db.mana >= 2) {
-                    db.mana -= 2;
-                    db.bal += db.pwr;
-                    spawnFx(t.clientX, t.clientY);
-                    tg.HapticFeedback.impactOccurred('medium');
-                } else {
-                    tg.HapticFeedback.notificationOccurred('error');
+            container.onclick = (e) => {
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                ray.setFromCamera(mouse, resCamera);
+                const hits = ray.intersectObjects(resNodes);
+                if(hits.length > 0) {
+                    const obj = hits[0].object;
+                    resScene.remove(obj);
+                    resNodes = resNodes.filter(n => n !== obj);
+                    score++;
+                    document.getElementById('res-score').innerText = ${score} / ${goal};
+                    tg.HapticFeedback.impactOccurred('rigid');
+                    spawnCell();
+                    if(score >= goal) endRes(id);
                 }
-            });
-            sync();
-        });
+            };
 
-        function spawnFx(x, y) {
-            const el = document.createElement('div');
-            el.className = 'pulse-text';
-            el.innerText = "+" + db.pwr.toFixed(1);
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 700);
-        }
-
-        function view(mode) {
-            const sh = document.getElementById('shop');
-            if(mode === 'shop') {
-                sh.classList.add('active');
-                document.getElementById('tab-shop').classList.add('active');
-                document.getElementById('tab-cast').classList.remove('active');
-            } else {
-                sh.classList.remove('active');
-                document.getElementById('tab-cast').classList.add('active');
-                document.getElementById('tab-shop').classList.remove('active');
+            function animateRes() {
+                if(!resActive) return;
+                requestAnimationFrame(animateRes);
+                resNodes.forEach(n => {
+                    n.position.y -= 0.04 + (id * 0.005); // Gravity speed
+                    n.rotation.z += 0.02;
+                    if(n.position.y < -10) n.position.y = 10;
+                });
+                resRenderer.render(resScene, resCamera);
             }
-            tg.HapticFeedback.selectionChanged();
+            animateRes();
         }
 
-        function purchase(t) {
-            if(t === 'pwr' && db.bal >= db.cP) {
-                db.bal -= db.cP;
-                db.pwr += 0.5;
-                db.lvl++;
-                db.cP *= 1.7;
-            } else if(t === 'mana' && db.bal >= db.cM) {
-                db.bal -= db.cM;
-                db.max += 250;
-                db.mana = db.max;
-                db.cM *= 1.9;
+        function endRes(id) {
+            resActive = false;
+            let bonus = id * 12000;
+            state.ariai += bonus;
+            if(id === state.unlocked && state.unlocked < 100) state.unlocked++;
+            document.getElementById('res-ui').style.display = 'none';
+            updateUI();
+            renderGenome();
+        }
+
+        // --- CORE SYSTEM ---
+        function updateUI() {
+            document.getElementById('ariai-bal').innerText = state.ariai.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mult-ui').innerText = state.pwr.toFixed(1);
+            document.getElementById('mana-text').innerText = ${Math.floor(state.mana)}/1000;
+            document.getElementById('mana-bar').style.width = (state.mana/state.max*100) + '%';
+            document.getElementById('xp-text').innerText = LVL ${state.lvl};
+            document.getElementById('xp-bar').style.width = (state.xp/(state.lvl*1000)*100) + '%';
+            localStorage.setItem('ariai_live_v1', JSON.stringify(state));
+        }
+
+        function renderGenome() {
+            const list = document.getElementById('cell-list');
+            list.innerHTML = '';
+            for(let i=1; i<=100; i++) {
+                const locked = i > state.unlocked;
+                const div = document.createElement('div');
+                div.className = cell-card ${locked ? 'locked' : ''};
+                div.style.opacity = locked ? '0.2' : '1';
+                div.innerHTML = `
+                    <p style="font-size:8px; color:var(--bio-pink)">GENE_${i}</p>
+                    <p style="font-size:11px; margin:5px 0; font-weight:900;">RESURRECT</p>
+                    <p style="font-size:9px; color:var(--bio-cyan)">+${(i*12).toLocaleString()}K</p>
+                `;
+                if(!locked) div.onclick = () => startResurrection(i);
+                list.appendChild(div);
             }
-            tg.HapticFeedback.notificationOccurred('success');
-            sync();
         }
 
-        // Mana to'lishi
+        function tab(name, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            if(name !== 'main') {
+                document.getElementById(`sheet-${name}`).classList.add('active');
+                if(name === 'genome') renderGenome();
+            }
+        }
+
         setInterval(() => {
-            if(db.mana < db.max) {
-                db.mana = Math.min(db.max, db.mana + (2 + db.lvl * 0.1));
-                sync();
-            }
+            if(state.mana < state.max) state.mana = Math.min(state.max, state.mana + 4);
+            updateUI();
         }, 1000);
 
-        sync();
+        window.onload = () => { initBioScene(); updateUI(); };
     </script>
 </body>
 </html>
