@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | iOS Pro</title>
+    <title>Aira Protocol | Professional Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --ios-bg: #000000;
-            --ios-card: rgba(28, 28, 30, 0.75);
+            --ios-card: rgba(28, 28, 30, 0.7);
             --ios-blue: #0A84FF;
             --ios-green: #32D74B;
-            --ios-purple: #BF5AF2;
-            --ios-orange: #FF9F0A;
-            --ios-border: rgba(255, 255, 255, 0.12);
+            --ios-border: rgba(255, 255, 255, 0.1);
             --text-main: #FFFFFF;
             --text-secondary: #8E8E93;
         }
@@ -27,151 +25,164 @@
             background-image: radial-gradient(circle at 50% -20%, #1c1c1e 0%, #000000 100%);
         }
 
-        .bg-glow { position: fixed; width: 300px; height: 300px; background: var(--ios-purple); filter: blur(120px); opacity: 0.12; top: 10%; right: -50px; z-index: -1; }
+        /* --- Header & Balance --- */
+        .header { padding: 40px 20px 10px; text-align: center; z-index: 10; }
+        .rank-name { color: var(--ios-blue); font-weight: 700; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; }
+        .bal-val { font-size: 44px; font-weight: 800; letter-spacing: -1.5px; display: block; transition: 0.1s; }
+        .profit-badge { background: rgba(50, 215, 75, 0.15); color: var(--ios-green); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
 
-        .header { padding: 60px 20px 20px; text-align: center; backdrop-filter: blur(30px); border-bottom: 0.5px solid var(--ios-border); z-index: 10; }
-        .bal-val { font-size: 42px; font-weight: 700; letter-spacing: -1.5px; margin: 2px 0; display: block; }
-        .profit-badge { background: rgba(50, 215, 75, 0.15); color: var(--ios-green); padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; }
-
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .view-content.active { display: block; animation: ios-in 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes ios-in { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        .ios-card { background: var(--ios-card); backdrop-filter: blur(25px); border-radius: 22px; border: 0.5px solid var(--ios-border); padding: 18px; margin-bottom: 16px; }
-        
-        /* Wheel UI */
-        .wheel-box { text-align: center; position: relative; }
-        .wheel-container { position: relative; width: 180px; height: 180px; margin: 10px auto 20px; }
-        .wheel { 
-            width: 100%; height: 100%; border: 6px solid #2c2c2e; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 44px; 
-            background: conic-gradient(from 0deg, #1c1c1e, #2c2c2e, #3a3a3c, #2c2c2e, #1c1c1e);
-            transition: transform 3.5s cubic-bezier(0.15, 0, 0.15, 1);
-        }
-        .wheel-pointer { 
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-            border-top: 20px solid var(--ios-blue); z-index: 2;
+        /* --- 8D Engine --- */
+        .char-stage {
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            touch-action: none;
+            position: relative;
         }
 
-        .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .ios-btn { background: var(--ios-card); border: 0.5px solid var(--ios-border); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; }
-        .ios-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
-        .ios-btn .icon { font-size: 24px; margin-bottom: 8px; }
-        .ios-btn .label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
-        .ios-btn .value { font-size: 17px; font-weight: 700; margin: 4px 0; }
-
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .grid-item { aspect-ratio: 1; background: rgba(255,255,255,0.04); border-radius: 14px; border: 0.5px solid var(--ios-border); transition: 0.2s; }
-        .grid-item.active { background: var(--ios-blue); box-shadow: 0 0 20px rgba(10, 132, 255, 0.5); border: none; }
-
-        .tap-target { 
-            width: 170px; height: 170px; background: radial-gradient(circle, #2c2c2e 0%, #1c1c1e 100%); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            margin: 20px auto; border: 8px solid #252527; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: 0.1s;
+        .char-8d-wrap {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .tap-target:active { transform: scale(0.92); }
 
-        .action-btn { background: var(--ios-blue); color: white; width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 17px; font-weight: 700; transition: 0.2s; cursor: pointer; }
-        .action-btn:active { opacity: 0.85; transform: scale(0.98); }
-        .action-btn:disabled { background: #1c1c1e; color: #555; cursor: not-allowed; }
+        .char-glow {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background: var(--ios-blue);
+            filter: blur(60px);
+            opacity: 0.3;
+            transform: translateZ(-50px);
+            border-radius: 50%;
+        }
 
-        .nav { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(30px); border-top: 0.5px solid var(--ios-border); display: flex; justify-content: space-around; padding-bottom: 25px; z-index: 100; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 11px; font-weight: 500; transition: 0.2s; cursor: pointer; }
+        .char-layer-main {
+            width: 170px;
+            z-index: 5;
+            transform: translateZ(60px);
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+            animation: float8d 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float8d {
+            0%, 100% { transform: translateZ(60px) translateY(0); }
+            50% { transform: translateZ(100px) translateY(-15px); }
+        }
+
+        /* --- UI Components --- */
+        .ios-card { 
+            background: var(--ios-card); 
+            backdrop-filter: blur(25px); 
+            border-radius: 24px; 
+            border: 1px solid var(--ios-border); 
+            padding: 18px; 
+            margin: 0 20px 12px; 
+        }
+
+        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--ios-blue); width: 0%; transition: 0.4s; }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 20px 12px; }
+        .stat-item { background: var(--ios-card); padding: 12px; border-radius: 20px; border: 1px solid var(--ios-border); text-align: center; }
+        .stat-label { color: var(--text-secondary); font-size: 10px; text-transform: uppercase; font-weight: 600; }
+        .stat-val { font-size: 18px; font-weight: 700; display: block; margin-top: 3px; }
+
+        /* Energy Bar */
+        .energy-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: #FFD60A; margin-bottom: 10px; }
+
+        .action-btn { 
+            background: var(--ios-blue); 
+            color: white; 
+            width: calc(100% - 40px);
+            margin: 0 20px; 
+            padding: 16px; 
+            border-radius: 20px; 
+            border: none; 
+            font-size: 17px; 
+            font-weight: 700; 
+            transition: 0.2s;
+        }
+        .action-btn:active { transform: scale(0.96); }
+
+        .nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(20,20,22, 0.9); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding-bottom: 25px; border-top: 0.5px solid var(--ios-border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 10px; font-weight: 600; }
         .nav-item.active { color: var(--ios-blue); }
-        .nav-item svg { width: 26px; height: 26px; margin-bottom: 5px; }
 
-        .floating-text { position: absolute; color: var(--ios-blue); font-weight: 700; font-size: 28px; pointer-events: none; animation: ios-float 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards; z-index: 1000; }
-        @keyframes ios-float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
+        .floating-text {
+            position: absolute;
+            color: white;
+            font-weight: 800;
+            font-size: 24px;
+            pointer-events: none;
+            animation: floatUp 0.7s ease-out forwards;
+            z-index: 1000;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0) opacity: 1; } 100% { transform: translateY(-120px) opacity: 0; } }
     </style>
 </head>
-<body>
-
-<div class="bg-glow"></div>
+<body onpointermove="move8D(event)">
 
 <header class="header">
-    <div id="career-badge" style="font-size: 12px; font-weight: 700; color: var(--ios-purple); text-transform: uppercase; letter-spacing: 1px;">Aira Platinum</div>
+    <div class="rank-name" id="rank-name">AIRA NEOPHYTE</div>
     <span class="bal-val" id="total-bal">0</span>
-    <div class="profit-badge" id="profit-val">+0/s</div>
+    <div class="profit-badge" id="profit-val">+0.0/s</div>
 </header>
 
-<div id="view-core" class="view-content active">
-    <div class="ios-card">
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px;">
-            <span style="color: var(--text-secondary)">Milestone Progress</span>
-            <span id="next-rank-label" style="font-weight: 600;">Gold Level</span>
-        </div>
-        <div style="width: 100%; height: 7px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
-            <div id="rank-progress" style="height: 100%; background: var(--ios-blue); width: 0%; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+<div class="char-stage">
+    <div class="char-8d-wrap" id="char8d" onclick="handleTap(event)">
+        <div class="char-glow"></div>
+        <img src="https://cdn-icons-png.flaticon.com/512/6143/6143004.png" class="char-layer-main" id="hero-img">
+    </div>
+</div>
+
+<div class="energy-wrap">
+    <span>⚡️</span> <span id="energy-val">1000</span> / <span id="max-energy">1000</span>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-item">
+        <span class="stat-label">Power</span>
+        <span class="stat-val" id="power-val">1.0</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label">Next Rank</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="rank-progress"></div>
         </div>
     </div>
+</div>
 
-    <div class="widget-grid">
-        <div class="ios-btn" onclick="upgradeFarm()">
-            <span class="icon">💎</span>
-            <span class="label">Mining Power</span>
-            <span class="value" id="farm-lvl">Lvl 1</span>
-            <span style="font-size: 13px; color: var(--ios-blue); font-weight: 600;" id="farm-cost">500</span>
-        </div>
-        <div class="ios-btn" onclick="upgradeStake()">
-            <span class="icon">🏦</span>
-            <span class="label">Yield Staking</span>
-            <span class="value" id="stake-lvl">Lvl 0</span>
-            <span style="font-size: 13px; color: var(--ios-blue); font-weight: 600;" id="stake-cost">500</span>
-        </div>
+<div class="ios-card" style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+        <div style="font-size: 12px; color: var(--text-secondary);">Upgrade Drone</div>
+        <div style="font-size: 16px; font-weight: 700;" id="lvl-txt">Level 1</div>
     </div>
-
-    <div class="ios-card" style="display: flex; align-items: center; justify-content: space-between;">
-        <div>
-            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Network Volatility</div>
-            <div id="trend-val" style="font-size: 18px; font-weight: 700; color: var(--ios-green);">+5.8%</div>
-        </div>
-        <div style="font-size: 24px;">📈</div>
-    </div>
-
-    <button class="action-btn" id="stake-btn" onclick="startStake()">
-        Deposit Assets to Pool (<span id="stake-timer">Ready</span>)
+    <button class="action-btn" style="margin: 0; padding: 10px 20px; width: auto;" onclick="upgrade()">
+        Upgrade <span id="cost-txt" style="margin-left:5px">500</span>
     </button>
 </div>
 
-<div id="view-games" class="view-content">
-    <div class="ios-card wheel-box">
-        <div style="font-size: 16px; margin-bottom: 15px; font-weight: 700;">Aira Fortune Wheel</div>
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <div class="wheel" id="wheel-obj">🎁</div>
-        </div>
-        <button class="action-btn" id="spin-btn" onclick="spinWheel()" style="background: linear-gradient(135deg, var(--ios-purple), #8e44ad);">Spin (250 AIRA)</button>
-    </div>
-
-    <div style="padding: 0 5px 12px; font-weight: 700; color: var(--text-secondary); font-size: 13px; text-transform: uppercase;">Grid Reflex Test</div>
-    <div class="ios-card">
-        <div class="grid-container" id="grid-parent">
-            <div class="grid-item" onclick="checkGrid(0, event)"></div>
-            <div class="grid-item" onclick="checkGrid(1, event)"></div>
-            <div class="grid-item" onclick="checkGrid(2, event)"></div>
-            <div class="grid-item" onclick="checkGrid(3, event)"></div>
-            <div class="grid-item" onclick="checkGrid(4, event)"></div>
-            <div class="grid-item" onclick="checkGrid(5, event)"></div>
-            <div class="grid-item" onclick="checkGrid(6, event)"></div>
-            <div class="grid-item" onclick="checkGrid(7, event)"></div>
-            <div class="grid-item" onclick="checkGrid(8, event)"></div>
-        </div>
-    </div>
-
-    <div class="tap-target" onclick="handleTap(event)">
-        <img src="https://cdn-icons-png.flaticon.com/512/2592/2592201.png" style="width: 85px; filter: drop-shadow(0 0 10px rgba(10, 132, 255, 0.3));">
-    </div>
-</div>
-
 <nav class="nav">
-    <div class="nav-item active" onclick="switchTab('core', this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Dashboard
+    <div class="nav-item active">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="width:22px;margin-bottom:4px"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Command
     </div>
-    <div class="nav-item" onclick="switchTab('games', this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM7 7h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2z"/></svg>
-        Arcade
+    <div class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="width:22px;margin-bottom:4px"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Earn
+    </div>
+    <div class="nav-item">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="width:22px;margin-bottom:4px"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        Squad
     </div>
 </nav>
 
@@ -180,13 +191,23 @@
     tg.ready();
     tg.expand();
 
-    // State
+    // Data State
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
-    let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
-    let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
-    let activeGridIndex = -1;
+    let lvl = parseInt(localStorage.getItem('aira_lvl')) || 1;
+    let energy = parseInt(localStorage.getItem('aira_nrg')) || 1000;
+    const maxEnergy = 1000 + (lvl * 50);
 
-    // Formatting
+    // 8D Motion
+    function move8D(e) {
+        const wrap = document.getElementById('char8d');
+        const hero = document.getElementById('hero-img');
+        const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        wrap.style.transform = `rotateY(${x * 20}deg) rotateX(${-y * 20}deg)`;
+        hero.style.transform = `translateZ(60px) translateX(${x * 15}px) translateY(${y * 15}px)`;
+    }
+
+    // Number Formatter
     function f(n) {
         if (n < 1000) return Math.floor(n).toString();
         const s = ["", "K", "M", "B", "T"];
@@ -194,170 +215,81 @@
         return (n / Math.pow(1000, e)).toFixed(1) + s[e];
     }
 
-    // --- WHEEL GAME ---
-    function spinWheel() {
-        if (balance < 250) { 
-            tg.HapticFeedback.notificationOccurred('error');
-            tg.showAlert("Balans yetarli emas (250 AIRA kerak)"); 
-            return; 
-        }
-        balance -= 250;
-        const btn = document.getElementById('spin-btn');
-        const wheel = document.getElementById('wheel-obj');
-        btn.disabled = true;
-        tg.HapticFeedback.impactOccurred('medium');
-        
-        let rotation = 1800 + Math.floor(Math.random() * 360);
-        wheel.style.transform = `rotate(${rotation}deg)`;
-        
-        setTimeout(() => {
-            const prizes = [1000, 0, 500, 50, 5000, 100];
-            const emojis = ['💰', '💨', '💎', '🥉', '👑', '🪙'];
-            const idx = Math.floor(Math.random() * prizes.length);
-            const win = prizes[idx];
-            
-            balance += win;
-            wheel.innerText = emojis[idx];
-            
-            if(win > 0) {
-                tg.HapticFeedback.notificationOccurred('success');
-            } else {
-                tg.HapticFeedback.notificationOccurred('warning');
-            }
-
-            btn.disabled = false;
-            setTimeout(() => {
-                wheel.style.transition = "none";
-                wheel.style.transform = "rotate(0deg)";
-                setTimeout(() => wheel.style.transition = "transform 3.5s cubic-bezier(0.15, 0, 0.15, 1)", 50);
-            }, 1500);
-            updateUI();
-        }, 3600);
-    }
-
-    // --- GRID GAME ---
-    function startGridGame() {
-        const items = document.querySelectorAll('.grid-item');
-        items.forEach(i => i.classList.remove('active'));
-        activeGridIndex = Math.floor(Math.random() * 9);
-        items[activeGridIndex].classList.add('active');
-    }
-
-    function checkGrid(idx, e) {
-        if (idx === activeGridIndex) {
-            let win = 15 * farmLevel;
-            balance += win;
-            tg.HapticFeedback.impactOccurred('light');
-            createFloatingText(e, `+${win}`);
-            startGridGame();
-            updateUI();
-        } else {
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-    }
-
-    // --- TAP ACTION ---
+    // Tap Logic
     function handleTap(e) {
-        let reward = 1 + (farmLevel * 0.4);
-        balance += reward;
+        if (energy <= 0) {
+            tg.HapticFeedback.notificationOccurred('warning');
+            return;
+        }
+
+        const power = 1 + (lvl * 0.5);
+        balance += power;
+        energy -= 1;
+        
         tg.HapticFeedback.impactOccurred('light');
-        createFloatingText(e, `+${reward.toFixed(1)}`);
+        
+        // Floating Text
+        const x = e.clientX || e.touches[0].clientX;
+        const y = e.clientY || e.touches[0].clientY;
+        const txt = document.createElement('div');
+        txt.className = 'floating-text';
+        txt.innerText = `+${power.toFixed(0)}`;
+        txt.style.left = `${x - 20}px`;
+        txt.style.top = `${y - 40}px`;
+        document.body.appendChild(txt);
+        setTimeout(() => txt.remove(), 700);
+
         updateUI();
     }
 
-    function createFloatingText(e, text) {
-        const el = document.createElement('div');
-        el.className = 'floating-text';
-        el.innerText = text;
-        
-        // Handle touch or click
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        el.style.left = `${clientX - 20}px`;
-        el.style.top = `${clientY - 20}px`;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 800);
-    }
-
-    // --- SYSTEM LOOP ---
-    setInterval(() => {
-        let aps = 55 * Math.pow(1.15, farmLevel - 1);
-        balance += (aps / 10);
-        document.getElementById('total-bal').innerText = f(balance);
-        document.getElementById('profit-val').innerText = "+" + f(aps) + "/s";
-        
-        // Progress bar logic
-        let progress = (balance / 150000) * 100;
-        document.getElementById('rank-progress').style.width = Math.min(progress, 100) + "%";
-        
-        // Market logic
-        if (Math.random() > 0.98) {
-            let trend = (Math.random() * 14 - 6).toFixed(1);
-            const tEl = document.getElementById('trend-val');
-            tEl.innerText = (trend > 0 ? "+" : "") + trend + "%";
-            tEl.style.color = trend > 0 ? "var(--ios-green)" : "var(--ios-orange)";
+    function upgrade() {
+        const cost = 500 * Math.pow(1.5, lvl - 1);
+        if (balance >= cost) {
+            balance -= cost;
+            lvl++;
+            tg.HapticFeedback.notificationOccurred('success');
+            updateUI();
+        } else {
+            tg.showAlert("Mablag' yetarli emas!");
         }
-    }, 100);
-
-    function upgradeFarm() {
-        let cost = 500 * Math.pow(1.2, farmLevel - 1);
-        if (balance >= cost) { 
-            balance -= cost; farmLevel++; 
-            tg.HapticFeedback.notificationOccurred('success'); 
-            updateUI(); 
-        } else tg.showAlert("Mablag' yetarli emas!");
-    }
-
-    function upgradeStake() {
-        let cost = 500 * Math.pow(1.25, stakeLevel);
-        if (balance >= cost) { 
-            balance -= cost; stakeLevel++; 
-            tg.HapticFeedback.notificationOccurred('success'); 
-            updateUI(); 
-        } else tg.showAlert("Mablag' yetarli emas!");
-    }
-
-    function startStake() {
-        if (balance < 100) { tg.showAlert("Kamida 100 AIRA kerak!"); return; }
-        let amt = balance; balance = 0;
-        document.getElementById('stake-btn').disabled = true;
-        tg.HapticFeedback.impactOccurred('heavy');
-        let t = 10;
-        const timer = setInterval(() => {
-            t--;
-            document.getElementById('stake-timer').innerText = t + "s";
-            if (t <= 0) {
-                clearInterval(timer);
-                balance += amt * (1.25 + (stakeLevel * 0.08));
-                document.getElementById('stake-timer').innerText = "Ready";
-                document.getElementById('stake-btn').disabled = false;
-                tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-            }
-        }, 1000);
-    }
-
-    function switchTab(tab, el) {
-        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('view-' + tab).classList.add('active');
-        el.classList.add('active');
-        if (tab === 'games') startGridGame();
-        tg.HapticFeedback.impactOccurred('selectionChanged');
     }
 
     function updateUI() {
-        document.getElementById('farm-lvl').innerText = `Lvl ${farmLevel}`;
-        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.2, farmLevel - 1));
-        document.getElementById('stake-lvl').innerText = `Lvl ${stakeLevel}`;
-        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.25, stakeLevel));
+        document.getElementById('total-bal').innerText = f(balance);
+        document.getElementById('lvl-txt').innerText = `Level ${lvl}`;
+        document.getElementById('cost-txt').innerText = f(500 * Math.pow(1.5, lvl - 1));
+        document.getElementById('power-val').innerText = (1 + (lvl * 0.5)).toFixed(1);
+        document.getElementById('energy-val').innerText = Math.floor(energy);
+        document.getElementById('max-energy').innerText = 1000 + (lvl * 50);
+
+        // Rank Progress
+        const nextRankAt = 10000 * Math.pow(2, Math.floor(lvl / 5));
+        const progress = (balance / nextRankAt) * 100;
+        document.getElementById('rank-progress').style.width = `${Math.min(progress, 100)}%`;
+
+        // Skin Evolution
+        const heroImg = document.getElementById('hero-img');
+        if (lvl >= 10 && lvl < 20) heroImg.src = "https://cdn-icons-png.flaticon.com/512/6143/6143004.png"; // Skin 2
+        if (lvl >= 20) heroImg.src = "https://cdn-icons-png.flaticon.com/512/2172/2172841.png"; // Boss Skin
+
         localStorage.setItem('aira_bal', balance);
-        localStorage.setItem('aira_farm', farmLevel);
-        localStorage.setItem('aira_stake', stakeLevel);
+        localStorage.setItem('aira_lvl', lvl);
+        localStorage.setItem('aira_nrg', energy);
     }
 
-    window.onload = updateUI;
+    // Background Loops
+    setInterval(() => {
+        // Passive Income
+        balance += (lvl * 0.2) / 10;
+        // Energy Recovery
+        if (energy < (1000 + (lvl * 50))) energy += 0.5;
+        
+        document.getElementById('total-bal').innerText = f(balance);
+        document.getElementById('profit-val').innerText = "+" + (lvl * 2).toFixed(1) + "/s";
+        document.getElementById('energy-val').innerText = Math.floor(energy);
+    }, 100);
+
+    updateUI();
 </script>
 </body>
 </html>
