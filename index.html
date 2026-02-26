@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Elite Economy</title>
+    <title>Aira Protocol | Elite V12.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,7 @@
 
         /* HEADER */
         .header { padding: 25px 20px; text-align: center; border-bottom: 2px solid var(--border); background: #000; position: relative; }
-        .rank-btn { position: absolute; left: 15px; top: 25px; background: #1a1a1a; border: 2px solid var(--lvl-color); padding: 6px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--lvl-color); }
+        .rank-btn { position: absolute; left: 15px; top: 25px; background: #1a1a1a; border: 2px solid var(--lvl-color); padding: 6px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--lvl-color); cursor: pointer; }
         .profit-badge { position: absolute; right: 15px; top: 25px; background: rgba(0,255,0,0.1); border: 1px solid #00ff00; padding: 5px 10px; border-radius: 8px; color: #00ff00; font-size: 12px; font-weight: 700; }
         .bal-val { font-size: 46px; font-weight: 700; color: #fff; }
         .staked-display { font-size: 14px; color: #ffbc00; font-weight: 700; margin-top: 5px; height: 18px; }
@@ -25,18 +25,22 @@
         .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .cost-tag { color: var(--lvl-color); font-weight: 700; font-size: 14px; margin-bottom: 5px; display: block; text-align: right; }
         
-        .btn-main { background: var(--lvl-color); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; text-transform: uppercase; }
-        .btn-main:disabled { background: #333 !important; color: #666 !important; }
+        .btn-main { background: var(--lvl-color); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 14px; }
+        .btn-main:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
 
         .lock-msg { background: rgba(255, 68, 68, 0.1); color: #ff4444; padding: 10px; border-radius: 8px; font-size: 12px; margin-top: 10px; text-align: center; border: 1px solid #ff4444; font-weight: 700; }
 
-        /* NFT STYLES */
-        .nft-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        /* MARKET & NFT */
+        .nft-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; }
         .nft-card { background: #1a1a1a; border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
 
         .nav { height: 80px; background: #000; display: flex; border-top: 2px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .nav-item.active { color: var(--lvl-color); border-top: 3px solid var(--lvl-color); }
+
+        /* MODAL */
+        #rank-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1000; padding:25px; flex-direction:column; }
+        .rank-list-item { background: #151515; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
@@ -46,7 +50,7 @@
         <div class="profit-badge" id="profit-val">+50/s</div>
         <div class="bal-val" id="total-bal">0</div>
         <div id="staked-info" class="staked-display" style="visibility: hidden;">STAKED: <span id="staked-amt">0</span></div>
-        <div id="career-name" style="font-size:12px; letter-spacing:3px; color:var(--lvl-color); font-weight:700;">BOSHLANG'ICH</div>
+        <div id="career-name" style="font-size:12px; letter-spacing:3px; color:var(--lvl-color); font-weight:700; text-transform: uppercase;">BOSHLANG'ICH</div>
     </header>
 
     <div id="view-core" class="view-content active">
@@ -58,9 +62,9 @@
             <button class="btn-main" onclick="startStake()" id="stake-btn">STAKE ALL (+%)</button>
             <div style="margin-top:15px">
                 <span class="cost-tag" id="stake-cost-tag">Narxi: 500</span>
-                <button class="btn-main" onclick="upgradeStake()" id="stake-up-btn" style="background:transparent; border:2px solid var(--lvl-color); color:var(--lvl-color)">KUCHAYTIRISH</button>
+                <button class="btn-main" onclick="upgradeStake()" id="stake-up-btn" style="background:transparent; border:2px solid var(--lvl-color); color:var(--lvl-color)">STAKING KUCHAYTIRISH</button>
             </div>
-            <div id="lock-stake" class="lock-msg">O'quvchi darajasi kerak!</div>
+            <div id="lock-stake" class="lock-msg">O'QUVCHI DARAJA KERAK!</div>
         </div>
 
         <div class="glass-card">
@@ -70,35 +74,44 @@
             </div>
             <span class="cost-tag" id="farm-cost-tag">Narxi: 500</span>
             <button class="btn-main" onclick="upgradeFarm()" id="farm-up-btn">FARMINGNI KUCHAYTIRISH</button>
-            <div id="lock-farm" class="lock-msg" style="display:none">MAX</div>
+            <div id="lock-farm" class="lock-msg" style="display:none">MAX DARADA</div>
         </div>
     </div>
 
     <div id="view-market" class="view-content">
         <div id="nft-section">
-            <h3 style="text-align:center; color:gold;">GOLDEN NFT MARKET</h3>
+            <h3 style="text-align:center; color:gold; margin-top:0;">GOLDEN NFT MARKET</h3>
             <div class="nft-grid">
                 <div class="nft-card">
-                    <div style="font-size:40px;">💎</div>
-                    <div style="font-weight:700;">AIRA ELITE #01</div>
-                    <button class="btn-main" style="margin-top:10px;" onclick="buyNFT(1000000)">1M COINS</button>
+                    <div style="font-size:40px; margin-bottom:10px;">💎</div>
+                    <div style="font-weight:700; margin-bottom:10px;">AIRA ELITE CARD #01</div>
+                    <button class="btn-main" onclick="buyNFT(1000000)">1,000,000 COINS</button>
                 </div>
             </div>
-            <div id="lock-nft" class="lock-msg">Vazir darajasi kerak!</div>
+            <div id="lock-nft" class="lock-msg">VAZIR DARAJASI KERAK!</div>
         </div>
 
         <div class="glass-card" style="margin-top:20px;">
-            <div style="font-weight:700;">AUTO-STAKING</div>
-            <button class="btn-main" style="margin-top:10px;" onclick="buyAuto()" id="auto-btn">BUY (15,000)</button>
-            <div id="lock-auto" class="lock-msg">Talaba darajasi kerak!</div>
+            <div style="font-weight:700; font-size:18px;">AUTO-STAKING (30S)</div>
+            <p style="font-size:12px; color:#aaa;">Har 30 soniyada avtomatik staking qiladi.</p>
+            <button class="btn-main" onclick="buyAuto()" id="auto-btn">SOTIB OLISH (15,000)</button>
+            <div id="lock-auto" class="lock-msg">TALABA DARAJA KERAK!</div>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('core', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('market', this)">MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('News: Tez kunda...')">NEWS</div>
+        <div class="nav-item" onclick="tg.showAlert('Roadmap: Klanlar tizimi tez kunda!')">NEWS</div>
     </nav>
+
+    <div id="rank-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+            <h2 style="margin:0; letter-spacing:1px">GLOBAL RANK</h2>
+            <button onclick="closeRank()" style="background:var(--lvl-color); border:none; padding:10px 20px; border-radius:10px; font-weight:900">X</button>
+        </div>
+        <div id="rank-list"></div>
+    </div>
 
 <script>
     const tg = window.Telegram.WebApp;
@@ -110,6 +123,7 @@
     let isStaking = false;
     let currentStaked = 0;
     let career = { name: "BOSHLANG'ICH", color: "#00f2ff" };
+    let autoTimer = 0;
 
     function checkCareer() {
         let total = balance + currentStaked;
@@ -124,20 +138,26 @@
         updateUI();
     }
 
-    // 2x PROGRESSIYA VA PROFIT
+    // MAIN LOOP (MINING & 30s AUTO-STAKE)
     setInterval(() => {
-        // Har bir darajada daromad 2x bo'ladi (Boshlang'ich 50 dan boshlanadi)
         let aps = 50 * Math.pow(2, farmLevel - 1);
-        balance += (aps / 3.33);
+        balance += (aps / 3.33); // 300ms lik interval
         
         document.getElementById('total-bal').innerText = Math.floor(balance).toLocaleString();
         document.getElementById('profit-val').innerText = "+" + Math.floor(aps).toLocaleString() + "/s";
         document.getElementById('aps-ui').innerText = Math.floor(aps).toLocaleString() + " APS";
 
-        // Auto-Stake 5s
+        // AUTO-STAKE LOGIC (30 SECONDS = 100 TICKS)
         if(hasAuto && career.auto && !isStaking && balance > 1000) {
-            startStake();
+            autoTimer++;
+            if(autoTimer >= 100) {
+                startStake();
+                autoTimer = 0;
+            }
+        } else {
+            autoTimer = 0;
         }
+        
         checkCareer();
     }, 300);
 
@@ -163,10 +183,10 @@
     }
 
     function upgradeFarm() {
-        // Xarajat ham 2x o'sadi: 500 dan boshlab
         let cost = 500 * Math.pow(2, farmLevel - 1);
         if (balance >= cost && farmLevel < career.fMax) {
             balance -= cost; farmLevel++; save();
+            tg.HapticFeedback.notificationOccurred('success');
         }
     }
 
@@ -174,6 +194,7 @@
         let cost = 500 * Math.pow(2, stakeLevel);
         if (balance >= cost && stakeLevel < career.sMax) {
             balance -= cost; stakeLevel++; save();
+            tg.HapticFeedback.notificationOccurred('success');
         }
     }
 
@@ -186,15 +207,42 @@
         document.getElementById('farm-lvl').innerText = farmLevel;
         document.getElementById('stake-lvl').innerText = stakeLevel;
 
-        // Locks
+        // Locks & Buttons
+        document.getElementById('stake-btn').disabled = isStaking || !career.stake;
+        document.getElementById('stake-up-btn').disabled = !career.stake || stakeLevel >= career.sMax;
         document.getElementById('lock-stake').style.display = career.stake ? "none" : "block";
         document.getElementById('lock-auto').style.display = career.auto ? "none" : "block";
         document.getElementById('lock-nft').style.display = career.nft ? "none" : "block";
+        
         document.getElementById('auto-btn').disabled = !career.auto || hasAuto;
         if(hasAuto) document.getElementById('auto-btn').innerText = "SOTIB OLINGAN";
+        
+        document.getElementById('farm-up-btn').disabled = farmLevel >= career.fMax;
+        document.getElementById('lock-farm').style.display = farmLevel >= career.fMax ? "block" : "none";
     }
 
+    function openRank() {
+        const list = document.getElementById('rank-list');
+        document.getElementById('rank-modal').style.display = "flex";
+        let users = [
+            { name: "Siz*", bal: balance, lvl: career.name },
+            { name: "Bekru*", bal: 1500000, lvl: "VAZIR" },
+            { name: "Sardo*", bal: 750000, lvl: "VAZIR" },
+            { name: "Dmitr*", bal: 120000, lvl: "MAGISTR" }
+        ].sort((a,b) => b.bal - a.bal);
+        list.innerHTML = users.map(u => `
+            <div class="rank-list-item">
+                <div style="font-weight:700">${u.name}<br><small style="color:var(--lvl-color)">${u.lvl}</small></div>
+                <div>${Math.floor(u.bal).toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+
+    function closeRank() { document.getElementById('rank-modal').style.display = "none"; }
+    function buyAuto() { if (balance >= 15000) { balance -= 15000; hasAuto = true; localStorage.setItem('aira_auto', 'true'); save(); } }
+    function buyNFT(p) { if (balance >= p) { balance -= p; save(); tg.showAlert("NFT Muvaffaqiyatli olindi!"); } else { tg.showAlert("Mablag' yetarli emas!"); } }
     function save() { localStorage.setItem('aira_bal', balance); localStorage.setItem('aira_farm', farmLevel); localStorage.setItem('aira_stake', stakeLevel); }
+    
     function switchTab(tab, el) {
         document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
