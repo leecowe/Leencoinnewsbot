@@ -3,134 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Ultima</title>
+    <title>Leenova Mega</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #00f2ff; --pink: #ff007f; --purple: #bc00ff; --gold: #ffcc00; --dark: #01080e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            background: radial-gradient(circle at center, #020b16 0%, #01080e 100%); display: flex; flex-direction: column;
-        }
+        body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden; background: #01080e; display: flex; flex-direction: column; }
 
-        /* HUD - PROFESSIONAL HEADER */
-        .hud { padding: 45px 25px 20px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--blue); position: relative; z-index: 10; }
-        .label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
-        .balance { font-family: 'Orbitron'; font-size: 42px; font-weight: 700; text-shadow: 0 0 20px var(--blue); margin: 5px 0; }
-        .stats-row { display: flex; gap: 15px; }
-        .stat-card { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; font-size: 11px; }
+        /* HUD */
+        .hud { padding: 45px 25px 20px; background: rgba(0,0,0,0.85); border-bottom: 2px solid var(--blue); position: relative; z-index: 10; }
+        .balance { font-family: 'Orbitron'; font-size: 38px; font-weight: 700; text-shadow: 0 0 15px var(--blue); margin: 5px 0; }
+        .stats-row { display: flex; gap: 10px; }
+        .stat-card { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 4px 10px; border-radius: 4px; font-family: 'Orbitron'; font-size: 10px; }
 
-        /* COMBO UI */
-        #combo-ui { position: absolute; right: 25px; top: 60px; color: var(--pink); font-family: 'Orbitron'; font-weight: bold; font-size: 18px; display: none; text-shadow: 0 0 10px var(--pink); animation: shake 0.2s infinite; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
-
-        /* WINDOW SYSTEM */
-        .window { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; position: relative; }
+        /* WINDOWS */
+        .window { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
         .window.active { display: block; }
 
-        /* CLICKER ZONE */
-        .click-area { height: 100%; display: flex; justify-content: center; align-items: center; background: url('https://images.alphacoders.com/131/1314605.png') no-repeat center bottom; background-size: cover; }
-        .core-wrap { position: relative; }
-        .core-btn {
-            width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--blue);
-            box-shadow: 0 0 40px var(--blue), inset 0 0 20px var(--blue);
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            animation: breathe 4s infinite ease-in-out; transition: 0.1s;
-        }
-        .core-btn:active { transform: scale(0.92); }
-        .core-btn img { width: 110px; pointer-events: none; filter: drop-shadow(0 0 10px var(--blue)); }
-        @keyframes breathe { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--blue); } 50% { transform: scale(1.05); box-shadow: 0 0 60px var(--blue); } }
+        /* CITY/CLICKER */
+        .click-area { height: 100%; display: flex; justify-content: center; align-items: center; background: url('https://images.alphacoders.com/131/1314605.png') no-repeat center center; background-size: cover; }
+        .core-btn { width: 200px; height: 200px; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 30px var(--blue); display: flex; justify-content: center; align-items: center; transition: 0.1s; animation: pulse 4s infinite; }
+        .core-btn:active { transform: scale(0.9); }
+        .core-btn img { width: 100px; filter: drop-shadow(0 0 10px var(--blue)); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
-        /* MARKET & UPGRADES */
-        .up-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.15); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .progress-track { width: 100%; height: 5px; background: #000; border-radius: 3px; margin-top: 8px; }
-        .progress-bar { height: 100%; background: var(--blue); transition: 0.4s; box-shadow: 0 0 10px var(--blue); }
-        .action-btn { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); color: #fff; padding: 10px 18px; border-radius: 8px; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; }
-        .action-btn:disabled { opacity: 0.3; border-color: #444; }
+        /* CARDS & NFT */
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nft-card { background: rgba(188, 0, 255, 0.05); border: 2px solid var(--purple); border-radius: 15px; padding: 15px; text-align: center; }
+        .nft-card.owned { opacity: 0.5; border-color: #444; }
+        .nft-icon { font-size: 40px; display: block; margin-bottom: 8px; }
 
-        /* NAVIGATION */
-        .nav { display: flex; background: rgba(0,0,0,0.95); border-top: 1px solid var(--blue); position: fixed; bottom: 0; width: 100%; z-index: 100; }
-        .nav-item { flex: 1; padding: 20px; text-align: center; font-family: 'Orbitron'; font-size: 10px; color: #555; transition: 0.3s; }
-        .nav-item.active { color: var(--blue); background: rgba(0, 242, 255, 0.05); border-bottom: 3px solid var(--blue); }
+        /* BUTTONS */
+        .btn { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); color: #fff; padding: 8px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        .btn:disabled { opacity: 0.3; border-color: #555; }
 
-        /* EFFECTS */
-        .pop-num { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: floatUp 0.8s forwards; z-index: 1000; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.5); } }
-        
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #01080e; border: 2px solid var(--blue); padding: 25px; border-radius: 15px; z-index: 2000; text-align: center; width: 80%; box-shadow: 0 0 50px #000; }
+        /* NAV */
+        .nav { display: flex; background: #000; border-top: 1px solid var(--blue); position: fixed; bottom: 0; width: 100%; }
+        .nav-item { flex: 1; padding: 18px; text-align: center; font-family: 'Orbitron'; font-size: 10px; color: #555; }
+        .nav-item.active { color: var(--blue); background: rgba(0, 242, 255, 0.1); }
+
+        /* POPUP & MODAL */
+        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.7s forwards; }
+        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #01080e; border: 2px solid var(--blue); padding: 25px; border-radius: 15px; z-index: 2000; text-align: center; width: 85%; }
     </style>
 </head>
 <body>
 
     <div class="hud">
-        <div class="label">LEENOVA NETWORK CREDITS</div>
         <div class="balance" id="bal">0</div>
         <div class="stats-row">
-            <div class="stat-card">TAP: +<span id="t-pow">1</span></div>
-            <div class="stat-card">AUTO: +<span id="a-pow">0</span>/s</div>
+            <div class="stat-card">T: +<span id="t-pow">1</span></div>
+            <div class="stat-card">A: +<span id="a-pow">0</span>/s</div>
         </div>
-        <div id="combo-ui">COMBO X1</div>
     </div>
 
     <div id="win-city" class="window active">
-        <div class="click-area">
-            <div class="core-wrap">
-                <div class="core-btn" id="tap-btn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png" alt="Core">
-                </div>
-            </div>
-        </div>
+        <div class="click-area"><div class="core-btn" id="tap-btn"><img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png"></div></div>
     </div>
 
-    <div id="win-up" class="window">
-        <h2 style="font-family: 'Orbitron'; color: var(--blue); margin-top: 0;">SYSTEM MARKET</h2>
-        <div id="up-list"></div>
-    </div>
+    <div id="win-up" class="window"><div id="up-list"></div></div>
+
+    <div id="win-nft" class="window"><div class="nft-grid" id="nft-list"></div></div>
 
     <div id="modal" class="modal">
-        <h3 style="font-family: 'Orbitron'; color: var(--blue);">WELCOME BACK</h3>
+        <h3 id="modal-title" style="color:var(--blue); font-family:Orbitron;"></h3>
         <p id="modal-msg"></p>
-        <button class="action-btn" onclick="closeModal()">COLLECT</button>
+        <button class="btn" onclick="document.getElementById('modal').style.display='none'">COLLECT</button>
     </div>
 
     <div class="nav">
         <div class="nav-item active" onclick="tab('win-city', this)">CITY</div>
-        <div class="nav-item" onclick="tab('win-up', this)">MARKET</div>
+        <div class="nav-item" onclick="tab('win-up', this)">UPGRADES</div>
+        <div class="nav-item" onclick="tab('win-nft', this)">NFT MARKET</div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        const tg = window.Telegram.WebApp; tg.expand();
 
-        // 1. DATA STATE
         let data = {
-            m: parseFloat(localStorage.getItem('ln_m')) || 0,
-            l: JSON.parse(localStorage.getItem('ln_l')) || {u1:0,u2:0,u3:0,u4:0,u5:0,u6:0,u7:0,u8:0},
-            last: parseInt(localStorage.getItem('ln_last')) || Date.now()
+            m: parseFloat(localStorage.getItem('mega_m')) || 0,
+            l: JSON.parse(localStorage.getItem('mega_l')) || {u1:0,u2:0,u3:0,u4:0},
+            n: JSON.parse(localStorage.getItem('mega_n')) || [],
+            t: parseInt(localStorage.getItem('mega_t')) || Date.now()
         };
 
-        let lastTap = 0, combo = 0, comboMult = 1;
-
-        const ups = [
+        const upgrades = [
             { id: 'u1', name: 'Neural Link', base: 15, val: 2, type: 'tap' },
             { id: 'u2', name: 'Cyber Miner', base: 100, val: 5, type: 'auto' },
-            { id: 'u3', name: 'Nano Pulse', base: 500, val: 10, type: 'tap' },
-            { id: 'u4', name: 'Data Stream', base: 1500, val: 40, type: 'auto' },
-            { id: 'u5', name: 'Quantum CPU', base: 5000, val: 150, type: 'auto' },
-            { id: 'u6', name: 'Void Core', base: 15000, val: 50, type: 'tap' },
-            { id: 'u7', name: 'Nebula Drive', base: 50000, val: 600, type: 'auto' },
-            { id: 'u8', name: 'Titan Node', base: 120000, val: 2000, type: 'auto' }
+            { id: 'u3', name: 'Quantum CPU', base: 1000, val: 50, type: 'auto' },
+            { id: 'u4', name: 'Titan Core', base: 5000, val: 100, type: 'tap' }
         ];
 
-        // 2. CORE LOGIC
+        const nftMarket = Array.from({length: 16}, (_, i) => ({
+            id: i, name: `KIBER NFT #${i+1}`, cost: (i+1)*10000, p: (i+1)*400, icon: ['🤖','🛰️','👾','💎','🔥','⚡','🪐','🛸','⭐','🌌','🧿','🧬','🌀','🛡️','👑','👹'][i]
+        }));
+
         function getStats() {
             let t = 1, a = 0;
-            ups.forEach(u => {
-                let lvl = data.l[u.id] || 0;
-                if(u.type === 'tap') t += lvl * u.val; else a += lvl * u.val;
-            });
+            upgrades.forEach(u => { let lvl = data.l[u.id]; if(u.type==='tap') t += lvl*u.val; else a += lvl*u.val; });
+            nftMarket.filter(n => data.n.includes(n.id)).forEach(n => a += n.p);
             return { t, a };
         }
 
@@ -141,109 +115,54 @@
             document.getElementById('a-pow').innerText = s.a;
 
             const ul = document.getElementById('up-list');
-            if(ul) {
-                let html = '';
-                let chain = true;
-                ups.forEach(u => {
-                    if(!chain) return;
-                    let lvl = data.l[u.id];
-                    let cost = Math.floor(u.base * Math.pow(1.6, lvl));
-                    html += `
-                        <div class="up-item">
-                            <div style="flex:1; margin-right:15px">
-                                <div style="font-family:Orbitron; font-size:12px; font-weight:700">${u.name} (LVL ${lvl})</div>
-                                <div class="progress-track"><div class="progress-bar" style="width:${lvl*10}%"></div></div>
-                            </div>
-                            <button class="action-btn" onclick="buyU('${u.id}', ${cost})" ${data.m < cost || lvl >= 10 ? 'disabled' : ''}>
-                                ${lvl >= 10 ? 'MAX' : cost.toLocaleString()}
-                            </button>
-                        </div>`;
-                    if(lvl < 10) chain = false;
-                });
-                ul.innerHTML = html;
-            }
+            ul.innerHTML = '<h2 style="font-family:Orbitron;color:var(--blue)">UPGRADES</h2>';
+            upgrades.forEach(u => {
+                let lvl = data.l[u.id]; let cost = Math.floor(u.base * Math.pow(1.6, lvl));
+                ul.innerHTML += `<div class="card"><div><b>${u.name}</b><br><small>Lvl ${lvl}</small></div>
+                <button class="btn" onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''}>${cost.toLocaleString()}</button></div>`;
+            });
+
+            const nl = document.getElementById('nft-list');
+            nl.innerHTML = '';
+            nftMarket.forEach(n => {
+                const own = data.n.includes(n.id);
+                nl.innerHTML += `<div class="nft-card ${own ? 'owned' : ''}"><span class="nft-icon">${n.icon}</span>
+                <small>${n.name}</small><br><b style="color:var(--blue)">+${n.p}/s</b><br><br>
+                <button class="btn" style="width:100%" onclick="buyN(${n.id}, ${n.cost})" ${own || data.m < n.cost ? 'disabled' : ''}>
+                ${own ? 'OWNED' : n.cost.toLocaleString()}</button></div>`;
+            });
             save();
         }
 
-        function save() {
-            localStorage.setItem('ln_m', data.m);
-            localStorage.setItem('ln_l', JSON.stringify(data.l));
-            localStorage.setItem('ln_last', Date.now());
-        }
+        function save() { localStorage.setItem('mega_m', data.m); localStorage.setItem('mega_l', JSON.stringify(data.l)); localStorage.setItem('mega_n', JSON.stringify(data.n)); localStorage.setItem('mega_t', Date.now()); }
 
-        // 3. ACTIONS
-        window.buyU = (id, c) => {
-            if(data.m >= c) {
-                data.m -= c; data.l[id]++; 
-                tg.HapticFeedback.impactOccurred('medium');
-                render();
-            }
+        window.buyU = (id, c) => { if(data.m >= c) { data.m -= c; data.l[id]++; render(); tg.HapticFeedback.impactOccurred('medium'); } };
+        window.buyN = (id, c) => { if(data.m >= c) { data.m -= c; data.n.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); } };
+
+        document.getElementById('tap-btn').onclick = (e) => {
+            const s = getStats(); data.m += s.t;
+            const p = document.createElement('div'); p.className = 'pop'; p.innerText = `+${s.t}`;
+            p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+            document.body.appendChild(p); setTimeout(() => p.remove(), 700);
+            render(); tg.HapticFeedback.impactOccurred('light');
         };
 
-        document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const now = Date.now();
-            if(now - lastTap < 300) combo++; else combo = 0;
-            lastTap = now;
+        function tab(id, el) { document.querySelectorAll('.window, .nav-item').forEach(x => x.classList.remove('active')); document.getElementById(id).classList.add('active'); el.classList.add('active'); render(); }
 
-            comboMult = combo > 20 ? 3 : (combo > 10 ? 2 : 1);
-            const cui = document.getElementById('combo-ui');
-            if(comboMult > 1) {
-                cui.innerText = `COMBO X${comboMult}`;
-                cui.style.display = 'block';
-            } else cui.style.display = 'none';
+        setInterval(() => { const s = getStats(); if(s.a > 0) { data.m += s.a/10; document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString(); } }, 100);
 
-            const s = getStats();
-            const val = s.t * comboMult;
-            data.m += val;
-
-            const touch = e.touches[0];
-            const p = document.createElement('div');
-            p.className = 'pop-num';
-            p.innerText = `+${val}`;
-            p.style.left = touch.clientX + 'px';
-            p.style.top = touch.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-
-            tg.HapticFeedback.impactOccurred('light');
-            render();
-        });
-
-        window.tab = function(id, el) {
-            document.querySelectorAll('.window, .nav-item').forEach(x => x.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            render();
-        };
-
-        // 4. OFFLINE & AUTO
-        function checkOffline() {
-            const s = getStats();
-            const diff = (Date.now() - data.last) / 1000;
+        // Offline check
+        const offline = () => {
+            const s = getStats(); const diff = (Date.now() - data.t)/1000;
             if(diff > 60 && s.a > 0) {
-                const earned = Math.floor(diff * s.a * 0.5); // Offline daromad 50%
-                data.m += earned;
-                document.getElementById('modal-msg').innerText = `Siz yo'qligingizda tizim ${Math.floor(diff/60)} daqiqa ishladi va ${earned.toLocaleString()} kredit yig'di.`;
+                const earned = Math.floor(diff * s.a * 0.5); data.m += earned;
+                document.getElementById('modal-title').innerText = "WELCOME BACK";
+                document.getElementById('modal-msg').innerText = `Tizim sizsiz ${earned.toLocaleString()} kredit yig'di!`;
                 document.getElementById('modal').style.display = 'block';
             }
-        }
+        };
 
-        window.closeModal = () => { document.getElementById('modal').style.display = 'none'; render(); };
-
-        setInterval(() => {
-            const s = getStats();
-            if(s.a > 0) {
-                data.m += s.a / 10;
-                document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-            }
-        }, 100);
-
-        // Har 10 soniyada xotiraga yozish
-        setInterval(save, 10000);
-
-        checkOffline();
-        render();
+        offline(); render();
     </script>
 </body>
 </html>
