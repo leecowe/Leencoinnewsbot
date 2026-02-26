@@ -10,58 +10,55 @@
             background: #000; color: #fff; text-align: center; font-family: 'Segoe UI', sans-serif; 
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        .header { padding: 25px 20px; background: linear-gradient(to bottom, #1a1a1a, #000); }
-        .score { font-size: 60px; font-weight: bold; color: #ffcc00; text-shadow: 0 0 20px rgba(255, 204, 0, 0.6); margin: 5px 0; }
+        .header { padding: 20px; background: linear-gradient(to bottom, #1a1a1a, #000); }
+        .score { font-size: 55px; font-weight: bold; color: #ffcc00; text-shadow: 0 0 20px rgba(255, 204, 0, 0.5); }
         
-        /* Progress Bar */
-        .progress-container { width: 80%; background: #333; height: 10px; border-radius: 5px; margin: 10px auto; overflow: hidden; }
+        .progress-container { width: 85%; background: #333; height: 12px; border-radius: 6px; margin: 10px auto; overflow: hidden; border: 1px solid #444; }
         .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff9900, #ffcc00); transition: width 0.3s; }
 
-        .stats-row { display: flex; justify-content: space-around; font-size: 14px; color: #00ff00; font-weight: bold; }
+        .energy-section { font-size: 14px; color: #aaa; margin-top: 5px; }
+        .stats-row { display: flex; justify-content: space-around; font-size: 13px; color: #00ff00; font-weight: bold; margin-top: 10px; }
         
         .main-game { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        
-        /* Tanga dizayni */
-        .coin-wrapper { position: relative; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         .coin { 
-            width: 230px; height: 230px; background: radial-gradient(circle, #ffcc00 30%, #ff9900 100%); 
-            border-radius: 50%; box-shadow: 0 0 60px rgba(255, 153, 0, 0.4), inset 0 0 20px rgba(255,255,255,0.5);
-            display: flex; align-items: center; justify-content: center; font-size: 100px;
-            transition: transform 0.05s; border: 10px solid #e6b800;
+            width: 220px; height: 220px; background: radial-gradient(circle, #ffcc00, #ff9900); 
+            border-radius: 50%; box-shadow: 0 0 50px rgba(255, 153, 0, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 90px;
+            transition: transform 0.05s; border: 8px solid #e6b800; -webkit-tap-highlight-color: transparent;
         }
         .coin:active { transform: scale(0.92); }
+        .coin.disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
         
-        /* Uchuvchi raqamlar */
-        .tap-anim { position: absolute; color: #fff; font-size: 32px; font-weight: 900; pointer-events: none; animation: fly 0.7s ease-out forwards; text-shadow: 0 0 10px #000; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.5); } }
+        .tap-anim { position: absolute; color: #fff; font-size: 30px; font-weight: 900; pointer-events: none; animation: fly 0.6s ease-out forwards; }
+        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
         
-        .shop-container { padding: 30px 20px; background: #111; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
-        .upgrade-btn {
-            background: linear-gradient(45deg, #ff9900, #ffcc00); color: #000; border: none; padding: 18px; 
-            border-radius: 15px; font-weight: 900; font-size: 18px; width: 100%; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+        .footer-menu { padding: 20px; background: #111; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 25px 25px 0 0; }
+        .btn {
+            border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.3s;
         }
-        .upgrade-btn:disabled { background: #333; color: #777; box-shadow: none; }
+        .upgrade-btn { background: #ffcc00; color: #000; }
+        .upgrade-btn:disabled { background: #333; color: #777; }
+        .invite-btn { background: #248bcf; color: #fff; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="score" id="score">0</div>
         <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
+        <div class="energy-section">⚡️ Energiya: <span id="energy">100</span>/100</div>
         <div class="stats-row">
-            <span id="tap-power">🚀 TAP: +1</span>
-            <span id="auto-rate">⚙️ AUTO: +1/s</span>
+            <span id="tap-power">🚀 Tap: +1</span>
+            <span id="auto-rate">⚙️ Auto: +1/s</span>
         </div>
     </div>
 
-    <div class="main-game" id="game-area">
-        <div class="coin-wrapper" id="tap-zone">
-            <div class="coin">💰</div>
-        </div>
+    <div class="main-game">
+        <div class="coin" id="coin">💰</div>
     </div>
 
-    <div class="shop-container">
-        <button class="upgrade-btn" id="upgrade-btn">LEVEL UP (Narxi: 100)</button>
+    <div class="footer-menu">
+        <button class="btn upgrade-btn" id="upgrade-btn">Level Up (💰 100)</button>
+        <button class="btn invite-btn" id="invite-btn">Invite Friends 👥</button>
     </div>
 
     <script>
@@ -71,67 +68,72 @@
         let score = parseFloat(localStorage.getItem('score')) || 0;
         let tapPower = parseInt(localStorage.getItem('tapPower')) || 1;
         let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 100;
+        let energy = parseInt(localStorage.getItem('energy')) || 100;
 
         const scoreEl = document.getElementById('score');
-        const tapPowerEl = document.getElementById('tap-power');
-        const upgradeBtn = document.getElementById('upgrade-btn');
+        const energyEl = document.getElementById('energy');
         const progressBar = document.getElementById('progress');
+        const upgradeBtn = document.getElementById('upgrade-btn');
 
         function updateUI() {
             scoreEl.innerText = Math.floor(score).toLocaleString();
-            tapPowerEl.innerText = `🚀 TAP: +${tapPower}`;
-            upgradeBtn.innerText = `LEVEL UP (💰 ${upgradeCost})`;
+            energyEl.innerText = energy;
+            document.getElementById('tap-power').innerText = `🚀 Tap: +${tapPower}`;
+            upgradeBtn.innerText = `Level Up (💰 ${upgradeCost})`;
             
-            // Progress Bar hisoblash
-            let progress = (score / upgradeCost) * 100;
-            progressBar.style.width = Math.min(progress, 100) + "%";
-            
+            let prog = (score / upgradeCost) * 100;
+            progressBar.style.width = Math.min(prog, 100) + "%";
             upgradeBtn.disabled = score < upgradeCost;
+            
+            if(energy <= 0) document.getElementById('coin').classList.add('disabled');
+            else document.getElementById('coin').classList.remove('disabled');
         }
 
-        // Avto-daromad
+        // Auto-daromad va Energiya tiklanishi
         setInterval(() => {
             score += 1;
+            if (energy < 100) energy += 1;
             updateUI();
-            localStorage.setItem('score', score);
+            save();
         }, 1000);
 
-        // Effekti bilan Tap
-        document.getElementById('tap-zone').onclick = (e) => {
-            score += tapPower;
-            updateUI();
+        function save() {
             localStorage.setItem('score', score);
-            tg.HapticFeedback.impactOccurred('medium');
+            localStorage.setItem('tapPower', tapPower);
+            localStorage.setItem('upgradeCost', upgradeCost);
+            localStorage.setItem('energy', energy);
+        }
 
-            // Uchuvchi raqam animatsiyasi
-            const anim = document.createElement('div');
-            anim.className = 'tap-anim';
-            anim.innerText = `+${tapPower}`;
-            
-            const x = e.clientX || window.innerWidth / 2;
-            const y = e.clientY || window.innerHeight / 2;
-            
-            anim.style.left = x - 20 + 'px';
-            anim.style.top = y - 50 + 'px';
-            
-            document.getElementById('game-area').appendChild(anim);
-            setTimeout(() => anim.remove(), 700);
+        document.getElementById('coin').onclick = (e) => {
+            if (energy >= tapPower) {
+                score += tapPower;
+                energy -= tapPower;
+                updateUI();
+                tg.HapticFeedback.impactOccurred('medium');
+
+                const anim = document.createElement('div');
+                anim.className = 'tap-anim';
+                anim.innerText = `+${tapPower}`;
+                anim.style.left = e.clientX + 'px';
+                anim.style.top = e.clientY + 'px';
+                document.body.appendChild(anim);
+                setTimeout(() => anim.remove(), 600);
+            }
         };
 
-        // Upgrade
         upgradeBtn.onclick = () => {
             if (score >= upgradeCost) {
                 score -= upgradeCost;
                 tapPower += 1;
-                upgradeCost = Math.floor(upgradeCost * 1.8);
-                
-                localStorage.setItem('score', score);
-                localStorage.setItem('tapPower', tapPower);
-                localStorage.setItem('upgradeCost', upgradeCost);
-                
+                upgradeCost = Math.floor(upgradeCost * 2);
                 updateUI();
-                tg.HapticFeedback.notificationOccurred('success');
+                save();
             }
+        };
+
+        document.getElementById('invite-btn').onclick = () => {
+            const url = `https://t.me/share/url?url=https://t.me/${tg.initDataUnsafe.bot.username}&text=Bu o'yinda pul ishla!`;
+            tg.openTelegramLink(url);
         };
 
         updateUI();
