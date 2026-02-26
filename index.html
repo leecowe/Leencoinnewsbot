@@ -3,164 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Evolution</title>
+    <title>Aira Protocol V2.1 - Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cyan: #00f2ff;
+            --primary: #00f2ff;
             --pink: #ff007f;
             --bg: #050a10;
+            --card: rgba(0, 242, 255, 0.05);
             --border: rgba(0, 242, 255, 0.2);
+            --glow: 0 0 20px rgba(0, 242, 255, 0.3);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body {
             background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif;
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            background-image: radial-gradient(circle at 50% 50%, #0a1a25 0%, #050a10 100%);
         }
 
-        /* Stats Section */
-        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .bal-val { font-family: 'Orbitron'; font-size: 48px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--cyan); }
-        .level-info { font-family: 'Orbitron'; font-size: 12px; color: var(--pink); margin-top: 5px; }
+        /* HEADER */
+        .header { padding: 40px 20px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .version { font-family: 'Orbitron'; font-size: 10px; color: var(--primary); letter-spacing: 4px; }
+        .score-val { font-family: 'Orbitron'; font-size: 52px; font-weight: 900; text-shadow: var(--glow); margin: 5px 0; }
+        .lvl-tag { color: var(--pink); font-family: 'Orbitron'; font-size: 12px; }
 
-        /* Game Board */
-        .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 280px; }
-        .tile {
-            aspect-ratio: 1; background: rgba(0, 242, 255, 0.05); border: 2px solid var(--border);
-            border-radius: 15px; display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron'; font-size: 20px; transition: 0.2s; cursor: pointer;
+        /* GAME GRID */
+        .game-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            width: 100%; max-width: 300px; padding: 20px;
+            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
         }
-        .tile.blink { background: var(--cyan); box-shadow: 0 0 25px var(--cyan); border-color: #fff; }
+        .node {
+            aspect-ratio: 1; background: rgba(0, 242, 255, 0.03); border: 2px solid var(--border);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 24px; color: #fff; transition: 0.2s; cursor: pointer;
+        }
+        .node.active { background: var(--primary); border-color: #fff; box-shadow: 0 0 25px var(--primary); color: #000; }
+        .node.error { background: var(--pink); border-color: #fff; box-shadow: 0 0 25px var(--pink); }
 
-        /* Reward Modal */
-        #reward-modal {
-            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; background: #0a1a25; border: 2px solid var(--cyan); padding: 20px;
-            border-radius: 20px; z-index: 100; text-align: center; backdrop-filter: blur(10px);
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: #0a1a25; border: 2px solid var(--primary); padding: 30px;
+            border-radius: 24px; text-align: center; width: 100%; max-width: 320px;
         }
         .opt-btn {
-            display: block; width: 100%; padding: 15px; margin: 10px 0;
-            background: var(--glass); border: 1px solid var(--cyan); color: #fff;
-            border-radius: 10px; font-family: 'Orbitron'; cursor: pointer;
+            width: 100%; padding: 15px; margin: 10px 0; background: var(--card);
+            border: 1px solid var(--primary); color: #fff; border-radius: 12px;
+            font-family: 'Orbitron'; font-weight: bold; cursor: pointer;
         }
 
-        /* Nav */
-        .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
-        .n-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
-        .n-item.active { color: var(--cyan); border-top: 3px solid var(--cyan); }
+        /* NAVIGATION */
+        .nav { height: 85px; background: rgba(0,0,0,0.95); display: flex; border-top: 1px solid var(--border); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; }
+        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: linear-gradient(0deg, rgba(0,242,255,0.05), transparent); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="bal-val" id="score">0</div>
-        <div class="level-info" id="lvl-display">PROTOCOL LEVEL: 1</div>
+    <header class="header">
+        <div class="version">AIRA PROTOCOL V2.1</div>
+        <div class="score-val" id="score-display">0</div>
+        <div class="lvl-tag" id="level-display">PROTOCOL LEVEL: 1</div>
+    </header>
+
+    <div class="game-container">
+        <div class="grid" id="grid-board"></div>
+        <div id="status-text" style="margin-top:20px; font-family:'Orbitron'; color:var(--primary); font-size:13px;">ESLAB QOLING...</div>
+        <div id="timer-text" style="margin-top:10px; font-size:18px; font-family:'Orbitron';">VAQT: 30s</div>
     </div>
 
-    <div class="game-area">
-        <div class="grid" id="board"></div>
-        <div id="reward-modal">
-            <h3 style="font-family:'Orbitron'; color:var(--cyan)">MUKOFOTNI TANLANG</h3>
-            <button class="opt-btn" onclick="claim(1)">+50 DATA COINS</button>
-            <button class="opt-btn" onclick="claim(2)">+1.5x MULTIPLIER</button>
+    <div class="modal" id="reward-modal">
+        <div class="modal-content">
+            <h2 style="font-family:'Orbitron'; color:var(--primary); font-size:18px;">HACK MUVAFFAQIYATLI!</h2>
+            <p style="font-size:12px; margin-bottom:20px;">MUKOFOTNI TANLANG:</p>
+            <button class="opt-btn" onclick="claim(1)">+100 DATA COINS</button>
+            <button class="opt-btn" onclick="claim(2)">+200 DATA COINS</button>
         </div>
-        <p id="msg" style="margin-top:20px; font-family:'Orbitron'; font-size:12px; color:var(--cyan)">TAYYOR TURING...</p>
     </div>
 
-    <div class="nav">
-        <div class="n-item active">HACK</div>
-        <div class="n-item">MARKET</div>
-        <div class="n-item">WALLET</div>
-    </div>
+    <nav class="nav">
+        <div class="nav-item active">HACK</div>
+        <div class="nav-item" onclick="tg.showAlert('Market yaqin kunlarda ochiladi!')">MARKET</div>
+        <div class="nav-item" onclick="tg.showAlert('NFT sektori bloklangan!')">NFT</div>
+    </nav>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    let state = {
-        score: parseInt(localStorage.getItem('a_sc')) || 0,
-        level: parseInt(localStorage.getItem('a_lv')) || 1,
-        diff: 1000, // boshlang'ich tezlik (ms)
-        seqLen: 3
-    };
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    let sequence = [];
-    let userStep = 0;
+        // 1. DATA PERSISTENCE (ESLAB QOLISH)
+        let state = {
+            score: parseInt(localStorage.getItem('aira_sc')) || 0,
+            level: parseInt(localStorage.getItem('aira_lv')) || 1,
+            speed: parseInt(localStorage.getItem('aira_sp')) || 1000,
+            seqLen: parseInt(localStorage.getItem('aira_sl')) || 3
+        };
 
-    function init() {
-        const board = document.getElementById('board');
-        board.innerHTML = '';
-        for(let i=0; i<9; i++) {
-            let t = document.createElement('div');
-            t.className = 'tile';
-            t.onclick = () => handleTap(i, t);
-            board.appendChild(t);
-        }
-        document.getElementById('score').innerText = state.score;
-        document.getElementById('lvl-display').innerText = `PROTOCOL LEVEL: ${state.level}`;
-        setTimeout(startRound, 2000);
-    }
+        let sequence = [];
+        let userSteps = 0;
+        let timeLeft = 30;
+        let isGameActive = false;
 
-    function startRound() {
-        sequence = [];
-        userStep = 0;
-        document.getElementById('msg').innerText = "ESLAB QOLING!";
-        
-        for(let i=0; i < state.seqLen; i++) {
-            sequence.push(Math.floor(Math.random() * 9));
+        function save() {
+            localStorage.setItem('aira_sc', state.score);
+            localStorage.setItem('aira_lv', state.level);
+            localStorage.setItem('aira_sp', state.speed);
+            localStorage.setItem('aira_sl', state.seqLen);
         }
 
-        let i = 0;
-        const interval = setInterval(() => {
-            const tiles = document.querySelectorAll('.tile');
-            tiles[sequence[i]].classList.add('blink');
-            setTimeout(() => tiles[sequence[i]].classList.remove('blink'), state.diff * 0.7);
-            i++;
-            if(i >= sequence.length) {
-                clearInterval(interval);
+        function initBoard() {
+            const board = document.getElementById('grid-board');
+            board.innerHTML = '';
+            for(let i=0; i<9; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.innerText = '?';
+                node.onclick = () => handleInput(i, node);
+                board.appendChild(node);
+            }
+            document.getElementById('score-display').innerText = state.score;
+            document.getElementById('level-display').innerText = `PROTOCOL LEVEL: ${state.level}`;
+        }
+
+        function startRound() {
+            isGameActive = false;
+            sequence = [];
+            userSteps = 0;
+            document.getElementById('status-text').innerText = "ESLAB QOLING...";
+            
+            for(let i=0; i < state.seqLen; i++) {
+                sequence.push(Math.floor(Math.random() * 9));
+            }
+
+            let step = 0;
+            const nodes = document.querySelectorAll('.node');
+            const interval = setInterval(() => {
+                nodes[sequence[step]].classList.add('active');
+                setTimeout(() => nodes[sequence[step]].classList.remove('active'), state.speed * 0.7);
+                step++;
+                if(step >= sequence.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('status-text').innerText = "QAYTARING!";
+                        isGameActive = true;
+                    }, state.speed);
+                }
+            }, state.speed);
+        }
+
+        function handleInput(id, el) {
+            if(!isGameActive) return;
+
+            if(id === sequence[userSteps]) {
+                el.classList.add('active');
+                setTimeout(() => el.classList.remove('active'), 200);
+                userSteps++;
+                if(userSteps === sequence.length) {
+                    isGameActive = false;
+                    tg.HapticFeedback.notificationOccurred('success');
+                    document.getElementById('reward-modal').style.display = 'flex';
+                }
+            } else {
+                el.classList.add('error');
+                tg.HapticFeedback.notificationOccurred('error');
+                isGameActive = false;
                 setTimeout(() => {
-                    document.getElementById('msg').innerText = "QAYTARING!";
-                }, state.diff);
+                    el.classList.remove('error');
+                    startRound();
+                }, 1000);
             }
-        }, state.diff);
-    }
-
-    function handleTap(id, el) {
-        if(id === sequence[userStep]) {
-            el.classList.add('blink');
-            setTimeout(() => el.classList.remove('blink'), 200);
-            userStep++;
-            if(userStep === sequence.length) {
-                document.getElementById('reward-modal').style.display = 'block';
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        } else {
-            tg.HapticFeedback.notificationOccurred('error');
-            document.getElementById('msg').innerText = "XATO! TIZIM QAYTA YUKLANMOQDA...";
-            setTimeout(startRound, 2000);
         }
-    }
 
-    function claim(type) {
-        if(type === 1) state.score += 50;
-        else state.score += 100; // Multiplier mantiqi uchun soddalashtirilgan
+        function claim(type) {
+            state.score += (type === 1 ? 100 : 200);
+            state.level++;
+            
+            // 20% QIYINLASHISH
+            state.speed = Math.max(300, state.speed * 0.85); // Tezlik oshadi
+            if(state.level % 2 === 0) state.seqLen++; // Har 2 levelda uzunlik oshadi
 
-        state.level++;
-        // 20% QIYINLASHISH: Tezlikni oshirish va har 3 levelda uzunlikni qo'shish
-        state.diff = Math.max(300, state.diff * 0.8); // 20% tezlashadi
-        if(state.level % 3 === 0) state.seqLen++;
+            save();
+            document.getElementById('reward-modal').style.display = 'none';
+            initBoard();
+            startRound();
+        }
 
-        localStorage.setItem('a_sc', state.score);
-        localStorage.setItem('a_lv', state.level);
-        
-        document.getElementById('reward-modal').style.display = 'none';
-        document.getElementById('score').innerText = state.score;
-        document.getElementById('lvl-display').innerText = `PROTOCOL LEVEL: ${state.level}`;
+        // Timer
+        setInterval(() => {
+            if(timeLeft > 0) {
+                timeLeft--;
+                document.getElementById('timer-text').innerText = `VAQT: ${timeLeft}s`;
+            } else {
+                timeLeft = 30;
+                if(!isGameActive && document.getElementById('reward-modal').style.display !== 'flex') startRound();
+            }
+        }, 1000);
+
+        initBoard();
         startRound();
-    }
-
-    init();
-</script>
+    </script>
 </body>
 </html>
