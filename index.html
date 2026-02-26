@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Ultima Pro</title>
+    <title>Leenova Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -11,203 +11,187 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden; background: #01080e; display: flex; flex-direction: column; }
 
+        /* NEWS TICKER (4-funksiya) */
+        .news-container { background: rgba(255, 0, 127, 0.1); border-bottom: 1px solid var(--pink); height: 25px; overflow: hidden; position: relative; z-index: 101; margin-top: 35px; }
+        .news-track { display: flex; width: 200%; animation: scrollNews 20s linear infinite; }
+        .news-item { white-space: nowrap; padding: 3px 50px; color: var(--pink); font-family: 'Orbitron'; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
+        @keyframes scrollNews { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
         /* HUD */
-        .hud { padding: 40px 20px 15px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--blue); z-index: 100; }
-        .balance { font-family: 'Orbitron'; font-size: 34px; font-weight: 700; text-shadow: 0 0 15px var(--blue); color: #fff; text-align: center; }
-        
-        /* WINDOW SYSTEM */
+        .hud { padding: 10px 20px 15px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--blue); position: relative; }
+        .balance { font-family: 'Orbitron'; font-size: 38px; font-weight: 700; text-shadow: 0 0 15px var(--blue); text-align: center; margin: 5px 0; }
+        .stats-row { display: flex; justify-content: center; gap: 10px; }
+        .stat-card { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 5px 12px; border-radius: 4px; font-family: 'Orbitron'; font-size: 10px; }
+
+        /* WINDOWS */
         .window { display: none; flex-grow: 1; overflow-y: auto; padding: 20px 20px 100px; }
         .window.active { display: block; }
 
         /* CLICKER */
-        .core-zone { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #02162b 0%, #01080e 100%); }
-        .main-btn { width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 30px var(--blue); display: flex; justify-content: center; align-items: center; transition: 0.1s; position: relative; }
-        .main-btn img { width: 120px; filter: drop-shadow(0 0 10px var(--blue)); }
-        
-        /* CARDS & ITEMS */
-        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,242,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); color: #fff; padding: 8px 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
-        .btn:disabled { opacity: 0.3; }
+        .click-area { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle, #02162b 0%, #01080e 100%); }
+        .main-btn { width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 30px var(--blue); display: flex; justify-content: center; align-items: center; transition: 0.1s; position: relative; animation: breathe 4s infinite; }
+        .main-btn img { width: 120px; filter: drop-shadow(0 0 10px var(--blue)); pointer-events: none; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* SPECIAL SECTIONS */
-        .daily-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-        .day-box { background: #000; border: 1px solid #333; padding: 10px 5px; text-align: center; border-radius: 8px; font-size: 10px; }
-        .day-box.active { border-color: var(--gold); background: rgba(255, 204, 0, 0.1); }
-
-        .spin-wheel { width: 200px; height: 200px; border: 5px solid var(--gold); border-radius: 50%; margin: 20px auto; position: relative; transition: 4s cubic-bezier(0.1, 0, 0, 1); }
-        .spin-arrow { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: red; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
+        /* CARDS */
+        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .progress-track { width: 100px; height: 4px; background: #000; border-radius: 2px; margin-top: 5px; }
+        .progress-bar { height: 100%; background: var(--blue); box-shadow: 0 0 8px var(--blue); transition: 0.3s; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nft-card { background: rgba(188, 0, 255, 0.05); border: 2px solid var(--purple); border-radius: 15px; padding: 15px; text-align: center; }
+        .nft-card.owned { border-color: #333; opacity: 0.6; }
+        .nft-icon { font-size: 40px; display: block; margin-bottom: 8px; }
 
         /* NAV */
         .nav { display: flex; background: #000; border-top: 1px solid var(--blue); position: fixed; bottom: 0; width: 100%; z-index: 100; }
-        .nav-item { flex: 1; padding: 15px 5px; text-align: center; font-family: 'Orbitron'; font-size: 8px; color: #555; }
-        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); }
+        .nav-item { flex: 1; padding: 18px 5px; text-align: center; font-family: 'Orbitron'; font-size: 8px; color: #555; }
+        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-bottom: 2px solid var(--blue); }
 
-        /* ANIMATIONS */
+        /* BUTTONS */
+        .btn { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); color: #fff; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        .btn:disabled { opacity: 0.3; }
+
+        /* EFFECTS */
         .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.7s forwards; }
-        @keyframes fly { to { transform: translateY(-120px); opacity: 0; } }
+        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
+    <div class="news-container">
+        <div class="news-track" id="news-track">
+            <div class="news-item">FLASH: NEW NFT COLLECTION DROPPED!</div>
+            <div class="news-item">PLAYER_772 JUST UPGRADED TO TITAN CORE!</div>
+            <div class="news-item">SYSTEM STATUS: 100% OPERATIONAL</div>
+            <div class="news-item">GLOBAL CREDITS MINED: 1.2 TRILLION</div>
+            <div class="news-item">JOIN THE COMMUNITY CHANNEL FOR UPDATES!</div>
+        </div>
+    </div>
+
     <div class="hud">
         <div class="balance" id="bal">0</div>
-        <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
-            <div class="btn" style="font-size:9px">TAP: +<span id="t-pow">1</span></div>
-            <div class="btn" style="font-size:9px">AUTO: +<span id="a-pow">0</span>/s</div>
+        <div class="stats-row">
+            <div class="stat-card">TAP: +<span id="t-pow">1</span></div>
+            <div class="stat-card">AUTO: +<span id="a-pow">0</span>/s</div>
         </div>
     </div>
 
     <div id="win-city" class="window active">
-        <div class="core-zone">
+        <div class="click-area">
             <div class="main-btn" id="tap-btn">
                 <img id="core-img" src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
             </div>
-            <p style="margin-top:20px; color:var(--blue); font-family:Orbitron; font-size:12px;">LEVEL: <span id="user-lvl">1</span></p>
+            <p style="margin-top:20px; font-family:Orbitron; color:var(--blue)">RANK: <span id="rank-name">NOVICE</span></p>
         </div>
     </div>
 
-    <div id="win-tasks" class="window">
-        <h3 style="font-family:Orbitron; color:var(--gold)">DAILY BONUS</h3>
-        <div class="daily-grid" id="daily-grid"></div>
-        
-        <h3 style="font-family:Orbitron; color:var(--blue)">TASKS</h3>
-        <div id="task-list"></div>
-    </div>
-
-    <div id="win-market" class="window">
-        <h3 style="font-family:Orbitron; color:var(--blue)">UPGRADES</h3>
+    <div id="win-up" class="window">
+        <h3 style="font-family:Orbitron; color:var(--blue)">SYSTEM UPGRADES</h3>
         <div id="up-list"></div>
-        
-        <h3 style="font-family:Orbitron; color:var(--pink)">SKINS</h3>
-        <div id="skin-list"></div>
     </div>
 
-    <div id="win-spin" class="window" style="text-align:center">
-        <h3 style="font-family:Orbitron; color:var(--gold)">LUCK SPIN</h3>
-        <div class="spin-arrow"></div>
-        <div class="spin-wheel" id="wheel" style="background: conic-gradient(var(--blue) 0deg 90deg, var(--purple) 90deg 180deg, var(--pink) 180deg 270deg, var(--gold) 270deg 360deg);"></div>
-        <button class="btn" id="spin-btn" onclick="spinWheel()" style="margin-top:20px; width:150px; font-size:14px">SPIN (FREE)</button>
+    <div id="win-nft" class="window">
+        <h3 style="font-family:Orbitron; color:var(--purple)">ELITE NFT CARDS</h3>
+        <div class="nft-grid" id="nft-list"></div>
     </div>
 
-    <div id="win-leader" class="window">
-        <h3 style="font-family:Orbitron; color:var(--blue)">LEADERBOARD</h3>
-        <div id="leader-list"></div>
+    <div id="win-tasks" class="window">
+        <h3 style="font-family:Orbitron; color:var(--gold)">STATION TASKS</h3>
+        <div id="task-list"></div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" onclick="tab('win-city', this)">CITY</div>
+        <div class="nav-item" onclick="tab('win-up', this)">UPGRADES</div>
+        <div class="nav-item" onclick="tab('win-nft', this)">NFT</div>
         <div class="nav-item" onclick="tab('win-tasks', this)">TASKS</div>
-        <div class="nav-item" onclick="tab('win-market', this)">MARKET</div>
-        <div class="nav-item" onclick="tab('win-spin', this)">SPIN</div>
-        <div class="nav-item" onclick="tab('win-leader', this)">TOP</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp; tg.expand();
 
-        let game = {
-            m: parseFloat(localStorage.getItem('v3_m')) || 0,
-            l: JSON.parse(localStorage.getItem('v3_l')) || {u1:0, u2:0},
-            t: JSON.parse(localStorage.getItem('v3_t')) || [], // Tasks
-            d: parseInt(localStorage.getItem('v3_d')) || 0, // Daily day
-            lastD: localStorage.getItem('v3_lastD') || "",
-            skin: localStorage.getItem('v3_skin') || "https://cdn-icons-png.flaticon.com/512/11550/11550085.png"
+        let data = {
+            m: parseFloat(localStorage.getItem('el_m')) || 0,
+            l: JSON.parse(localStorage.getItem('el_l')) || {u1:0, u2:0, u3:0, u4:0, u5:0, u6:0},
+            n: JSON.parse(localStorage.getItem('el_n')) || [],
+            t: JSON.parse(localStorage.getItem('el_t')) || [],
+            skin: localStorage.getItem('el_skin') || "https://cdn-icons-png.flaticon.com/512/11550/11550085.png"
         };
 
         const upgrades = [
-            { id: 'u1', name: 'Neural Chip', base: 50, val: 2, type: 'tap' },
-            { id: 'u2', name: 'Auto Drone', base: 200, val: 5, type: 'auto' }
+            { id: 'u1', name: 'Neural Link', base: 15, val: 2, type: 'tap' },
+            { id: 'u2', name: 'Bento Bot', base: 100, val: 5, type: 'auto' },
+            { id: 'u3', name: 'Cyber Miner', base: 800, val: 25, type: 'auto' },
+            { id: 'u4', name: 'Nano Pulse', base: 3000, val: 20, type: 'tap' },
+            { id: 'u5', name: 'Quantum Core', base: 10000, val: 200, type: 'auto' },
+            { id: 'u6', name: 'Titan Server', base: 50000, val: 1000, type: 'auto' }
         ];
 
-        const skins = [
-            { name: 'Neon Blue', cost: 0, img: 'https://cdn-icons-png.flaticon.com/512/11550/11550085.png' },
-            { name: 'Ruby Core', cost: 50000, img: 'https://cdn-icons-png.flaticon.com/512/11550/11550047.png' },
-            { name: 'Gold Master', cost: 250000, img: 'https://cdn-icons-png.flaticon.com/512/11550/11550100.png' }
-        ];
+        const nfts = Array.from({length: 16}, (_, i) => ({
+            id: i, name: `KIBER NFT #${i+1}`, cost: (i+1)*25000, p: (i+1)*800, 
+            icon: ['🤖','🛰️','👾','💎','🔥','⚡','🪐','🛸','⭐','🌌','🧿','🧬','🌀','🛡️','👑','👹'][i]
+        }));
 
         const tasks = [
-            { id: 1, text: "Join Channel", reward: 5000 },
-            { id: 2, text: "Follow Twitter", reward: 3000 },
-            { id: 3, text: "Invite 5 Friends", reward: 20000 }
+            { id: 1, text: "Join News Channel", reward: 15000 },
+            { id: 2, text: "Follow Cyber Twitter", reward: 10000 },
+            { id: 3, text: "Watch Cyber Ad", reward: 50000 }
         ];
 
         function getStats() {
             let t = 1, a = 0;
-            upgrades.forEach(u => { let lvl = game.l[u.id]; if(u.type==='tap') t += lvl*u.val; else a += lvl*u.val; });
+            upgrades.forEach(u => { let lvl = data.l[u.id]; if(u.type==='tap') t += lvl*u.val; else a += lvl*u.val; });
+            nfts.filter(n => data.n.includes(n.id)).forEach(n => a += n.p);
             return { t, a };
         }
 
         function render() {
             const s = getStats();
-            document.getElementById('bal').innerText = Math.floor(game.m).toLocaleString();
+            document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
             document.getElementById('t-pow').innerText = s.t;
             document.getElementById('a-pow').innerText = s.a;
-            document.getElementById('core-img').src = game.skin;
-            document.getElementById('user-lvl').innerText = Math.floor(game.m / 10000) + 1;
-
-            // Tasks Render
-            const tl = document.getElementById('task-list'); tl.innerHTML = '';
-            tasks.forEach(task => {
-                const done = game.t.includes(task.id);
-                tl.innerHTML += `<div class="card"><div>${task.text}<br><small>+${task.reward}</small></div>
-                <button class="btn" onclick="doTask(${task.id}, ${task.reward})" ${done ? 'disabled' : ''}>${done ? 'DONE' : 'GO'}</button></div>`;
-            });
-
-            // Daily Render
-            const dg = document.getElementById('daily-grid'); dg.innerHTML = '';
-            for(let i=1; i<=8; i++){
-                dg.innerHTML += `<div class="day-box ${game.d >= i ? 'active' : ''}">Day ${i}<br>🎁</div>`;
-            }
+            
+            // Rank
+            const ranks = ["NOVICE", "MINER", "ELITE", "CYBER LORD", "TITAN"];
+            document.getElementById('rank-name').innerText = ranks[Math.min(4, Math.floor(data.m / 1000000))];
 
             // Upgrades Render
             const ul = document.getElementById('up-list'); ul.innerHTML = '';
             upgrades.forEach(u => {
-                let cost = Math.floor(u.base * Math.pow(1.8, game.l[u.id]));
-                ul.innerHTML += `<div class="card"><div>${u.name}<br><small>Lvl ${game.l[u.id]}</small></div>
-                <button class="btn" onclick="buyU('${u.id}', ${cost})">${cost.toLocaleString()}</button></div>`;
+                let lvl = data.l[u.id]; let cost = Math.floor(u.base * Math.pow(1.65, lvl));
+                ul.innerHTML += `<div class="card">
+                    <div style="flex:1"><b>${u.name} (Lvl ${lvl})</b><div class="progress-track"><div class="progress-bar" style="width:${lvl*10}%"></div></div></div>
+                    <button class="btn" onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''}>${cost.toLocaleString()}</button>
+                </div>`;
             });
 
-            // Skins Render
-            const sl = document.getElementById('skin-list'); sl.innerHTML = '';
-            skins.forEach(sk => {
-                sl.innerHTML += `<div class="card"><div>${sk.name}</div>
-                <button class="btn" onclick="setSkin('${sk.img}', ${sk.cost})" ${game.skin === sk.img ? 'disabled' : ''}>${sk.cost === 0 ? 'FREE' : sk.cost}</button></div>`;
+            // NFT Render
+            const nl = document.getElementById('nft-list'); nl.innerHTML = '';
+            nfts.forEach(n => {
+                const owned = data.n.includes(n.id);
+                nl.innerHTML += `<div class="nft-card ${owned ? 'owned' : ''}"><span class="nft-icon">${n.icon}</span><small>${n.name}</small><br><b style="color:var(--blue)">+${n.p}/s</b><br><br>
+                <button class="btn" style="width:100%" onclick="buyN(${n.id}, ${n.cost})" ${owned || data.m < n.cost ? 'disabled' : ''}>${owned ? 'OWNED' : n.cost.toLocaleString()}</button></div>`;
+            });
+
+            // Tasks Render
+            const tl = document.getElementById('task-list'); tl.innerHTML = '';
+            tasks.forEach(task => {
+                const done = data.t.includes(task.id);
+                tl.innerHTML += `<div class="card"><div>${task.text}<br><small>+${task.reward}</small></div>
+                <button class="btn" onclick="doTask(${task.id}, ${task.reward})" ${done ? 'disabled' : ''}>${done ? 'CLAIMED' : 'START'}</button></div>`;
             });
 
             save();
         }
 
-        function save() {
-            localStorage.setItem('v3_m', game.m);
-            localStorage.setItem('v3_l', JSON.stringify(game.l));
-            localStorage.setItem('v3_t', JSON.stringify(game.t));
-            localStorage.setItem('v3_d', game.d);
-            localStorage.setItem('v3_skin', game.skin);
-        }
+        function save() { localStorage.setItem('el_m', data.m); localStorage.setItem('el_l', JSON.stringify(data.l)); localStorage.setItem('el_n', JSON.stringify(data.n)); localStorage.setItem('el_t', JSON.stringify(data.t)); }
 
-        window.buyU = (id, c) => { if(game.m >= c){ game.m -= c; game.l[id]++; render(); } };
-        window.doTask = (id, r) => { game.m += r; game.t.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); };
-        window.setSkin = (img, c) => { if(game.m >= c){ if(c > 0 && game.skin !== img) game.m -= c; game.skin = img; render(); } };
+        window.buyU = (id, c) => { if(data.m >= c) { data.m -= c; data.l[id]++; render(); tg.HapticFeedback.impactOccurred('medium'); } };
+        window.buyN = (id, c) => { if(data.m >= c) { data.m -= c; data.n.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); } };
+        window.doTask = (id, r) => { data.m += r; data.t.push(id); render(); tg.HapticFeedback.notificationOccurred('success'); };
 
-        // SPIN LOGIC
-        let spinning = false;
-        window.spinWheel = () => {
-            if(spinning) return;
-            spinning = true;
-            const deg = Math.floor(3000 + Math.random() * 3000);
-            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
-            setTimeout(() => {
-                spinning = false;
-                const win = Math.floor(Math.random() * 50000);
-                game.m += win;
-                alert(`Siz ${win.toLocaleString()} kredit yutdingiz!`);
-                render();
-            }, 4000);
-        };
-
-        // CLICK LOGIC
         document.getElementById('tap-btn').onclick = (e) => {
-            const s = getStats(); game.m += s.t;
+            const s = getStats(); data.m += s.t;
             const p = document.createElement('div'); p.className = 'pop'; p.innerText = `+${s.t}`;
             p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
             document.body.appendChild(p); setTimeout(() => p.remove(), 700);
@@ -221,7 +205,7 @@
             render();
         };
 
-        setInterval(() => { const s = getStats(); if(s.a > 0){ game.m += s.a/10; document.getElementById('bal').innerText = Math.floor(game.m).toLocaleString(); }}, 100);
+        setInterval(() => { const s = getStats(); if(s.a > 0) { data.m += s.a/10; document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString(); } }, 100);
 
         render();
     </script>
