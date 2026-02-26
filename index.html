@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Astral Mage | Mystic Journey</title>
+    <title>Astral Sehrgar | Koinot Sayohati</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -27,7 +27,7 @@
             flex-direction: column;
         }
 
-        /* Space Background */
+        /* Orqa fon - Koinot */
         .void-bg {
             position: fixed;
             inset: 0;
@@ -35,19 +35,18 @@
             z-index: -1;
         }
 
-        /* Floating Stars */
         .stars-overlay {
             position: absolute;
             width: 100%; height: 100%;
             background-image: radial-gradient(white 1px, transparent 1px);
             background-size: 50px 50px;
-            opacity: 0.1;
-            animation: moveStars 100s linear infinite;
+            opacity: 0.15;
+            animation: moveStars 120s linear infinite;
         }
 
         @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
 
-        /* Header UI */
+        /* Yuqori Panel */
         .header { padding: 50px 20px 10px; display: flex; justify-content: space-between; z-index: 100; }
         .badge {
             background: rgba(110, 72, 170, 0.2);
@@ -61,7 +60,7 @@
             text-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        /* Score Display */
+        /* Balans */
         .score-section { text-align: center; margin-top: 15px; z-index: 10; }
         .score-label { font-size: 11px; font-family: 'Cinzel'; letter-spacing: 3px; color: #a29bfe; }
         .main-balance {
@@ -74,7 +73,7 @@
             filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.4));
         }
 
-        /* CHARACTER AREA */
+        /* PERSONAJ MAYDONI */
         .char-area {
             flex-grow: 1;
             display: flex;
@@ -91,20 +90,12 @@
             box-shadow: inset 0 0 50px rgba(157, 80, 187, 0.2);
             animation: rotateSeal 20s linear infinite;
         }
-        .magic-seal::before {
-            content: '';
-            position: absolute;
-            inset: 20px;
-            border: 1px dashed var(--astral-purple);
-            border-radius: 50%;
-            opacity: 0.5;
-        }
 
         @keyframes rotateSeal { to { transform: rotate(360deg); } }
 
         .mage-container {
             position: relative;
-            width: 300px; height: 300px;
+            width: 250px; height: 250px;
             z-index: 20;
             cursor: pointer;
             transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -115,35 +106,22 @@
         .mage-sprite {
             width: 100%; height: 100%;
             object-fit: contain;
-            /* Original AI-Character Image: Astral Elf Girl */
             filter: drop-shadow(0 0 30px rgba(157, 80, 187, 0.6));
             animation: mageFloat 4s ease-in-out infinite;
         }
 
         @keyframes mageFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
-        /* HUD Bottom */
+        /* Mana HUD */
         .mana-hud { width: 85%; margin: 0 auto 110px; z-index: 10; }
         .mana-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-family: 'Cinzel'; font-size: 10px; color: var(--neon-cyan); }
-        .track {
-            height: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            overflow: hidden;
-        }
-        .fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--astral-purple), var(--neon-cyan));
-            box-shadow: 0 0 20px var(--neon-cyan);
-            width: 100%;
-            transition: width 0.3s ease;
-        }
+        .track { height: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 20px; border: 1px solid rgba(0, 242, 255, 0.1); overflow: hidden; }
+        .fill { height: 100%; background: linear-gradient(90deg, var(--astral-purple), var(--neon-cyan)); box-shadow: 0 0 20px var(--neon-cyan); width: 100%; transition: width 0.3s ease; }
 
-        /* Shop System */
+        /* Do'kon Paneli */
         .bottom-sheet {
             position: fixed;
             bottom: -100%; left: 0; width: 100%;
@@ -168,19 +146,14 @@
             border: 1px solid rgba(157, 80, 187, 0.1);
         }
         .item-title { font-family: 'Cinzel'; font-size: 14px; color: var(--neon-cyan); }
-        .item-desc { font-size: 11px; color: #778899; margin-top: 5px; }
         
         .action-btn {
             background: linear-gradient(135deg, var(--astral-purple), var(--astral-blue));
-            color: #fff; font-weight: 800;
-            border: none; padding: 12px 25px;
-            border-radius: 15px;
-            font-size: 13px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #fff; font-weight: 800; border: none; padding: 12px 25px; border-radius: 15px; font-size: 13px;
         }
-        .action-btn:disabled { background: #1a1a1a; color: #444; box-shadow: none; }
+        .action-btn:disabled { background: #1a1a1a; color: #444; }
 
-        /* Nav */
+        /* Pastki Navigatsiya */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%;
             display: flex; justify-content: space-around;
@@ -188,21 +161,14 @@
             background: linear-gradient(to top, #000 70%, transparent);
             z-index: 1100;
         }
-        .tab {
-            background: none; border: none; color: #fff; opacity: 0.3;
-            display: flex; flex-direction: column; align-items: center;
-            transition: 0.3s;
-        }
+        .tab { background: none; border: none; color: #fff; opacity: 0.3; display: flex; flex-direction: column; align-items: center; }
         .tab.active { opacity: 1; color: var(--neon-cyan); }
-        .tab span { font-size: 10px; font-family: 'Cinzel'; margin-top: 8px; letter-spacing: 1px; }
+        .tab span { font-size: 10px; font-family: 'Cinzel'; margin-top: 8px; }
 
-        /* Effects */
+        /* Click Effekti */
         .pulse-text {
-            position: fixed; pointer-events: none;
-            color: #fff; font-family: 'Cinzel'; font-weight: 900;
-            text-shadow: 0 0 15px var(--neon-cyan);
-            animation: pulseOut 0.7s ease-out forwards;
-            z-index: 2000;
+            position: fixed; pointer-events: none; color: #fff; font-family: 'Cinzel'; font-weight: 900;
+            text-shadow: 0 0 15px var(--neon-cyan); animation: pulseOut 0.7s ease-out forwards; z-index: 2000;
         }
         @keyframes pulseOut {
             0% { transform: translateY(0) scale(1); opacity: 1; }
@@ -222,14 +188,14 @@
     </div>
 
     <div class="score-section">
-        <p class="score-label">COLLECTED ESSENCE</p>
+        <p class="score-label">TO'PLANGAN ENERGIYA</p>
         <h1 class="main-balance" id="bal-ui">0</h1>
     </div>
 
     <div class="char-area">
         <div class="magic-seal"></div>
         <div class="mage-container" id="tap-target">
-            <img src="https://cdnb.artstation.com/p/assets/images/images/051/157/202/original/lucas-reiner-wizard-sprite.gif?1656600000" 
+            <img src="https://www.rpgmakerweb.com/wp-content/uploads/2021/01/MZ_Mage_Side.png" 
                  onerror="this.src='https://files.catbox.moe/p4m9h7.png'" 
                  class="mage-sprite" id="mage-img">
         </div>
@@ -237,7 +203,7 @@
 
     <div class="mana-hud">
         <div class="mana-info">
-            <span>ASTRAL ENERGY</span>
+            <span>ASTRAL ENERGIYA</span>
             <span id="mana-val">1000 / 1000</span>
         </div>
         <div class="track">
@@ -247,20 +213,20 @@
 
     <div class="bottom-sheet" id="shop">
         <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 30px;"></div>
-        <h2 style="font-family: 'Cinzel'; margin-bottom: 25px; text-align: center; color: var(--neon-cyan);">Astral Grimoire</h2>
+        <h2 style="font-family: 'Cinzel'; margin-bottom: 25px; text-align: center; color: var(--neon-cyan);">Sehr Kitobi</h2>
         
         <div class="item">
             <div>
-                <p class="item-title">Void Blast</p>
-                <p class="item-desc">Power: +<span id="pwr-stat">1.0</span></p>
+                <p class="item-title">Void Zarba</p>
+                <p style="font-size: 11px; color: #778899;">Kuch: +<span id="pwr-stat">1.0</span></p>
             </div>
             <button class="action-btn" id="buy-pwr" onclick="purchase('pwr')">100</button>
         </div>
 
         <div class="item">
             <div>
-                <p class="item-title">Star Core</p>
-                <p class="item-desc">Max Mana: +250</p>
+                <p class="item-title">Yulduz Yadrosi</p>
+                <p style="font-size: 11px; color: #778899;">Maks Mana: +250</p>
             </div>
             <button class="action-btn" id="buy-mana" onclick="purchase('mana')">250</button>
         </div>
@@ -268,12 +234,12 @@
 
     <nav class="tab-bar">
         <button class="tab active" id="tab-cast" onclick="view('cast')">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-            <span>CHANNEL</span>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>SEHR</span>
         </button>
         <button class="tab" id="tab-shop" onclick="view('shop')">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-            <span>GRIMOIRE</span>
+            <span>KITOBLAR</span>
         </button>
     </nav>
 
@@ -283,7 +249,7 @@
         tg.backgroundColor = "#020408";
         tg.headerColor = "#020408";
 
-        let db = JSON.parse(localStorage.getItem('astral_mage_save')) || {
+        let db = JSON.parse(localStorage.getItem('astral_mage_save_v2')) || {
             bal: 0,
             mana: 1000,
             max: 1000,
@@ -300,29 +266,21 @@
             document.getElementById('lvl-txt').innerText = `ARCHMAGE ${db.lvl}`;
             document.getElementById('pwr-stat').innerText = db.pwr.toFixed(1);
             
-            const pBtn = document.getElementById('buy-pwr');
-            pBtn.innerText = Math.round(db.cP);
-            pBtn.disabled = db.bal < db.cP;
+            document.getElementById('buy-pwr').innerText = Math.round(db.cP);
+            document.getElementById('buy-pwr').disabled = db.bal < db.cP;
 
-            const mBtn = document.getElementById('buy-mana');
-            mBtn.innerText = Math.round(db.cM);
-            mBtn.disabled = db.bal < db.cM;
+            document.getElementById('buy-mana').innerText = Math.round(db.cM);
+            document.getElementById('buy-mana').disabled = db.bal < db.cM;
 
-            const rTxt = document.getElementById('rank-txt');
-            if(db.lvl > 100) rTxt.innerText = "COSMIC ENTITY";
-            else if(db.lvl > 40) rTxt.innerText = "GALAXY MASTER";
-
-            localStorage.setItem('astral_mage_save', JSON.stringify(db));
+            localStorage.setItem('astral_mage_save_v2', JSON.stringify(db));
         }
 
         const tapTarget = document.getElementById('tap-target');
-        const img = document.getElementById('mage-img');
-
         tapTarget.addEventListener('touchstart', (e) => {
             e.preventDefault();
             [...e.changedTouches].forEach(t => {
-                if(db.mana >= 3) {
-                    db.mana -= 3;
+                if(db.mana >= 2) {
+                    db.mana -= 2;
                     db.bal += db.pwr;
                     spawnFx(t.clientX, t.clientY);
                     tg.HapticFeedback.impactOccurred('medium');
@@ -360,23 +318,23 @@
         function purchase(t) {
             if(t === 'pwr' && db.bal >= db.cP) {
                 db.bal -= db.cP;
-                db.pwr += 0.6;
+                db.pwr += 0.5;
                 db.lvl++;
-                db.cP *= 1.8;
+                db.cP *= 1.7;
             } else if(t === 'mana' && db.bal >= db.cM) {
                 db.bal -= db.cM;
-                db.max += 300;
+                db.max += 250;
                 db.mana = db.max;
-                db.cM *= 2.0;
+                db.cM *= 1.9;
             }
             tg.HapticFeedback.notificationOccurred('success');
             sync();
         }
 
-        // Regen
+        // Mana to'lishi
         setInterval(() => {
             if(db.mana < db.max) {
-                db.mana = Math.min(db.max, db.mana + (2 + db.lvl * 0.15));
+                db.mana = Math.min(db.max, db.mana + (2 + db.lvl * 0.1));
                 sync();
             }
         }, 1000);
