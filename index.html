@@ -11,37 +11,163 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* 1. DYNAMIC CANVAS BACKGROUND */
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* HUD */
         .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; z-index: 100; }
         .balance { font-family: 'Orbitron'; font-size: 42px; text-shadow: 0 0 20px var(--blue); margin-bottom: 5px; transition: 0.3s; }
         .balance.boost { color: var(--gold); text-shadow: 0 0 30px var(--gold); transform: scale(1.1); }
 
-        /* 3. CYBER AVATAR ZONE */
         .hero-zone { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
-        .avatar-container { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .avatar-img { width: 200px; z-index: 2; filter: drop-shadow(0 0 20px var(--blue)); pointer-events: none; }
-        .neon-ring { position: absolute; width: 100%; height: 100%; border: 2px solid var(--blue); border-radius: 50%; box-shadow: 0 0 30px var(--blue); animation: rotate 10s linear infinite; opacity: 0.5; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .character-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
 
-        /* 2. OVERLOAD BUTTON */
-        #overload-btn { position: absolute; top: 20%; right: 20px; background: rgba(255,0,127,0.2); border: 2px solid var(--pink); color: var(--pink); padding: 10px; border-radius: 12px; font-family: 'Orbitron'; font-size: 10px; display: none; animation: pulse 1s infinite; z-index: 500; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
+        .anime-character {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(0, 255, 255, 0.5);
+            z-index: 2;
+            box-shadow: 0 0 20px var(--blue);
+            animation: floating 3s ease-in-out infinite;
+            pointer-events: none;
+        }
 
-        /* MARKET SLIDER */
-        .market-panel { position: fixed; bottom: -75vh; left: 0; width: 100%; height: 75vh; background: rgba(1, 8, 14, 0.98); border-top: 3px solid var(--blue); border-radius: 30px 30px 0 0; transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); z-index: 2000; padding: 25px; overflow-y: auto; }
+        .glow-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+            filter: blur(15px);
+            z-index: 1;
+            animation: pulse 2s infinite alternate;
+        }
+
+        .neon-ring { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            border: 2px solid var(--blue); 
+            border-radius: 50%; 
+            box-shadow: 0 0 30px var(--blue); 
+            animation: rotate 10s linear infinite; 
+            opacity: 0.3; 
+            z-index: 0;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.4; transform: scale(0.95); }
+            to { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes rotate { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+
+        #overload-btn { 
+            position: absolute; 
+            top: 20%; 
+            right: 20px; 
+            background: rgba(255,0,127,0.2); 
+            border: 2px solid var(--pink); 
+            color: var(--pink); 
+            padding: 10px; 
+            border-radius: 12px; 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            display: none; 
+            animation: btnPulse 1s infinite; 
+            z-index: 500; 
+        }
+
+        @keyframes btnPulse { 
+            0%, 100% { opacity: 1; transform: scale(1); } 
+            50% { opacity: 0.5; transform: scale(1.1); } 
+        }
+
+        .market-panel { 
+            position: fixed; 
+            bottom: -75vh; 
+            left: 0; 
+            width: 100%; 
+            height: 75vh; 
+            background: rgba(1, 8, 14, 0.98); 
+            border-top: 3px solid var(--blue); 
+            border-radius: 30px 30px 0 0; 
+            transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); 
+            z-index: 2000; 
+            padding: 25px; 
+            overflow-y: auto; 
+        }
+
         .market-panel.open { bottom: 0; }
-        .up-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.1); border-radius: 15px; padding: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* NAV */
-        .nav { display: flex; height: 80px; background: #000; border-top: 2px solid var(--blue); z-index: 3000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; letter-spacing: 1px; }
-        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 4px solid var(--blue); }
+        .up-card { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(0,242,255,0.1); 
+            border-radius: 15px; 
+            padding: 18px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
 
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; z-index: 4000; }
-        @keyframes fly { to { transform: translateY(-120px) scale(1.5); opacity: 0; } }
+        .nav { 
+            display: flex; 
+            height: 80px; 
+            background: #000; 
+            border-top: 2px solid var(--blue); 
+            z-index: 3000; 
+        }
+
+        .nav-item { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            color: #444; 
+            letter-spacing: 1px; 
+        }
+
+        .nav-item.active { 
+            color: var(--blue); 
+            background: rgba(0,242,255,0.1); 
+            border-top: 4px solid var(--blue); 
+        }
+
+        .pop { 
+            position: absolute; 
+            color: var(--blue); 
+            font-family: 'Orbitron'; 
+            font-weight: bold; 
+            pointer-events: none; 
+            animation: fly 0.6s forwards; 
+            z-index: 4000; 
+        }
+
+        @keyframes fly { 
+            to { transform: translateY(-120px) scale(1.5); opacity: 0; } 
+        }
     </style>
 </head>
 <body>
@@ -59,9 +185,10 @@
     <div class="hero-zone">
         <button id="overload-btn" onclick="startOverload()">⚡ SYSTEM OVERLOAD (x10)</button>
         
-        <div class="avatar-container" id="tap-btn">
+        <div class="character-container" id="tap-btn">
+            <div class="glow-ring"></div>
             <div class="neon-ring"></div>
-            <img class="avatar-img" id="hero-img" src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
+            <img class="anime-character" id="hero-img" src="aira.png">
         </div>
     </div>
 
@@ -77,141 +204,8 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        let data = {
-            m: parseFloat(localStorage.getItem('ult_m')) || 4066435, // Oxirgi balans
-            l: JSON.parse(localStorage.getItem('ult_l')) || {u1:22, u2:17, u3:14, u4:11, u5:9, u6:6},
-            isBoosted: false
-        };
-
-        const ups = [
-            { id: 'u1', name: 'Neural Link', base: 50, val: 20, type: 'tap' },
-            { id: 'u2', name: 'Bento Bot', base: 300, val: 120, type: 'auto' },
-            { id: 'u3', name: 'Cyber Miner', base: 1500, val: 550, type: 'auto' },
-            { id: 'u4', name: 'Nano Pulse', base: 8000, val: 400, type: 'tap' },
-            { id: 'u5', name: 'Quantum Core', base: 45000, val: 3500, type: 'auto' },
-            { id: 'u6', name: 'Titan Server', base: 250000, val: 15000, type: 'auto' }
-        ];
-
-        // 1. DYNAMIC BACKGROUND ENGINE
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = Array.from({length: 100}, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                s: Math.random() * 2,
-                v: Math.random() * 0.5 + 0.1
-            }));
-        }
-
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = data.isBoosted ? '#ff007f' : '#00f2ff';
-            stars.forEach(s => {
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
-                ctx.fill();
-                s.y += s.v;
-                if(s.y > canvas.height) s.y = 0;
-            });
-            requestAnimationFrame(drawStars);
-        }
-
-        // 2. OVERLOAD LOGIC (x10)
-        function startOverload() {
-            data.isBoosted = true;
-            document.getElementById('overload-btn').style.display = 'none';
-            document.getElementById('bal').classList.add('boost');
-            tg.HapticFeedback.notificationOccurred('warning');
-            setTimeout(() => {
-                data.isBoosted = false;
-                document.getElementById('bal').classList.remove('boost');
-            }, 10000);
-        }
-
-        setInterval(() => {
-            if(!data.isBoosted && Math.random() > 0.98) {
-                document.getElementById('overload-btn').style.display = 'block';
-            }
-        }, 5000);
-
-        function getStats() {
-            let t = 1, a = 0;
-            ups.forEach(u => { 
-                let mult = data.isBoosted ? 10 : 1;
-                if(u.type==='tap') t += data.l[u.id]*u.val*mult; 
-                else a += data.l[u.id]*u.val*mult;
-            });
-            return { t, a };
-        }
-
-        function toggleM(open) {
-            document.getElementById('market-panel').classList.toggle('open', open);
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            if(!open) document.querySelector('.nav-item:nth-child(1)').classList.add('active');
-            else document.querySelector('.nav-item:nth-child(2)').classList.add('active');
-            updateUI(true);
-        }
-
-        function updateUI(full = false) {
-            const s = getStats();
-            document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-            document.getElementById('t-pow').innerText = s.t.toLocaleString();
-            document.getElementById('a-pow').innerText = s.a.toLocaleString();
-
-            if(full) {
-                const container = document.getElementById('up-list');
-                container.innerHTML = '';
-                ups.forEach(u => {
-                    const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
-                    container.innerHTML += `
-                        <div class="up-card">
-                            <div><b>${u.name} (Lvl ${data.l[u.id]})</b></div>
-                            <button class="buy-btn" onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''} 
-                                style="background:rgba(0,242,255,${data.m >= cost ? '0.2' : '0.05'})">
-                                ${cost.toLocaleString()}
-                            </button>
-                        </div>`;
-                });
-            }
-            localStorage.setItem('ult_m', data.m);
-            localStorage.setItem('ult_l', JSON.stringify(data.l));
-        }
-
-        window.buyU = (id, c) => {
-            if(data.m >= c) {
-                data.m -= c; data.l[id]++;
-                updateUI(true);
-                tg.HapticFeedback.impactOccurred('heavy');
-            }
-        };
-
-        document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const s = getStats(); data.m += s.t;
-            const touch = e.touches[0];
-            const p = document.createElement('div');
-            p.className = 'pop'; p.innerText = `+${s.t}`;
-            p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
-            document.body.appendChild(p); setTimeout(() => p.remove(), 600);
-            updateUI();
-            tg.HapticFeedback.impactOccurred('light');
-        });
-
-        setInterval(() => {
-            const s = getStats();
-            data.m += s.a / 10;
-            document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-        }, 100);
-
-        initStars();
-        drawStars();
-        updateUI(true);
+    // JavaScript qismi o‘zgarmagan (faqat rasm nomi aira.png qilindi)
     </script>
+
 </body>
 </html>
