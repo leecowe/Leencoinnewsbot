@@ -3,332 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Frieren | Sky Magic Journey</title>
+    <title>Astral Mage | Mystic Journey</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --sky-blue: #00d2ff;
-            --azure: #0072ff;
-            --mana-glow: rgba(0, 210, 255, 0.4);
-            --bg-dark: #050a12;
-            --card-glass: rgba(255, 255, 255, 0.05);
+            --astral-purple: #9d50bb;
+            --astral-blue: #6e48aa;
+            --neon-cyan: #00f2ff;
+            --deep-void: #020408;
+            --gold: #ffcc33;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
 
         body {
-            background: var(--bg-dark);
+            background: var(--deep-void);
             color: #fff;
-            margin: 0;
             font-family: 'Quicksand', sans-serif;
-            overflow: hidden;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Sehrli Osmon Fon */
-        .magic-bg {
+        /* Space Background */
+        .void-bg {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 10%, #0a192f 0%, #050a12 100%);
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #120b21 0%, #020408 100%);
             z-index: -1;
         }
 
-        .aura-ring {
+        /* Floating Stars */
+        .stars-overlay {
             position: absolute;
-            top: 45%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px; height: 300px;
-            background: var(--mana-glow);
-            filter: blur(80px);
+            width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            animation: moveStars 100s linear infinite;
+        }
+
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
+
+        /* Header UI */
+        .header { padding: 50px 20px 10px; display: flex; justify-content: space-between; z-index: 100; }
+        .badge {
+            background: rgba(110, 72, 170, 0.2);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 15px;
+            padding: 10px 18px;
+            font-family: 'Cinzel';
+            font-size: 11px;
+            backdrop-filter: blur(10px);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Score Display */
+        .score-section { text-align: center; margin-top: 15px; z-index: 10; }
+        .score-label { font-size: 11px; font-family: 'Cinzel'; letter-spacing: 3px; color: #a29bfe; }
+        .main-balance {
+            font-family: 'Cinzel';
+            font-size: 55px;
+            font-weight: 900;
+            background: linear-gradient(to bottom, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.4));
+        }
+
+        /* CHARACTER AREA */
+        .char-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .magic-seal {
+            position: absolute;
+            width: 340px; height: 340px;
+            border: 1px solid rgba(0, 242, 255, 0.1);
             border-radius: 50%;
-            animation: pulseAura 4s ease-in-out infinite;
-            z-index: 1;
+            box-shadow: inset 0 0 50px rgba(157, 80, 187, 0.2);
+            animation: rotateSeal 20s linear infinite;
         }
-
-        @keyframes pulseAura {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
-        }
-
-        .header { padding: 45px 20px 10px; display: flex; justify-content: space-between; position: relative; z-index: 100; }
-        .badge { 
-            background: var(--card-glass); 
-            border: 1px solid var(--sky-blue); 
-            border-radius: 15px; 
-            padding: 6px 14px; 
-            font-family: 'Cinzel'; 
-            font-size: 11px; 
-            color: var(--sky-blue);
-            backdrop-filter: blur(5px);
-        }
-
-        .game-area { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 5; }
-
-        .balance-txt { 
-            font-family: 'Cinzel'; 
-            font-size: 52px; 
-            font-weight: 700; 
-            color: #fff;
-            text-shadow: 0 0 25px var(--sky-blue);
-            margin-bottom: 10px;
-        }
-
-        .frieren-box { position: relative; cursor: pointer; transition: transform 0.1s; z-index: 10; touch-action: none; }
-        .frieren-avatar {
-            width: 260px; height: 260px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 20px var(--sky-blue));
-            pointer-events: none;
-        }
-
-        .hud { width: 80%; margin-top: 25px; }
-        .hud-label { display: flex; justify-content: space-between; font-family: 'Cinzel'; font-size: 10px; color: var(--sky-blue); margin-bottom: 6px; letter-spacing: 1px;}
-        .bar-outer { height: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(0,210,255,0.2); overflow: hidden; }
-        .bar-inner { height: 100%; background: linear-gradient(90deg, var(--azure), var(--sky-blue)); box-shadow: 0 0 15px var(--sky-blue); transition: width 0.1s linear; }
-
-        .shop-panel {
+        .magic-seal::before {
+            content: '';
             position: absolute;
-            bottom: -100%;
-            left: 0; width: 100%;
-            background: rgba(10, 25, 47, 0.98);
+            inset: 20px;
+            border: 1px dashed var(--astral-purple);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        @keyframes rotateSeal { to { transform: rotate(360deg); } }
+
+        .mage-container {
+            position: relative;
+            width: 300px; height: 300px;
+            z-index: 20;
+            cursor: pointer;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mage-container:active { transform: scale(0.92); }
+
+        .mage-sprite {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            /* Shaxsiy original personaj: Koinot Sehrgari */
+            filter: drop-shadow(0 0 30px rgba(157, 80, 187, 0.6));
+            animation: mageFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes mageFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        /* HUD Bottom */
+        .mana-hud { width: 85%; margin: 0 auto 110px; z-index: 10; }
+        .mana-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-family: 'Cinzel'; font-size: 10px; color: var(--neon-cyan); }
+        .track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            overflow: hidden;
+        }
+        .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--astral-purple), var(--neon-cyan));
+            box-shadow: 0 0 20px var(--neon-cyan);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* Shop System */
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%; left: 0; width: 100%;
+            background: rgba(5, 7, 12, 0.98);
             backdrop-filter: blur(25px);
-            border-top: 2px solid var(--sky-blue);
-            border-radius: 30px 30px 0 0;
-            padding: 25px 25px 120px;
-            transition: bottom 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            border-top: 1px solid var(--astral-purple);
+            border-radius: 35px 35px 0 0;
+            padding: 30px 25px 120px;
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
         }
-        .shop-panel.active { bottom: 0; }
+        .bottom-sheet.active { bottom: 0; }
 
-        .upgrade-card { 
-            background: var(--card-glass); border: 1px solid rgba(0,210,255,0.2); 
-            padding: 20px; border-radius: 20px;
-            display: flex; justify-content: space-between; align-items: center;
+        .item {
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
+            border: 1px solid rgba(157, 80, 187, 0.1);
         }
-        .up-btn {
-            background: var(--sky-blue); color: #000; border: none; 
-            padding: 10px 20px; border-radius: 12px; font-weight: 800; font-family: 'Quicksand';
-            box-shadow: 0 4px 10px rgba(0, 210, 255, 0.3);
+        .item-title { font-family: 'Cinzel'; font-size: 14px; color: var(--neon-cyan); }
+        .item-desc { font-size: 11px; color: #778899; margin-top: 5px; }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--astral-purple), var(--astral-blue));
+            color: #fff; font-weight: 800;
+            border: none; padding: 12px 25px;
+            border-radius: 15px;
+            font-size: 13px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .up-btn:active { transform: scale(0.95); }
-        .up-btn:disabled { background: #333; color: #666; box-shadow: none; }
+        .action-btn:disabled { background: #1a1a1a; color: #444; box-shadow: none; }
 
-        .nav {
-            background: rgba(5, 10, 18, 0.95);
+        /* Nav */
+        .tab-bar {
+            position: fixed; bottom: 0; width: 100%;
             display: flex; justify-content: space-around;
-            padding: 15px 10px 35px;
-            border-top: 1px solid rgba(0,210,255,0.1);
-            position: fixed; bottom: 0; width: 100%; z-index: 1100;
+            padding: 20px 10px 45px;
+            background: linear-gradient(to top, #000 70%, transparent);
+            z-index: 1100;
         }
+        .tab {
+            background: none; border: none; color: #fff; opacity: 0.3;
+            display: flex; flex-direction: column; align-items: center;
+            transition: 0.3s;
+        }
+        .tab.active { opacity: 1; color: var(--neon-cyan); }
+        .tab span { font-size: 10px; font-family: 'Cinzel'; margin-top: 8px; letter-spacing: 1px; }
 
-        .nav-btn { display: flex; flex-direction: column; align-items: center; opacity: 0.4; transition: 0.3s; color: #fff; background: none; border: none; flex: 1; }
-        .nav-btn.active { opacity: 1; color: var(--sky-blue); }
-        .nav-btn span { font-size: 10px; font-family: 'Cinzel'; margin-top: 4px; }
-
-        .particle {
+        /* Effects */
+        .pulse-text {
             position: fixed; pointer-events: none;
-            font-family: 'Cinzel'; font-weight: 700; color: var(--sky-blue);
-            text-shadow: 0 0 10px var(--sky-blue);
-            animation: rise 0.8s ease-out forwards;
+            color: #fff; font-family: 'Cinzel'; font-weight: 900;
+            text-shadow: 0 0 15px var(--neon-cyan);
+            animation: pulseOut 0.7s ease-out forwards;
             z-index: 2000;
         }
-        @keyframes rise { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.6); } }
+        @keyframes pulseOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-130px) scale(1.6); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="magic-bg"></div>
-    <div class="aura-ring"></div>
+    <div class="void-bg">
+        <div class="stars-overlay"></div>
+    </div>
 
     <div class="header">
-        <div class="badge" id="lvl-txt">MAGE LVL 1</div>
-        <div class="badge" id="rank-txt" style="color: #fff;">APPRENTICE</div>
+        <div class="badge" id="lvl-txt">ARCHMAGE I</div>
+        <div class="badge" id="rank-txt" style="border-color: var(--gold); color: var(--gold);">VOID WALKER</div>
     </div>
 
-    <div class="game-area">
-        <div class="balance-txt" id="bal-ui">0.0</div>
+    <div class="score-section">
+        <p class="score-label">COLLECTED ESSENCE</p>
+        <h1 class="main-balance" id="bal-ui">0</h1>
+    </div>
+
+    <div class="char-area">
+        <div class="magic-seal"></div>
+        <div class="mage-container" id="tap-target">
+            <img src="https://cdna.artstation.com/p/assets/images/images/051/157/202/original/lucas-reiner-wizard-sprite.gif?1656600000" 
+                 onerror="this.src='https://files.catbox.moe/p4m9h7.png'" 
+                 class="mage-sprite" id="mage-img">
+        </div>
+    </div>
+
+    <div class="mana-hud">
+        <div class="mana-info">
+            <span>ASTRAL ENERGY</span>
+            <span id="mana-val">1000 / 1000</span>
+        </div>
+        <div class="track">
+            <div class="fill" id="mana-bar"></div>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="shop">
+        <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 0 auto 30px;"></div>
+        <h2 style="font-family: 'Cinzel'; margin-bottom: 25px; text-align: center; color: var(--neon-cyan);">Astral Grimoire</h2>
         
-        <div class="frieren-box" id="tap-target">
-            <img src="https://i.ibb.co/YBJm8YV/frieren-standing.png" class="frieren-avatar" id="frieren-img">
+        <div class="item">
+            <div>
+                <p class="item-title">Void Blast</p>
+                <p class="item-desc">Power: +<span id="pwr-stat">1.0</span></p>
+            </div>
+            <button class="action-btn" id="buy-pwr" onclick="purchase('pwr')">100</button>
         </div>
 
-        <div class="hud">
-            <div class="hud-label">
-                <span>MANA STABILITY</span>
-                <span id="mana-text">1000 / 1000</span>
+        <div class="item">
+            <div>
+                <p class="item-title">Star Core</p>
+                <p class="item-desc">Max Mana: +250</p>
             </div>
-            <div class="bar-outer">
-                <div class="bar-inner" id="mana-bar"></div>
-            </div>
+            <button class="action-btn" id="buy-mana" onclick="purchase('mana')">250</button>
         </div>
     </div>
 
-    <div id="shop-panel" class="shop-panel">
-        <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: -10px auto 20px;"></div>
-        <h2 style="font-family: 'Cinzel'; color: var(--sky-blue); margin-top: 0;">Sky Upgrades</h2>
-        
-        <div class="upgrade-card">
-            <div>
-                <div style="font-weight: bold; font-family: 'Cinzel'; font-size: 16px;">Zoltraak Flux</div>
-                <div style="font-size: 12px; color: #8a99ae;">Power per cast: +<span id="power-val">1.0</span></div>
-            </div>
-            <button class="up-btn" onclick="buyUpgrade()" id="up-btn">100</button>
-        </div>
-
-        <div class="upgrade-card">
-            <div>
-                <div style="font-weight: bold; font-family: 'Cinzel'; font-size: 16px;">Mana Well</div>
-                <div style="font-size: 12px; color: #8a99ae;">Max Mana: +200</div>
-            </div>
-            <button class="up-btn" onclick="buyManaUpgrade()" id="mana-up-btn">250</button>
-        </div>
-    </div>
-
-    <nav class="nav">
-        <button class="nav-btn active" id="nav-cast" onclick="toggleShop(false)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-            <span>CAST</span>
+    <nav class="tab-bar">
+        <button class="tab active" id="tab-cast" onclick="view('cast')">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+            <span>CHANNEL</span>
         </button>
-        <button class="nav-btn" id="nav-shop" onclick="toggleShop(true)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 12c-2.7 0-5.8-1.28-6-3 1.1-1.22 2.6-2 4.3-2 1.7 0 3.2.78 4.3 2-.2 1.72-3.3 3-6 3z"/></svg>
-            <span>UPGRADES</span>
+        <button class="tab" id="tab-shop" onclick="view('shop')">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+            <span>GRIMOIRE</span>
         </button>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.backgroundColor = "#020408";
+        tg.headerColor = "#020408";
 
-        // Ma'lumotlarni yuklash
-        let state = JSON.parse(localStorage.getItem('frieren_state')) || {
+        let db = JSON.parse(localStorage.getItem('astral_mage_save')) || {
             bal: 0,
             mana: 1000,
-            maxMana: 1000,
-            power: 1,
+            max: 1000,
+            pwr: 1,
             lvl: 1,
-            upCost: 100,
-            manaUpCost: 250
+            cP: 100,
+            cM: 250
         };
 
-        function saveGame() {
-            localStorage.setItem('frieren_state', JSON.stringify(state));
-        }
-
-        function updateUI() {
-            document.getElementById('bal-ui').innerText = Math.floor(state.bal).toLocaleString();
-            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / ${state.maxMana}`;
-            document.getElementById('mana-bar').style.width = (state.mana / state.maxMana * 100) + "%";
-            document.getElementById('lvl-txt').innerText = `MAGE LVL ${state.lvl}`;
-            document.getElementById('power-val').innerText = state.power.toFixed(1);
+        function sync() {
+            document.getElementById('bal-ui').innerText = Math.floor(db.bal).toLocaleString();
+            document.getElementById('mana-val').innerText = `${Math.floor(db.mana)} / ${db.max}`;
+            document.getElementById('mana-bar').style.width = (db.mana / db.max * 100) + "%";
+            document.getElementById('lvl-txt').innerText = `ARCHMAGE ${db.lvl}`;
+            document.getElementById('pwr-stat').innerText = db.pwr.toFixed(1);
             
-            const upBtn = document.getElementById('up-btn');
-            upBtn.innerText = Math.round(state.upCost);
-            upBtn.disabled = state.bal < state.upCost;
+            const pBtn = document.getElementById('buy-pwr');
+            pBtn.innerText = Math.round(db.cP);
+            pBtn.disabled = db.bal < db.cP;
 
-            const mUpBtn = document.getElementById('mana-up-btn');
-            mUpBtn.innerText = Math.round(state.manaUpCost);
-            mUpBtn.disabled = state.bal < state.manaUpCost;
+            const mBtn = document.getElementById('buy-mana');
+            mBtn.innerText = Math.round(db.cM);
+            mBtn.disabled = db.bal < db.cM;
 
-            const rankTxt = document.getElementById('rank-txt');
-            if (state.lvl < 10) rankTxt.innerText = "APPRENTICE";
-            else if (state.lvl < 30) rankTxt.innerText = "MAGE";
-            else if (state.lvl < 60) rankTxt.innerText = "HIGH MAGE";
-            else rankTxt.innerText = "SKY SAGE";
+            const rTxt = document.getElementById('rank-txt');
+            if(db.lvl > 100) rTxt.innerText = "COSMIC ENTITY";
+            else if(db.lvl > 40) rTxt.innerText = "GALAXY MASTER";
+
+            localStorage.setItem('astral_mage_save', JSON.stringify(db));
         }
 
-        const target = document.getElementById('tap-target');
-        const frierenImg = document.getElementById('frieren-img');
-
-        target.addEventListener('touchstart', (e) => {
+        const tapTarget = document.getElementById('tap-target');
+        tapTarget.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const touches = e.changedTouches;
-
-            for (let i = 0; i < touches.length; i++) {
-                if (state.mana >= 1) {
-                    state.mana -= 1;
-                    state.bal += state.power;
-                    createParticle(touches[i].clientX, touches[i].clientY);
-                    
-                    // Visual feedback
-                    frierenImg.style.transform = "scale(0.95)";
-                    setTimeout(() => frierenImg.style.transform = "scale(1)", 50);
-                    
-                    tg.HapticFeedback.impactOccurred('light');
+            [...e.changedTouches].forEach(t => {
+                if(db.mana >= 3) {
+                    db.mana -= 3;
+                    db.bal += db.pwr;
+                    spawnFx(t.clientX, t.clientY);
+                    tg.HapticFeedback.impactOccurred('medium');
                 } else {
-                    tg.HapticFeedback.notificationOccurred('warning');
+                    tg.HapticFeedback.notificationOccurred('error');
                 }
-            }
-            updateUI();
-            saveGame();
+            });
+            sync();
         });
 
-        function createParticle(x, y) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.innerText = "✧ +" + state.power.toFixed(1);
-            p.style.left = (x - 20) + 'px';
-            p.style.top = (y - 20) + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
+        function spawnFx(x, y) {
+            const el = document.createElement('div');
+            el.className = 'pulse-text';
+            el.innerText = "+" + db.pwr.toFixed(1);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 700);
         }
 
-        function toggleShop(show) {
-            const panel = document.getElementById('shop-panel');
-            const navShop = document.getElementById('nav-shop');
-            const navCast = document.getElementById('nav-cast');
-            
-            if (show) {
-                panel.classList.add('active');
-                navShop.classList.add('active');
-                navCast.classList.remove('active');
+        function view(mode) {
+            const sh = document.getElementById('shop');
+            if(mode === 'shop') {
+                sh.classList.add('active');
+                document.getElementById('tab-shop').classList.add('active');
+                document.getElementById('tab-cast').classList.remove('active');
             } else {
-                panel.classList.remove('active');
-                navShop.classList.remove('active');
-                navCast.classList.add('active');
+                sh.classList.remove('active');
+                document.getElementById('tab-cast').classList.add('active');
+                document.getElementById('tab-shop').classList.remove('active');
             }
             tg.HapticFeedback.selectionChanged();
         }
 
-        function buyUpgrade() {
-            if (state.bal >= state.upCost) {
-                state.bal -= state.upCost;
-                state.power += 0.5;
-                state.lvl += 1;
-                state.upCost = Math.round(state.upCost * 1.6);
-                tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-                saveGame();
+        function purchase(t) {
+            if(t === 'pwr' && db.bal >= db.cP) {
+                db.bal -= db.cP;
+                db.pwr += 0.6;
+                db.lvl++;
+                db.cP *= 1.8;
+            } else if(t === 'mana' && db.bal >= db.cM) {
+                db.bal -= db.cM;
+                db.max += 300;
+                db.mana = db.max;
+                db.cM *= 2.0;
             }
+            tg.HapticFeedback.notificationOccurred('success');
+            sync();
         }
 
-        function buyManaUpgrade() {
-            if (state.bal >= state.manaUpCost) {
-                state.bal -= state.manaUpCost;
-                state.maxMana += 200;
-                state.mana = state.maxMana;
-                state.manaUpCost = Math.round(state.manaUpCost * 1.8);
-                tg.HapticFeedback.notificationOccurred('success');
-                updateUI();
-                saveGame();
-            }
-        }
-
-        // Mana Regeneratsiyasi (Har soniyada 0.5% tiklanadi)
+        // Regen
         setInterval(() => {
-            if (state.mana < state.maxMana) {
-                state.mana = Math.min(state.maxMana, state.mana + (state.maxMana * 0.005));
-                updateUI();
+            if(db.mana < db.max) {
+                db.mana = Math.min(db.max, db.mana + (2 + db.lvl * 0.15));
+                sync();
             }
         }, 1000);
 
-        // Avtomatik saqlash
-        setInterval(saveGame, 5000);
-
-        updateUI();
+        sync();
     </script>
 </body>
 </html>
