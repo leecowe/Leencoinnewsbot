@@ -3,146 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol V1.0 - Farming Elite</title>
+    <title>Aira Protocol - TEST MODE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #000; --card: rgba(13, 27, 42, 0.85); }
+        :root { --cyan: #00f2ff; --pink: #ff007f; --dark: #000; --test: #ffea00; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { background: var(--dark); color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        #bg-canvas { position: fixed; top: 0; z-index: -1; pointer-events: none; }
+        /* TEST MODE INDICATOR */
+        .test-banner { 
+            background: var(--test); color: #000; font-family: 'Orbitron'; 
+            font-size: 9px; text-align: center; padding: 2px 0; font-weight: bold;
+            position: fixed; top: 0; width: 100%; z-index: 200; letter-spacing: 2px;
+        }
 
-        /* HEADER */
-        .header { padding: 50px 20px 10px; text-align: center; background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent); }
-        .brand { font-family: 'Orbitron'; font-size: 14px; color: var(--cyan); letter-spacing: 3px; text-shadow: 0 0 10px var(--cyan); }
-        .balance { font-family: 'Orbitron'; font-size: 48px; font-weight: 700; margin: 5px 0; color: #fff; text-shadow: 0 0 20px var(--cyan); }
-        .stats { display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron'; font-size: 10px; }
-        .stat-i span { color: var(--cyan); }
+        #bg-canvas { position: fixed; top: 0; z-index: -1; }
 
-        /* CONTENT */
-        .content { flex: 1; position: relative; overflow: hidden; }
-        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .page.active { display: flex; flex-direction: column; }
+        /* HUD */
+        .header { padding: 55px 20px 10px; text-align: center; position: relative; }
+        .brand { font-family: 'Orbitron'; font-size: 14px; color: var(--cyan); letter-spacing: 3px; }
+        .balance { font-family: 'Orbitron'; font-size: 52px; font-weight: 700; text-shadow: 0 0 20px var(--cyan); margin: 5px 0; }
+        .stats { display: flex; justify-content: center; gap: 15px; font-family: 'Orbitron'; font-size: 10px; }
 
         /* CORE */
-        .hero { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .main-btn { 
+        .content { flex: 1; position: relative; overflow: hidden; }
+        .page { position: absolute; width: 100%; height: 100%; display: none; padding: 20px; overflow-y: auto; }
+        .page.active { display: flex; flex-direction: column; }
+
+        .hero { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .main-orb { 
             width: 260px; height: 260px; border-radius: 50%; border: 2px solid var(--cyan);
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, rgba(0,242,255,0.15), transparent);
-            box-shadow: 0 0 30px rgba(0,242,255,0.2); transition: 0.05s;
+            background: radial-gradient(circle, rgba(0,242,255,0.1), transparent);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(0,242,255,0.1);
         }
-        .main-btn:active { transform: scale(0.95); }
 
         /* MARKET & NFT CARDS */
         .card { 
-            background: var(--card); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 14px; 
-            padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-            backdrop-filter: blur(5px);
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 242, 255, 0.15); 
+            border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .card b { font-family: 'Orbitron'; font-size: 14px; display: block; color: var(--cyan); }
-        .card span { font-size: 11px; color: #aaa; }
-        .btn-action { 
-            background: #111; border: 1px solid var(--cyan); color: #fff; padding: 10px 15px; 
-            border-radius: 10px; font-family: 'Orbitron'; font-size: 11px; min-width: 80px;
+        .btn-buy { 
+            background: #111; border: 1px solid var(--cyan); color: #fff; padding: 10px; 
+            border-radius: 8px; font-family: 'Orbitron'; font-size: 11px; min-width: 85px;
         }
-        .btn-action:disabled { border-color: #333; color: #555; }
-        .btn-action.max { border-color: var(--pink); color: var(--pink); }
+        .btn-buy:disabled { border-color: #333; color: #555; }
 
-        /* NFT GRID */
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px; }
-        .nft-box { 
-            background: var(--card); border: 1px solid rgba(255, 0, 127, 0.2); border-radius: 12px; 
-            padding: 10px; text-align: center; position: relative;
+        /* NFT GRID - 100 NFT */
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
+        .nft-item { 
+            background: rgba(13, 27, 42, 0.6); border: 1px solid var(--pink); border-radius: 12px; 
+            padding: 12px; text-align: center; transition: 0.2s;
         }
-        .nft-box.owned { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
-        .nft-box img { width: 50px; height: 50px; margin-bottom: 8px; filter: drop-shadow(0 0 5px var(--pink)); }
-        
+        .nft-item.owned { border-color: var(--cyan); background: rgba(0, 242, 255, 0.05); }
+        .nft-power { font-size: 11px; color: var(--cyan); font-family: 'Orbitron'; margin: 5px 0; }
+
         /* NAVIGATION */
         .nav { height: 85px; background: #000; border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-t { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; cursor: pointer; }
-        .nav-t.active { color: var(--cyan); border-top: 3px solid var(--cyan); background: linear-gradient(to top, rgba(0,242,255,0.05), transparent); }
+        .nav-t { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; }
+        .nav-t.active { color: var(--cyan); border-top: 3px solid var(--cyan); }
 
-        .pop { position: absolute; color: var(--cyan); font-family: 'Orbitron'; font-weight: 700; pointer-events: none; animation: fly 0.5s ease-out forwards; z-index: 100; }
-        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
+        .pop { position: absolute; color: var(--cyan); font-family: 'Orbitron'; font-weight: 700; pointer-events: none; animation: fly 0.6s linear forwards; }
+        @keyframes fly { to { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
 
+<div class="test-banner">SYSTEM TEST REJIMI: ACTIVE 🧪</div>
 <canvas id="bg-canvas"></canvas>
 
 <div class="header">
     <div class="brand">AIRA PROTOCOL V1.0</div>
-    <div class="balance" id="money">0</div>
+    <div class="balance" id="m-bal">0</div>
     <div class="stats">
-        <div class="stat-i">TAP: +<span id="t-val">1</span></div>
-        <div class="stat-i" style="color:var(--pink)">FLOW: +<span id="a-val">0</span>/s</div>
+        <div style="color:var(--cyan)">TAP: +<span id="t-p">1</span></div>
+        <div style="color:var(--pink)">FARMING: +<span id="f-p">0</span>/s</div>
     </div>
 </div>
 
 <div class="content">
     <div id="core-p" class="page active">
         <div class="hero">
-            <div class="main-btn" id="tap-zone">
+            <div class="main-orb" id="tap-trigger">
                 <svg width="140" height="140" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="4"/>
-                    <path d="M30 40 Q50 30 70 40 L70 60 Q50 70 30 60 Z" fill="#112233" stroke="var(--cyan)" stroke-width="2"/>
-                    <circle cx="42" cy="48" r="3" fill="var(--cyan)"/><circle cx="58" cy="48" r="3" fill="var(--cyan)"/>
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="3,3"/>
+                    <rect x="25" y="40" width="50" height="25" rx="12" fill="#0d1b2a" stroke="var(--cyan)" stroke-width="2"/>
+                    <circle cx="40" cy="52" r="4" fill="var(--cyan)"/><circle cx="60" cy="52" r="4" fill="var(--cyan)"/>
                 </svg>
             </div>
         </div>
     </div>
 
     <div id="market-p" class="page">
-        <h3 style="font-family:Orbitron; text-align:center; color:var(--cyan); margin-bottom:15px;">SYSTEM MARKET</h3>
-        <div id="market-list"></div>
+        <h3 style="font-family:Orbitron; text-align:center; color:var(--cyan); margin-bottom:15px;">MARKET</h3>
+        <div id="m-list"></div>
     </div>
 
     <div id="nft-p" class="page">
-        <h3 style="font-family:Orbitron; text-align:center; color:var(--pink); margin-bottom:15px;">NFT FARMERS (100)</h3>
-        <div class="nft-grid" id="nft-list"></div>
+        <h3 style="font-family:Orbitron; text-align:center; color:var(--pink); margin-bottom:15px;">NFT FARMERS (100 UNITS)</h3>
+        <div class="nft-grid" id="n-list"></div>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-t active" onclick="go('core', this)">CORE</div>
-    <div class="nav-t" onclick="go('market', this)">MARKET</div>
-    <div class="nav-t" onclick="go('nft', this)">NFT</div>
+    <div class="nav-t active" onclick="tab('core', this)">CORE</div>
+    <div class="nav-t" onclick="tab('market', this)">MARKET</div>
+    <div class="nav-t" onclick="tab('nft', this)">NFT</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let data = {
-        coins: parseFloat(localStorage.getItem('aira_c')) || 0,
-        upgrades: JSON.parse(localStorage.getItem('aira_u')) || { u1:0, u2:0, u3:0 },
-        nfts: JSON.parse(localStorage.getItem('aira_n')) || []
+    let state = {
+        coins: parseFloat(localStorage.getItem('tc_coins')) || 0,
+        upgrades: JSON.parse(localStorage.getItem('tc_up')) || { u1:0, u2:0, u3:0 },
+        nfts: JSON.parse(localStorage.getItem('tc_nft')) || []
     };
 
-    const marketData = [
-        { id: 'u1', name: 'Neural Link', base: 100, bonus: 2, type: 'tap' },
-        { id: 'u2', name: 'Aira Drone', base: 500, bonus: 5, type: 'auto' },
-        { id: 'u3', name: 'Quantum Core', base: 2000, bonus: 25, type: 'auto' }
+    const marketMap = [
+        { id: 'u1', name: 'Neural Chip', base: 100, bonus: 2, type: 'tap' },
+        { id: 'u2', name: 'Nano Drone', base: 500, bonus: 5, type: 'auto' },
+        { id: 'u3', name: 'Quantum Core', base: 2000, bonus: 20, type: 'auto' }
     ];
 
-    // 100 ta NFT generatsiyasi
-    const nfts = Array.from({length: 100}, (_, i) => ({
-        id: 'n' + i,
-        name: 'Unit #' + (i + 1),
-        price: Math.floor(1000 * Math.pow(1.1, i)),
-        flow: Math.floor(10 * (i + 1))
+    // TEST ALGORITMI: 100 NFT yaratish
+    const nftCatalog = Array.from({length: 100}, (_, i) => ({
+        id: 'nft_' + i,
+        name: 'Unit-X' + (i + 1),
+        price: Math.floor(1000 * Math.pow(1.18, i)), // Narx 18% o'sadi
+        power: Math.floor(5 * Math.pow(1.15, i))    // Quvvat 15% o'sadi
     }));
 
     function getStats() {
-        let t = 1, a = 0;
-        marketData.forEach(u => { t += (data.upgrades[u.id] || 0) * (u.type === 'tap' ? u.bonus : 0); a += (data.upgrades[u.id] || 0) * (u.type === 'auto' ? u.bonus : 0); });
-        data.nfts.forEach(id => { const n = nfts.find(x => x.id === id); if(n) a += n.flow; });
-        return { t, a };
+        let tap = 1, farm = 0;
+        marketMap.forEach(u => {
+            const lvl = state.upgrades[u.id] || 0;
+            if(u.type === 'tap') tap += lvl * u.bonus;
+            else farm += lvl * u.bonus;
+        });
+        state.nfts.forEach(id => {
+            const n = nftCatalog.find(x => x.id === id);
+            if(n) farm += n.power;
+        });
+        return { tap, farm };
     }
 
-    function go(id, el) {
+    function tab(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-t').forEach(t => t.classList.remove('active'));
         document.getElementById(id + '-p').classList.add('active');
@@ -153,65 +160,64 @@
     }
 
     function renderMarket() {
-        document.getElementById('market-list').innerHTML = marketData.map(u => {
-            const lvl = data.upgrades[u.id] || 0;
-            const cost = Math.floor(u.base * Math.pow(1.8, lvl));
+        document.getElementById('m-list').innerHTML = marketMap.map(u => {
+            const lvl = state.upgrades[u.id] || 0;
+            const cost = Math.floor(u.base * Math.pow(2, lvl));
             const isMax = lvl >= 10;
-            return `
-                <div class="card">
-                    <div><b>${u.name}</b><span>Lvl ${lvl}/10 | +${u.bonus} ${u.type}</span></div>
-                    <button class="btn-action ${isMax?'max':''}" onclick="buyU('${u.id}', ${cost})" ${isMax || data.coins < cost ? 'disabled' : ''}>
-                        ${isMax ? 'MAX' : (cost>=1000?(cost/1000).toFixed(1)+'K':cost)}
-                    </button>
-                </div>`;
+            return `<div class="card">
+                <div><b>${u.name}</b><span>Lvl ${lvl}/10 | +${u.bonus} ${u.type}</span></div>
+                <button class="btn-buy" onclick="buyU('${u.id}', ${cost})" ${isMax || state.coins < cost ? 'disabled' : ''}>
+                    ${isMax ? 'MAX' : (cost>=1000?(cost/1000).toFixed(1)+'K':cost)}
+                </button>
+            </div>`;
         }).join('');
     }
 
     function renderNFTs() {
-        document.getElementById('nft-list').innerHTML = nfts.map(n => {
-            const owned = data.nfts.includes(n.id);
-            return `
-                <div class="nft-box ${owned?'owned':''}">
-                    <svg width="40" height="40" viewBox="0 0 100 100" style="margin-bottom:5px;">
-                        <rect x="20" y="20" width="60" height="60" rx="10" fill="none" stroke="${owned?'var(--cyan)':'var(--pink)'}" stroke-width="2"/>
-                        <circle cx="50" cy="50" r="10" fill="${owned?'var(--cyan)':'var(--pink)'}"/>
-                    </svg>
-                    <div style="font-size:10px; font-family:Orbitron;">${n.name}</div>
-                    <div style="font-size:9px; color:var(--cyan);">+${n.flow}/s</div>
-                    <button class="btn-action" style="width:100%; margin-top:8px; font-size:9px; padding:5px;" 
-                        onclick="buyN('${n.id}', ${n.price})" ${owned || data.coins < n.price ? 'disabled' : ''}>
-                        ${owned ? 'ACTIVE' : (n.price>=1000?(n.price/1000).toFixed(1)+'K':n.price)}
-                    </button>
-                </div>`;
+        document.getElementById('n-list').innerHTML = nftCatalog.map(n => {
+            const owned = state.nfts.includes(n.id);
+            return `<div class="nft-item ${owned?'owned':''}">
+                <div style="font-family:Orbitron; font-size:11px;">${n.name}</div>
+                <div class="nft-power">⚡ ${n.power}/s</div>
+                <button class="btn-buy" style="width:100%; margin-top:5px; font-size:9px;" 
+                    onclick="buyN('${n.id}', ${n.price})" ${owned || state.coins < n.price ? 'disabled' : ''}>
+                    ${owned ? 'ACTIVE' : (n.price>=1000?(n.price/1000).toFixed(1)+'K':n.price)}
+                </button>
+            </div>`;
         }).join('');
     }
 
-    window.buyU = (id, c) => { if(data.coins >= c && (data.upgrades[id]||0) < 10) { data.coins -= c; data.upgrades[id]++; save(); updateUI(); renderMarket(); tg.HapticFeedback.notificationOccurred('success'); } };
-    window.buyN = (id, c) => { if(data.coins >= c && !data.nfts.includes(id)) { data.coins -= c; data.nfts.push(id); save(); updateUI(); renderNFTs(); tg.HapticFeedback.notificationOccurred('success'); } };
+    window.buyU = (id, c) => { if(state.coins >= c) { state.coins -= c; state.upgrades[id]++; save(); updateUI(); renderMarket(); tg.HapticFeedback.notificationOccurred('success'); } };
+    window.buyN = (id, c) => { if(state.coins >= c) { state.coins -= c; state.nfts.push(id); save(); updateUI(); renderNFTs(); tg.HapticFeedback.notificationOccurred('success'); } };
 
     function updateUI() {
         const s = getStats();
-        document.getElementById('money').innerText = Math.floor(data.coins).toLocaleString();
-        document.getElementById('t-val').innerText = s.t;
-        document.getElementById('a-val').innerText = s.a;
+        document.getElementById('m-bal').innerText = Math.floor(state.coins).toLocaleString();
+        document.getElementById('t-p').innerText = s.tap;
+        document.getElementById('f-p').innerText = s.farm;
     }
 
-    function save() { localStorage.setItem('aira_c', data.coins); localStorage.setItem('aira_u', JSON.stringify(data.upgrades)); localStorage.setItem('aira_n', JSON.stringify(data.nfts)); }
+    function save() { 
+        localStorage.setItem('tc_coins', state.coins); 
+        localStorage.setItem('tc_up', JSON.stringify(state.upgrades)); 
+        localStorage.setItem('tc_nft', JSON.stringify(state.nfts)); 
+    }
 
-    document.getElementById('tap-zone').addEventListener('touchstart', (e) => {
-        e.preventDefault(); const s = getStats(); data.coins += s.t; updateUI(); save();
-        const t = e.touches[0]; const p = document.createElement('div'); p.className = 'pop'; p.innerText = '+'+s.t;
+    document.getElementById('tap-trigger').addEventListener('touchstart', (e) => {
+        e.preventDefault(); const s = getStats(); state.coins += s.tap; updateUI(); save();
+        const t = e.touches[0]; const p = document.createElement('div'); p.className = 'pop'; p.innerText = '+'+s.tap;
         p.style.left = t.clientX + 'px'; p.style.top = t.clientY + 'px'; document.body.appendChild(p);
-        setTimeout(()=>p.remove(), 500); tg.HapticFeedback.impactOccurred('medium');
+        setTimeout(()=>p.remove(), 600); tg.HapticFeedback.impactOccurred('medium');
     });
 
-    setInterval(() => { data.coins += getStats().a / 10; updateUI(); }, 100);
-    
+    // TEST REJIMI FLOW: Har 100ms da farming
+    setInterval(() => { state.coins += getStats().farm / 10; updateUI(); }, 100);
+
     // Star Background
     const cvs = document.getElementById('bg-canvas'); const ct = cvs.getContext('2d');
     cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-    let sts = Array.from({length: 50}, () => ({ x: Math.random()*cvs.width, y: Math.random()*cvs.height, v: Math.random()*0.5 }));
-    function drw() { ct.fillStyle = '#000'; ct.fillRect(0,0,cvs.width,cvs.height); ct.fillStyle = '#00f2ff44'; sts.forEach(s => { ct.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > cvs.height) s.y = 0; }); requestAnimationFrame(drw); }
+    let stars = Array.from({length: 40}, () => ({ x: Math.random()*cvs.width, y: Math.random()*cvs.height, v: Math.random()*0.4 }));
+    function drw() { ct.fillStyle = '#000'; ct.fillRect(0,0,cvs.width,cvs.height); ct.fillStyle = '#00f2ff44'; stars.forEach(s => { ct.fillRect(s.x, s.y, 1, 1); s.y += s.v; if(s.y > cvs.height) s.y = 0; }); requestAnimationFrame(drw); }
     drw(); updateUI();
 </script>
 </body>
