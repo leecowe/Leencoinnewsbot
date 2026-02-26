@@ -3,138 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Clicker Ultra</title>
+    <title>Leencoin Legend</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root { --neon-blue: #00f2ff; --neon-purple: #bc13fe; --gold: #ffcc00; }
         body { 
-            background: #000; color: #fff; text-align: center; font-family: 'Segoe UI', sans-serif; 
-            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            background: #050505; color: #fff; text-align: center; font-family: 'Orbitron', sans-serif; 
+            margin: 0; height: 100vh; display: flex; flex-direction: column; overflow-y: auto;
         }
-        .header { padding: 20px; background: linear-gradient(to bottom, #1a1a1a, #000); }
-        .score { font-size: 55px; font-weight: bold; color: #ffcc00; text-shadow: 0 0 20px rgba(255, 204, 0, 0.5); }
         
-        .progress-container { width: 85%; background: #333; height: 12px; border-radius: 6px; margin: 10px auto; overflow: hidden; border: 1px solid #444; }
-        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff9900, #ffcc00); transition: width 0.3s; }
+        /* Header & Score */
+        .header { padding: 20px; background: rgba(0, 0, 0, 0.8); sticky: top; border-bottom: 2px solid var(--neon-blue); }
+        .score { font-size: 50px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px var(--gold); }
+        
+        /* Main Game Area */
+        .game-screen { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .main-orb {
+            width: 200px; height: 200px; border-radius: 50%;
+            background: radial-gradient(circle, var(--neon-blue), #000);
+            box-shadow: 0 0 50px var(--neon-blue); border: 4px solid #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 80px;
+            transition: 0.1s; cursor: pointer; -webkit-tap-highlight-color: transparent;
+        }
+        .main-orb:active { transform: scale(0.9); box-shadow: 0 0 80px var(--neon-purple); }
 
-        .energy-section { font-size: 14px; color: #aaa; margin-top: 5px; }
-        .stats-row { display: flex; justify-content: space-around; font-size: 13px; color: #00ff00; font-weight: bold; margin-top: 10px; }
-        
-        .main-game { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        .coin { 
-            width: 220px; height: 220px; background: radial-gradient(circle, #ffcc00, #ff9900); 
-            border-radius: 50%; box-shadow: 0 0 50px rgba(255, 153, 0, 0.4);
-            display: flex; align-items: center; justify-content: center; font-size: 90px;
-            transition: transform 0.05s; border: 8px solid #e6b800; -webkit-tap-highlight-color: transparent;
+        /* Shop Section (VIP - EPIC) */
+        .shop-overlay { 
+            display: none; padding: 20px; background: linear-gradient(to bottom, #000, #1a1a1a);
+            border-top: 3px solid var(--neon-purple); border-radius: 30px 30px 0 0; margin-top: 20px;
         }
-        .coin:active { transform: scale(0.92); }
-        .coin.disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+        .shop-title { color: var(--neon-purple); font-size: 24px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
         
-        .tap-anim { position: absolute; color: #fff; font-size: 30px; font-weight: 900; pointer-events: none; animation: fly 0.6s ease-out forwards; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
-        
-        .footer-menu { padding: 20px; background: #111; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 25px 25px 0 0; }
-        .btn {
-            border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.3s;
+        .card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--neon-blue);
+            border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex;
+            justify-content: space-between; align-items: center;
         }
-        .upgrade-btn { background: #ffcc00; color: #000; }
-        .upgrade-btn:disabled { background: #333; color: #777; }
-        .invite-btn { background: #248bcf; color: #fff; }
+        .card-info h3 { margin: 0; font-size: 16px; color: var(--neon-blue); }
+        .card-info p { margin: 5px 0 0; font-size: 12px; color: #aaa; }
+        
+        .buy-btn {
+            background: var(--neon-blue); color: #000; border: none; padding: 10px 15px;
+            border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+        .buy-btn:disabled { background: #333; color: #666; }
+
+        /* Statuses */
+        .lvl-tag { font-size: 14px; color: var(--neon-purple); margin-bottom: 10px; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <div class="score" id="score">0</div>
-        <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
-        <div class="energy-section">⚡️ Energiya: <span id="energy">100</span>/100</div>
-        <div class="stats-row">
-            <span id="tap-power">🚀 Tap: +1</span>
-            <span id="auto-rate">⚙️ Auto: +1/s</span>
+        <div class="lvl-tag">AUTO-CLICKER: <span id="auto-lvl">1</span>/10</div>
+    </div>
+
+    <div class="game-screen" id="main-ui">
+        <div class="main-orb" id="orb">💎</div>
+        <p style="color: #00f2ff; margin-top: 20px;">Har bir bosish: +<span id="tap-val">1</span></p>
+    </div>
+
+    <div class="shop-overlay" id="epic-shop">
+        <div class="shop-title">✨ LEGENDARY SHOP ✨</div>
+        
+        <div class="card">
+            <div class="card-info">
+                <h3>VIP LEGEND CARD</h3>
+                <p>Har soniyada +50 ochko</p>
+            </div>
+            <button class="buy-btn" onclick="buyEpic(5000, 50)">💰 5,000</button>
+        </div>
+
+        <div class="card">
+            <div class="card-info">
+                <h3>MYSTIC ARTIFACT</h3>
+                <p>Tap kuchini +25 ga oshirish</p>
+            </div>
+            <button class="buy-btn" onclick="buyTap(10000, 25)">💰 10,000</button>
         </div>
     </div>
 
-    <div class="main-game">
-        <div class="coin" id="coin">💰</div>
-    </div>
-
-    <div class="footer-menu">
-        <button class="btn upgrade-btn" id="upgrade-btn">Level Up (💰 100)</button>
-        <button class="btn invite-btn" id="invite-btn">Invite Friends 👥</button>
+    <div style="padding: 20px;">
+        <button class="buy-btn" id="auto-btn" style="width: 100%; padding: 20px;" onclick="upgradeAuto()">
+            AUTO-CLICKER UPGRADE (💰 <span id="auto-cost">100</span>)
+        </button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let score = parseFloat(localStorage.getItem('score')) || 0;
+        let score = parseInt(localStorage.getItem('score')) || 0;
+        let autoLvl = parseInt(localStorage.getItem('autoLvl')) || 1;
         let tapPower = parseInt(localStorage.getItem('tapPower')) || 1;
-        let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 100;
-        let energy = parseInt(localStorage.getItem('energy')) || 100;
+        let autoRate = parseInt(localStorage.getItem('autoRate')) || 1;
 
         const scoreEl = document.getElementById('score');
-        const energyEl = document.getElementById('energy');
-        const progressBar = document.getElementById('progress');
-        const upgradeBtn = document.getElementById('upgrade-btn');
+        const autoLvlEl = document.getElementById('auto-lvl');
+        const autoBtn = document.getElementById('auto-btn');
+        const autoCostEl = document.getElementById('auto-cost');
+        const shopEl = document.getElementById('epic-shop');
 
         function updateUI() {
-            scoreEl.innerText = Math.floor(score).toLocaleString();
-            energyEl.innerText = energy;
-            document.getElementById('tap-power').innerText = `🚀 Tap: +${tapPower}`;
-            upgradeBtn.innerText = `Level Up (💰 ${upgradeCost})`;
-            
-            let prog = (score / upgradeCost) * 100;
-            progressBar.style.width = Math.min(prog, 100) + "%";
-            upgradeBtn.disabled = score < upgradeCost;
-            
-            if(energy <= 0) document.getElementById('coin').classList.add('disabled');
-            else document.getElementById('coin').classList.remove('disabled');
-        }
+            scoreEl.innerText = score.toLocaleString();
+            autoLvlEl.innerText = autoLvl;
+            document.getElementById('tap-val').innerText = tapPower;
+            let cost = Math.floor(100 * Math.pow(1.8, autoLvl - 1));
+            autoCostEl.innerText = cost;
 
-        // Auto-daromad va Energiya tiklanishi
-        setInterval(() => {
-            score += 1;
-            if (energy < 100) energy += 1;
-            updateUI();
+            if (autoLvl >= 10) {
+                autoBtn.style.display = 'none';
+                shopEl.style.display = 'block';
+            }
             save();
-        }, 1000);
+        }
 
         function save() {
             localStorage.setItem('score', score);
+            localStorage.setItem('autoLvl', autoLvl);
             localStorage.setItem('tapPower', tapPower);
-            localStorage.setItem('upgradeCost', upgradeCost);
-            localStorage.setItem('energy', energy);
+            localStorage.setItem('autoRate', autoRate);
         }
 
-        document.getElementById('coin').onclick = (e) => {
-            if (energy >= tapPower) {
-                score += tapPower;
-                energy -= tapPower;
+        // Tap
+        document.getElementById('orb').onclick = (e) => {
+            score += tapPower;
+            updateUI();
+            tg.HapticFeedback.impactOccurred('medium');
+        };
+
+        // Auto Upgrade (Max 10)
+        function upgradeAuto() {
+            let cost = parseInt(autoCostEl.innerText);
+            if (score >= cost && autoLvl < 10) {
+                score -= cost;
+                autoLvl++;
+                autoRate += 2;
                 updateUI();
-                tg.HapticFeedback.impactOccurred('medium');
-
-                const anim = document.createElement('div');
-                anim.className = 'tap-anim';
-                anim.innerText = `+${tapPower}`;
-                anim.style.left = e.clientX + 'px';
-                anim.style.top = e.clientY + 'px';
-                document.body.appendChild(anim);
-                setTimeout(() => anim.remove(), 600);
             }
-        };
+        }
 
-        upgradeBtn.onclick = () => {
-            if (score >= upgradeCost) {
-                score -= upgradeCost;
-                tapPower += 1;
-                upgradeCost = Math.floor(upgradeCost * 2);
+        // Epic Shop Functions
+        function buyEpic(cost, rate) {
+            if (score >= cost) {
+                score -= cost;
+                autoRate += rate;
                 updateUI();
-                save();
+                alert("LEGEND CARD ACTIVATED!");
             }
-        };
+        }
 
-        document.getElementById('invite-btn').onclick = () => {
-            const url = `https://t.me/share/url?url=https://t.me/${tg.initDataUnsafe.bot.username}&text=Bu o'yinda pul ishla!`;
-            tg.openTelegramLink(url);
-        };
+        function buyTap(cost, pwr) {
+            if (score >= cost) {
+                score -= cost;
+                tapPower += pwr;
+                updateUI();
+                alert("MYSTIC POWER UNLOCKED!");
+            }
+        }
+
+        // Global Loop
+        setInterval(() => {
+            score += autoRate;
+            updateUI();
+        }, 1000);
 
         updateUI();
     </script>
