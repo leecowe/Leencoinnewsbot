@@ -3,69 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Clicker</title>
+    <title>Leenova Clicker Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { 
             background: radial-gradient(circle, #1a1a1a, #000); 
-            color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #fff; text-align: center; font-family: sans-serif; 
             margin: 0; height: 100vh; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; overflow: hidden; user-select: none;
         }
-        .score-container { font-size: 50px; font-weight: bold; margin-bottom: 20px; color: #ffcc00; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
+        .score-container { font-size: 60px; font-weight: bold; color: #ffcc00; margin: 0; }
+        .auto-rate { font-size: 18px; color: #00ff00; margin-bottom: 20px; font-weight: bold; }
         .coin { 
-            width: 220px; height: 220px; 
-            background: radial-gradient(circle, #ffcc00, #ff9900); 
-            border-radius: 50%; box-shadow: 0 0 40px #ff9900; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            font-size: 90px; transition: transform 0.05s; -webkit-tap-highlight-color: transparent;
+            width: 220px; height: 220px; background: radial-gradient(circle, #ffcc00, #ff9900); 
+            border-radius: 50%; box-shadow: 0 0 50px #ff9900; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 90px;
+            transition: transform 0.05s; -webkit-tap-highlight-color: transparent;
             border: 8px solid #e6b800;
         }
         .coin:active { transform: scale(0.92); }
-        .tap-effect {
-            position: absolute; color: #ffcc00; font-size: 24px; font-weight: bold;
-            pointer-events: none; animation: flyUp 0.6s ease-out forwards;
-        }
-        @keyframes flyUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
-        }
+        .tap-effect { position: absolute; color: #ffcc00; font-size: 26px; font-weight: bold; pointer-events: none; animation: fly 0.6s ease-out forwards; }
+        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
     <div class="score-container" id="score">0</div>
+    <div class="auto-rate" id="rate">Daromad: +1/sek</div>
     <div class="coin" id="tap">💰</div>
-    <p style="margin-top: 20px; color: #aaa;">Ochkolaringiz saqlanadi!</p>
+    <p style="margin-top: 25px; color: #888;">Avtomatik yig'ilmoqda...</p>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let score = parseInt(localStorage.getItem('userScore')) || 0;
-        
+        let score = parseFloat(localStorage.getItem('userScore')) || 0;
         tg.expand();
-        document.getElementById('score').innerText = score;
 
-        const tapBtn = document.getElementById('tap');
         const scoreDisplay = document.getElementById('score');
+        
+        // Ochkoni ekranda yangilash funksiyasi
+        function updateDisplay() {
+            scoreDisplay.innerText = Math.floor(score);
+        }
 
-        tapBtn.onclick = (e) => {
+        updateDisplay();
+
+        // AVTO-CLICKER: Har soniyada 1 ochko qo'shish
+        setInterval(() => {
+            score += 1;
+            updateDisplay();
+            localStorage.setItem('userScore', score);
+        }, 1000);
+
+        // TAP: Bosganda ochko qo'shish
+        document.getElementById('tap').onclick = (e) => {
             score++;
-            scoreDisplay.innerText = score;
-            localStorage.setItem('userScore', score); // Ochkoni saqlash
-            
+            updateDisplay();
+            localStorage.setItem('userScore', score);
             tg.HapticFeedback.impactOccurred('medium');
 
             // +1 effekti
-            const rect = tapBtn.getBoundingClientRect();
-            const x = e.clientX || rect.left + rect.width / 2;
-            const y = e.clientY || rect.top;
-
             const effect = document.createElement('div');
             effect.innerText = '+1';
             effect.className = 'tap-effect';
-            effect.style.left = x + 'px';
-            effect.style.top = y + 'px';
+            effect.style.left = (e.clientX || window.innerWidth/2) + 'px';
+            effect.style.top = (e.clientY || window.innerHeight/2) + 'px';
             document.body.appendChild(effect);
-
             setTimeout(() => effect.remove(), 600);
         };
     </script>
