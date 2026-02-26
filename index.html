@@ -2,197 +2,235 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Aira Protocol</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #00f2ff; --pink: #ff007f; --dark: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: var(--dark); color: #fff; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Full Screen va Mobile uchun moslashuv */
+        body { 
+            margin: 0; 
+            height: 100vh; 
+            background: var(--dark); 
+            color: #fff; 
+            font-family: 'Rajdhani', sans-serif; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            padding-top: env(safe-area-inset-top); /* iPhone notch uchun */
+        }
 
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* HUD */
-        .top-hud { padding: 40px 20px 10px; text-align: center; z-index: 100; }
-        .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 15px; letter-spacing: 2px; }
-        .balance { font-family: 'Orbitron'; font-size: 52px; text-shadow: 0 0 25px var(--blue); margin: 10px 0; }
-        .stats-bar { display: flex; justify-content: center; gap: 20px; font-family: 'Orbitron'; font-size: 12px; }
+        /* HUD - Skrinshotdagi kabi */
+        .top-hud { padding: 20px 20px 10px; text-align: center; z-index: 100; }
+        .bot-name { font-family: 'Orbitron'; color: var(--blue); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+        .balance { font-family: 'Orbitron'; font-size: 52px; text-shadow: 0 0 25px var(--blue); margin: 5px 0; }
+        .stats-bar { display: flex; justify-content: center; gap: 15px; font-family: 'Orbitron'; font-size: 11px; }
 
         /* SECTIONS */
-        .section { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; position: relative; }
+        .section { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; position: relative; padding-bottom: 100px; }
         .section.active { display: flex; flex-direction: column; }
 
-        /* CORE */
+        /* CORE - Dumaloq Neon Chehra */
         .hero-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        .character-container { position: relative; width: 260px; height: 260px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 20px var(--blue); background: rgba(0,242,255,0.05); }
-        .character-img { width: 80%; height: 80%; object-fit: contain; }
+        .tap-circle { 
+            width: 250px; height: 250px; 
+            border-radius: 50%; 
+            border: 2px solid var(--blue); 
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            cursor: pointer;
+            transition: transform 0.05s;
+        }
+        .tap-circle:active { transform: scale(0.95); }
+        .smiley-svg { width: 60%; height: 60%; filter: drop-shadow(0 0 10px var(--blue)); }
 
-        /* MARKET */
-        .up-card { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .up-info b { font-family: 'Orbitron'; font-size: 14px; display: block; }
-        .up-info span { color: #888; font-size: 11px; }
-        .buy-btn { background: #222; border: 1px solid #444; color: #666; padding: 10px 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 13px; min-width: 90px; }
+        /* MARKET - Mukammal Kartochkalar */
+        .up-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(0, 242, 255, 0.3); 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .up-info b { font-family: 'Orbitron'; font-size: 14px; color: #fff; }
+        .up-info span { font-size: 12px; color: #888; display: block; margin-top: 4px; }
+        .buy-btn { 
+            background: #1a1a1a; border: 1px solid #333; color: #555; 
+            padding: 10px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 12px; min-width: 80px; 
+        }
         .buy-btn.active { border-color: var(--blue); color: #fff; background: rgba(0, 242, 255, 0.1); }
 
-        /* NAV */
-        .nav { display: flex; height: 85px; border-top: 1px solid rgba(0, 242, 255, 0.2); background: #000; }
+        /* NAV - Bottom Bar */
+        .nav { 
+            display: flex; height: 80px; 
+            background: #050505; 
+            border-top: 1px solid rgba(0, 242, 255, 0.2);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; color: #444; cursor: pointer; }
-        .nav-item.active { color: var(--blue); background: linear-gradient(to top, rgba(0,242,255,0.1), transparent); border-top: 3px solid var(--blue); }
+        .nav-item.active { color: var(--blue); border-top: 3px solid var(--blue); background: linear-gradient(to top, rgba(0,242,255,0.05), transparent); }
 
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; font-size: 24px; pointer-events: none; animation: fly 0.6s forwards; z-index: 5000; }
-        @keyframes fly { to { transform: translateY(-150px); opacity: 0; } }
+        /* EFFEKTLAR */
+        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; font-size: 26px; pointer-events: none; animation: fly 0.6s forwards; z-index: 1000; }
+        @keyframes fly { to { transform: translateY(-120px) scale(1.2); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-    <div class="top-hud">
-        <div class="bot-name">AIRA PROTOCOL V1.0</div>
-        <div class="balance" id="bal">0</div>
-        <div class="stats-bar">
-            <div style="color:var(--blue)">TAP: +<span id="t-pow">1</span></div>
-            <div style="color:var(--pink)">AUTO: +<span id="a-pow">0</span>/s</div>
+<div class="top-hud">
+    <div class="bot-name">AIRA PROTOCOL V1.0</div>
+    <div class="balance" id="bal">0</div>
+    <div class="stats-bar">
+        <div style="color:var(--blue)">TAP: +<span id="t-pow">1</span></div>
+        <div style="color:var(--pink)">AUTO: +<span id="a-pow">0</span>/s</div>
+    </div>
+</div>
+
+<div id="core-sec" class="section active">
+    <div class="hero-zone">
+        <div class="tap-circle" id="tap-btn">
+            <svg class="smiley-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30 40 Q30 35 35 35 Q40 35 40 40 Q40 45 35 45 Q30 45 30 40" fill="var(--blue)" />
+                <path d="M60 40 Q60 35 65 35 Q70 35 70 40 Q70 45 65 45 Q60 45 60 40" fill="var(--blue)" />
+                <path d="M30 65 Q50 85 70 65" stroke="var(--blue)" stroke-width="4" fill="none" stroke-linecap="round" />
+            </svg>
         </div>
     </div>
+</div>
 
-    <div id="core-sec" class="section active">
-        <div class="hero-zone">
-            <div class="character-container" id="tap-btn">
-                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Aira" class="character-img" alt="Aira">
-            </div>
-        </div>
-    </div>
+<div id="market-sec" class="section">
+    <h3 style="font-family:Orbitron; color:var(--blue); text-align:center;">UPGRADES</h3>
+    <div id="up-list"></div>
+</div>
 
-    <div id="market-sec" class="section">
-        <h2 style="text-align:center; font-family:Orbitron; color:var(--blue); margin-bottom:20px;">SYSTEM MARKET</h2>
-        <div id="up-list"></div>
-    </div>
+<div id="nft-sec" class="section">
+    <h3 style="font-family:Orbitron; color:var(--pink); text-align:center; margin-top:50px;">NFT GEAR</h3>
+    <p style="text-align:center; color:#555;">Tez kunda...</p>
+</div>
 
-    <div id="nft-sec" class="section">
-        <h2 style="text-align:center; font-family:Orbitron; color:var(--pink); margin-top:100px;">NFT GEAR</h2>
-        <p style="text-align:center; color:#444; font-size:18px;">Tez kunda...</p>
-    </div>
+<div class="nav">
+    <div class="nav-item active" onclick="showSec('core', this)">CORE</div>
+    <div class="nav-item" onclick="showSec('market', this)">MARKET</div>
+    <div class="nav-item" onclick="showSec('nft', this)">NFT</div>
+</div>
 
-    <div class="nav">
-        <div class="nav-item active" onclick="showSec('core', this)">CORE</div>
-        <div class="nav-item" onclick="showSec('market', this)">MARKET</div>
-        <div class="nav-item" onclick="showSec('nft', this)">NFT</div>
-    </div>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Full Screen qilish
+    tg.enableClosingConfirmation(); // Tasodifiy yopilishdan himoya
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    let data = {
+        m: parseFloat(localStorage.getItem('aira_m')) || 0,
+        l: JSON.parse(localStorage.getItem('aira_l')) || {u1:0, u2:0, u3:0}
+    };
 
-        let data = {
-            m: parseFloat(localStorage.getItem('aira_m')) || 0,
-            l: JSON.parse(localStorage.getItem('aira_l')) || {}
-        };
+    const upgrades = [
+        { id: 'u1', name: 'Neural Link', desc: 'Tap kuchini oshiradi', base: 100, bonus: 2, type: 'tap' },
+        { id: 'u2', name: 'Aira Drone', desc: 'Avtomatik daromad', base: 500, bonus: 5, type: 'auto' },
+        { id: 'u3', name: 'Quantum CPU', desc: 'Super tezlik', base: 2000, bonus: 25, type: 'auto' }
+    ];
 
-        const upgrades = [
-            { id: 'u1', name: 'Neural Link', desc: 'Tap kuchini oshiradi', basePrice: 100, bonus: 2, type: 'tap' },
-            { id: 'u2', name: 'Aira Drone', desc: 'Avto-daromadni boshlaydi', basePrice: 500, bonus: 5, type: 'auto' },
-            { id: 'u3', name: 'Quantum CPU', desc: 'Tizim tezligini oshiradi', basePrice: 2000, bonus: 25, type: 'auto' },
-            { id: 'u4', name: 'Cyber Core', desc: 'Global energiya manbai', basePrice: 10000, bonus: 100, type: 'tap' }
-        ];
+    function formatNum(n) {
+        if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+        if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+        return Math.floor(n);
+    }
 
-        function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return Math.floor(num);
-        }
-
-        function getStats() {
-            let t = 1, a = 0;
-            upgrades.forEach(u => {
-                const lvl = data.l[u.id] || 0;
-                if(u.type==='tap') t += lvl * u.bonus;
-                else a += lvl * u.bonus;
-            });
-            return { t, a };
-        }
-
-        function showSec(id, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id + '-sec').classList.add('active');
-            el.classList.add('active');
-            if(id === 'market') updateMarket();
-        }
-
-        function updateMarket() {
-            const list = document.getElementById('up-list');
-            list.innerHTML = '';
-            upgrades.forEach(u => {
-                const lvl = data.l[u.id] || 0;
-                const cost = Math.floor(u.basePrice * Math.pow(1.15, lvl));
-                const canAfford = data.m >= cost;
-
-                list.innerHTML += `
-                    <div class="up-card">
-                        <div class="up-info">
-                            <b>${u.name}</b>
-                            <span>${u.desc}</span>
-                            <div style="color: var(--pink); font-size: 11px; margin-top: 4px;">
-                                Lvl: ${lvl} | +${u.bonus}${u.type==='tap'?' per Tap':'/s'}
-                            </div>
-                        </div>
-                        <button class="buy-btn ${canAfford ? 'active' : ''}" 
-                                onclick="buyU('${u.id}', ${cost})" 
-                                ${!canAfford ? 'disabled' : ''}>
-                            ${formatNumber(cost)}
-                        </button>
-                    </div>`;
-            });
-        }
-
-        window.buyU = (id, c) => {
-            if(data.m >= c) {
-                data.m -= c;
-                data.l[id] = (data.l[id] || 0) + 1;
-                updateUI();
-                updateMarket();
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        };
-
-        function updateUI() {
-            const s = getStats();
-            document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-            document.getElementById('t-pow').innerText = s.t;
-            document.getElementById('a-pow').innerText = s.a;
-            localStorage.setItem('aira_m', data.m);
-            localStorage.setItem('aira_l', JSON.stringify(data.l));
-        }
-
-        document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const s = getStats();
-            data.m += s.t;
-            updateUI();
-            const touch = e.touches[0];
-            const p = document.createElement('div');
-            p.className = 'pop'; p.innerText = '+' + s.t;
-            p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 600);
-            tg.HapticFeedback.impactOccurred('medium');
+    function getStats() {
+        let t = 1, a = 0;
+        upgrades.forEach(u => {
+            const lvl = data.l[u.id] || 0;
+            if(u.type==='tap') t += lvl * u.bonus;
+            else a += lvl * u.bonus;
         });
+        return { t, a };
+    }
 
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let stars = Array.from({length: 60}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: Math.random()*0.4 }));
-        function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
-            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, Math.PI*2); ctx.fill(); s.y += s.v; if(s.y > canvas.height) s.y = 0; });
-            requestAnimationFrame(draw);
+    function showSec(id, el) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id + '-sec').classList.add('active');
+        el.classList.add('active');
+        if(id === 'market') updateMarket();
+    }
+
+    function updateMarket() {
+        const list = document.getElementById('up-list');
+        list.innerHTML = '';
+        upgrades.forEach(u => {
+            const lvl = data.l[u.id] || 0;
+            const cost = Math.floor(u.base * Math.pow(1.15, lvl));
+            const canBuy = data.m >= cost;
+            list.innerHTML += `
+                <div class="up-card">
+                    <div class="up-info">
+                        <b>${u.name}</b>
+                        <span>Lvl ${lvl} | +${u.bonus}${u.type==='tap'?' tap':'/s'}</span>
+                    </div>
+                    <button class="buy-btn ${canBuy?'active':''}" onclick="buyU('${u.id}', ${cost})">
+                        ${formatNum(cost)}
+                    </button>
+                </div>`;
+        });
+    }
+
+    window.buyU = (id, c) => {
+        if(data.m >= c) {
+            data.m -= c;
+            data.l[id] = (data.l[id] || 0) + 1;
+            updateUI(); updateMarket();
+            tg.HapticFeedback.notificationOccurred('success');
         }
+    };
 
-        setInterval(() => { data.m += getStats().a / 10; updateUI(); }, 100);
-        draw(); updateUI();
-    </script>
+    function updateUI() {
+        const s = getStats();
+        document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
+        document.getElementById('t-pow').innerText = s.t;
+        document.getElementById('a-pow').innerText = s.a;
+        localStorage.setItem('aira_m', data.m);
+        localStorage.setItem('aira_l', JSON.stringify(data.l));
+    }
+
+    document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const s = getStats();
+        data.m += s.t;
+        updateUI();
+        
+        const touch = e.touches[0];
+        const p = document.createElement('div');
+        p.className = 'pop'; p.innerText = '+' + s.t;
+        p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+        
+        tg.HapticFeedback.impactOccurred('medium');
+    });
+
+    // Star Background
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    let stars = Array.from({length: 80}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: Math.random()*0.5 }));
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = 'rgba(0, 242, 255, 0.4)';
+        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, Math.PI*2); ctx.fill(); s.y += s.v; if(s.y > canvas.height) s.y = 0; });
+        requestAnimationFrame(draw);
+    }
+
+    setInterval(() => { data.m += getStats().a / 10; updateUI(); }, 100);
+    draw(); updateUI();
+</script>
 </body>
 </html>
