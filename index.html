@@ -20,12 +20,18 @@
 
         /* HEADER */
         .header { padding: 15px; display: flex; align-items: center; gap: 10px; background: #1c1f24; border-bottom: 1px solid #32363c; }
-        .avatar-box { width: 45px; height: 45px; background: #f5bb5f; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 20px; }
+        .avatar-box { width: 45px; height: 45px; background: var(--accent-yellow); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 20px; }
         .user-meta { flex-grow: 1; }
-        .user-meta h4 { font-size: 14px; }
-        .rank-text { font-size: 12px; color: var(--accent-yellow); }
-        .settings-btn { cursor: pointer; padding: 5px; font-size: 20px; transition: transform 0.2s; }
-        .settings-btn:active { transform: rotate(45deg); }
+        .user-meta h4 { font-size: 14px; margin-bottom: 2px; }
+        
+        /* RANK STYLE */
+        .rank-container { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .rank-text { font-size: 11px; color: var(--accent-yellow); font-weight: 700; white-space: nowrap; }
+        .rank-progress-mini { flex-grow: 1; height: 6px; background: #32363c; border-radius: 10px; overflow: hidden; max-width: 100px; }
+        .rank-fill-mini { height: 100%; background: var(--accent-yellow); width: 0%; transition: width 0.3s; }
+        .rank-lvl-num { font-size: 11px; color: var(--text-main); font-weight: 700; }
+
+        .settings-btn { cursor: pointer; padding: 5px; font-size: 20px; }
 
         /* TOP STATS */
         .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 15px; }
@@ -61,7 +67,7 @@
         .bar-fill { height: 100%; background: linear-gradient(90deg, #f5bb5f, #fffb12); width: 100%; border-radius: 10px; transition: width 0.3s; }
 
         /* NAVBAR */
-        .navbar { position: fixed; bottom: 0; width: 100%; background: #272a30; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 0; border-top: 1px solid #333; }
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #272a30; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 0; border-top: 1px solid #333; }
         .nav-tab { text-align: center; color: var(--text-sub); font-size: 10px; cursor: pointer; }
         .nav-tab.active { color: white; }
         .nav-tab i { display: block; font-size: 20px; margin-bottom: 4px; }
@@ -69,15 +75,45 @@
         /* ANIMATION */
         .tap-anim { position: absolute; color: white; font-size: 28px; font-weight: 900; pointer-events: none; animation: fly 0.7s forwards; z-index: 1000; }
         @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+
+        /* MODAL SETTINGS */
+        #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; padding: 20px; }
+        .modal-content { background: var(--panel-color); border-radius: 20px; padding: 20px; margin-top: 50px; border: 1px solid #333; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { font-size: 24px; cursor: pointer; }
+        .setting-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
+
+    <div id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sozlamalar</h3>
+                <span class="close-modal" onclick="closeSettings()">✕</span>
+            </div>
+            <div class="setting-row">
+                <span>Vibratsiya</span>
+                <input type="checkbox" id="vib-switch" checked onchange="toggleVibration(this)">
+            </div>
+            <div class="setting-row" style="border:none">
+                <span>Versiya</span>
+                <span style="color:var(--accent-yellow)">3.5.0 Gold</span>
+            </div>
+        </div>
+    </div>
 
     <div class="header">
         <div class="avatar-box" id="user-initial">?</div>
         <div class="user-meta">
             <h4 id="user-name">Loading...</h4>
-            <div class="rank-text">Bronze • <span id="rank-lvl">1 / 10</span></div>
+            <div class="rank-container">
+                <span class="rank-text" id="rank-name">Bronze</span>
+                <div class="rank-progress-mini">
+                    <div class="rank-fill-mini" id="rank-fill"></div>
+                </div>
+                <span class="rank-lvl-num" id="rank-lvl">1 / 10</span>
+            </div>
         </div>
         <div class="settings-btn" onclick="openSettings()">⚙️</div>
     </div>
@@ -88,11 +124,11 @@
             <span class="stat-value" id="ui-pwt">+1</span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Coins to upgrade</span>
-            <span class="stat-value" style="color:#f5bb5f">2.5K</span>
+            <span class="stat-label">Next Rank at</span>
+            <span class="stat-value" id="ui-next-rank" style="color:#f5bb5f">5K</span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Profit per hour</span>
+            <span class="stat-label">Profit/hr</span>
             <span class="stat-value" id="ui-pph" style="color:#4ade80">+0</span>
         </div>
     </div>
@@ -127,23 +163,15 @@
         </section>
 
         <section id="friends" class="section">
-            <h2>Invite Friends</h2>
-            <p style="color:var(--text-sub); margin: 20px 0;">You have 0 friends</p>
+            <h2>Friends</h2>
+            <p style="color:var(--text-sub); margin: 20px 0;">Referral tizimi faol.</p>
             <button class="buy-btn active">Invite a friend</button>
-        </section>
-
-        <section id="earn" class="section">
-            <h2>Tasks</h2>
-            <div class="card" style="margin-top:15px; display:flex; justify-content:space-between;">
-                <span>Watch YouTube</span>
-                <span style="color:var(--accent-yellow)">+50,000</span>
-            </div>
         </section>
 
         <section id="airdrop" class="section" style="text-align:center">
             <div class="coin-img" style="margin: 0 auto 20px; width:80px; height:80px;"></div>
-            <h2>Airdrop Tasks</h2>
-            <p style="color:var(--text-sub); margin-top:10px;">Listing is coming soon...</p>
+            <h2>Airdrop</h2>
+            <p style="color:var(--text-sub); margin-top:10px;">Listing yaqin orada!</p>
         </section>
     </div>
 
@@ -160,7 +188,6 @@
         <div class="nav-tab active" onclick="showSection('exchange', this)"><i>🏠</i>Exchange</div>
         <div class="nav-tab" onclick="showSection('mine', this)"><i>⛏️</i>Mine</div>
         <div class="nav-tab" onclick="showSection('friends', this)"><i>👥</i>Friends</div>
-        <div class="nav-tab" onclick="showSection('earn', this)"><i>🪙</i>Earn</div>
         <div class="nav-tab" onclick="showSection('airdrop', this)"><i>🐹</i>Airdrop</div>
     </nav>
 
@@ -168,78 +195,105 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. FOYDALANUVCHI MA'LUMOTLARINI YUKLASH
+        let useHaptic = true;
+
+        // RANK BOSQICHLARI
+        const RANKS = [
+            { name: "Bronze", min: 0 },
+            { name: "Silver", min: 5000 },
+            { name: "Gold", min: 25000 },
+            { name: "Platinum", min: 100000 },
+            { name: "Diamond", min: 500000 },
+            { name: "Epic", min: 1000000 },
+            { name: "Legendary", min: 5000000 },
+            { name: "Master", min: 10000000 },
+            { name: "Grandmaster", min: 50000000 },
+            { name: "Lord", min: 100000000 }
+        ];
+
         function setupUser() {
             const user = tg.initDataUnsafe?.user;
             if (user) {
                 document.getElementById('user-name').innerText = user.first_name;
                 document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
             } else {
-                document.getElementById('user-name').innerText = "Guest User";
-                document.getElementById('user-initial').innerText = "G";
+                document.getElementById('user-name').innerText = "Mehmon";
+                document.getElementById('user-initial').innerText = "M";
             }
         }
 
-        // 2. SETTINGS FUNKSIYASI
         function openSettings() {
-            tg.HapticFeedback.impactOccurred('medium');
-            tg.showPopup({
-                title: 'Sozlamalar',
-                message: 'Leenova Kombat hisobingizni sozlamoqchimisiz?',
-                buttons: [
-                    {id: 'info', type: 'default', text: 'Ma\'lumotlar'},
-                    {id: 'close', type: 'destructive', text: 'Yopish'}
-                ]
-            }, (buttonId) => {
-                if (buttonId === 'info') {
-                    tg.showAlert("Bu versiya hozircha faqat demo rejimida ishlaydi.");
-                }
-            });
+            if(useHaptic) tg.HapticFeedback.impactOccurred('medium');
+            document.getElementById('settings-modal').style.display = 'block';
         }
 
-        // 3. O'YIN HOLATI (STATE)
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        function toggleVibration(el) {
+            useHaptic = el.checked;
+        }
+
         let state = JSON.parse(localStorage.getItem('leenova_v3')) || {
             bal: 0,
             energy: 1000,
             pwt: 1,
-            pph: 0,
-            lastLogin: Date.now()
+            pph: 0
         };
 
-        // 4. UI YANGILASH
         function updateUI() {
-            document.getElementById('ui-bal').innerText = Math.floor(state.bal).toLocaleString();
+            const bal = Math.floor(state.bal);
+            document.getElementById('ui-bal').innerText = bal.toLocaleString();
             document.getElementById('ui-energy').innerText = Math.floor(state.energy);
             document.getElementById('ui-bar').style.width = (state.energy / 10) + "%";
             document.getElementById('ui-pph').innerText = "+" + (state.pph).toLocaleString();
             document.getElementById('ui-pwt').innerText = "+" + state.pwt;
+
+            // RANK HISOB-KITOBI
+            let currentRankIdx = 0;
+            for (let i = RANKS.length - 1; i >= 0; i--) {
+                if (bal >= RANKS[i].min) {
+                    currentRankIdx = i;
+                    break;
+                }
+            }
+
+            const currentRank = RANKS[currentRankIdx];
+            const nextRank = RANKS[currentRankIdx + 1] || currentRank;
             
+            // Rank UI yangilash
+            document.getElementById('rank-name').innerText = currentRank.name;
+            document.getElementById('rank-lvl').innerText = (currentRankIdx + 1) + " / 10";
+            
+            // Keyingi rankka progress
+            if (currentRankIdx < RANKS.length - 1) {
+                const diff = nextRank.min - currentRank.min;
+                const progress = ((bal - currentRank.min) / diff) * 100;
+                document.getElementById('rank-fill').style.width = Math.min(100, progress) + "%";
+                document.getElementById('ui-next-rank').innerText = nextRank.min >= 1000000 ? (nextRank.min/1000000).toFixed(1) + "M" : (nextRank.min/1000).toFixed(0) + "K";
+            } else {
+                document.getElementById('rank-fill').style.width = "100%";
+                document.getElementById('ui-next-rank').innerText = "MAX";
+            }
+
             localStorage.setItem('leenova_v3', JSON.stringify(state));
         }
 
-        // 5. TABLARNI ALMASHTIRISH
         function showSection(id, el) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
+            if(useHaptic) tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 6. CLICKER LOGIKASI
         document.getElementById('tap-target').addEventListener('touchstart', (e) => {
-            if (state.energy < state.pwt) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return;
-            }
-
-            // Multi-touch support
+            if (state.energy < state.pwt) return;
             for (let i = 0; i < e.targetTouches.length; i++) {
                 const touch = e.targetTouches[i];
                 state.bal += state.pwt;
                 state.energy -= state.pwt;
-
-                // Animatsiya
                 const anim = document.createElement('div');
                 anim.className = 'tap-anim';
                 anim.innerText = "+" + state.pwt;
@@ -248,34 +302,28 @@
                 document.body.appendChild(anim);
                 setTimeout(() => anim.remove(), 700);
             }
-
-            tg.HapticFeedback.impactOccurred('medium');
+            if(useHaptic) tg.HapticFeedback.impactOccurred('medium');
             updateUI();
         });
 
-        // 7. DO'KON (MINE) LOGIKASI
         window.buyCard = (cost, profit) => {
             if (state.bal >= cost) {
                 state.bal -= cost;
                 state.pph += profit;
-                tg.HapticFeedback.notificationOccurred('success');
+                if(useHaptic) tg.HapticFeedback.notificationOccurred('success');
                 updateUI();
             } else {
-                tg.HapticFeedback.notificationOccurred('error');
+                if(useHaptic) tg.HapticFeedback.notificationOccurred('error');
                 tg.showAlert("Mablag' yetarli emas!");
             }
         };
 
-        // 8. PASSIV DAROMAD VA ENERGIYA
         setInterval(() => {
             if (state.energy < 1000) state.energy = Math.min(1000, state.energy + 2);
-            if (state.pph > 0) {
-                state.bal += (state.pph / 3600);
-            }
+            if (state.pph > 0) state.bal += (state.pph / 3600);
             updateUI();
         }, 1000);
 
-        // ILAVANI BOSHLASH
         setupUser();
         updateUI();
     </script>
