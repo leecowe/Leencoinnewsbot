@@ -3,113 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova: Cyber Evolution</title>
+    <title>Leenova: Anime Era</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;900&family=Mochi+iyom:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon: #00f2ff;
-            --violet: #bc13fe;
-            --gold: #ffcc00;
-            --bg: #030308;
+            --pink: #ff007f;
+            --cyan: #00e5ff;
+            --purple: #7000ff;
+            --glass: rgba(0, 0, 0, 0.6);
         }
 
         body {
-            background: var(--bg); color: #fff; text-align: center;
-            font-family: 'Rajdhani', sans-serif; margin: 0; height: 100vh;
-            display: flex; flex-direction: column; overflow: hidden;
+            margin: 0; height: 100vh; display: flex; flex-direction: column;
+            font-family: 'Poppins', sans-serif; color: #fff; overflow: hidden;
+            /* Anime uslubidagi orqa fon */
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://wallpaperaccess.com/full/1513515.jpg') no-repeat center center;
+            background-size: cover;
         }
 
-        /* Yuqori Panel: Yorqinlik effekti bilan */
+        /* Dashboard - Anime Style */
         .header {
-            padding: 30px 20px;
-            background: radial-gradient(circle at top, rgba(0, 242, 255, 0.15), transparent);
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 20px; background: var(--glass); backdrop-filter: blur(15px);
+            border-bottom: 3px solid var(--pink); box-shadow: 0 5px 20px rgba(255, 0, 127, 0.3);
         }
-        .score-display { 
-            font-size: 65px; font-weight: 700; color: var(--gold); 
-            text-shadow: 0 0 30px rgba(255, 204, 0, 0.6); margin: 0;
-            letter-spacing: -2px;
+        .balance-container { position: relative; display: inline-block; }
+        .score { 
+            font-size: 55px; font-weight: 900; color: #fff;
+            text-shadow: 3px 3px 0px var(--pink), -2px -2px 0px var(--cyan);
+            margin: 0; letter-spacing: 2px;
         }
-        .profit-line { font-size: 14px; color: var(--neon); opacity: 0.8; text-transform: uppercase; margin-top: 5px; }
+        .pps-tag { font-size: 14px; color: var(--cyan); text-transform: uppercase; font-weight: bold; }
 
-        /* Asosiy Markaz: Animatsiyalangan Core */
-        .main-stage { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .core-wrapper {
-            width: 260px; height: 260px; position: relative;
+        /* Asosiy Kristal / Personaj maydoni */
+        .game-zone { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .main-target {
+            width: 200px; height: 200px; border-radius: 50%;
+            background: radial-gradient(circle, var(--pink), var(--purple));
+            box-shadow: 0 0 50px var(--pink), inset 0 0 20px #fff;
             display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.1s transform; z-index: 5;
+            border: 5px solid #fff;
         }
-        .core-glow {
-            position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle, var(--neon) 0%, transparent 70%);
-            opacity: 0.3; animation: pulse 3s infinite;
-        }
-        .main-core-img {
-            width: 160px; z-index: 2; cursor: pointer;
-            filter: drop-shadow(0 0 25px var(--neon));
-            transition: 0.1s cubic-bezier(0.1, 0.8, 0.2, 1.2);
-        }
-        .main-core-img:active { transform: scale(0.85); filter: drop-shadow(0 0 50px var(--violet)); }
+        .main-target:active { transform: scale(0.9) rotate(5deg); }
+        .main-target img { width: 120px; filter: drop-shadow(0 0 10px #fff); }
 
-        /* Shop: Premium Kartalar */
-        .cyber-shop {
-            background: rgba(10, 10, 20, 0.98);
-            border-top: 2px solid var(--violet); border-radius: 40px 40px 0 0;
-            padding: 25px; max-height: 45%; overflow-y: auto;
-            box-shadow: 0 -15px 40px rgba(188, 19, 254, 0.2);
+        /* Do'kon - Silliq dizayn */
+        .anime-shop {
+            background: var(--glass); border-radius: 30px 30px 0 0;
+            padding: 20px; border-top: 4px solid var(--cyan);
+            max-height: 40%; overflow-y: auto;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px; padding: 18px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s; position: relative; overflow: hidden;
+        .upgrade-card {
+            background: rgba(255, 255, 255, 0.1); border-radius: 20px;
+            padding: 15px; margin-bottom: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .card::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.05), transparent);
-            transition: 0.5s;
-        }
-        .card:hover::after { left: 100%; }
+        .card-info h3 { margin: 0; font-size: 16px; color: var(--cyan); }
+        .card-info p { margin: 2px 0 0; font-size: 11px; color: #ddd; }
 
-        .card-data { text-align: left; }
-        .card-data h3 { margin: 0; font-size: 18px; color: var(--neon); }
-        .card-data p { margin: 4px 0 0; font-size: 12px; color: #888; }
-
-        .buy-button {
-            background: linear-gradient(135deg, var(--violet), #7000ff);
-            border: none; padding: 12px 22px; border-radius: 12px;
-            color: #fff; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.4);
+        .btn-buy {
+            background: linear-gradient(45deg, var(--pink), var(--purple));
+            border: none; padding: 10px 18px; border-radius: 12px;
+            color: #fff; font-weight: 900; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 0, 127, 0.4);
         }
-        .buy-button:disabled { opacity: 0.2; filter: grayscale(1); }
+        .btn-buy:disabled { filter: grayscale(1); opacity: 0.5; }
 
-        /* Effektlar */
-        @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.2; } 50% { transform: scale(1.1); opacity: 0.4; } 100% { transform: scale(0.9); opacity: 0.2; } }
-        .tap-particle {
-            position: absolute; color: #fff; font-weight: 700; font-size: 28px;
-            pointer-events: none; animation: rise 0.7s ease-out forwards;
-            text-shadow: 0 0 10px var(--neon);
+        /* Floating Text */
+        .pop-text {
+            position: absolute; color: #fff; font-weight: 900; font-size: 30px;
+            pointer-events: none; animation: animePop 0.8s ease-out forwards;
+            text-shadow: 2px 2px 0px var(--pink);
         }
-        @keyframes rise { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-150px); } }
+        @keyframes animePop {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.5) rotate(10deg); }
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1 class="score-display" id="balance">0</h1>
-        <div class="profit-line">⚡ SYSTEM PROFIT: +<span id="pps">0</span>/SEC</div>
+        <div class="balance-container">
+            <h1 class="score" id="balance">0</h1>
+        </div>
+        <div class="pps-tag">✨ Energy Rate: +<span id="pps">0</span>/s</div>
     </div>
 
-    <div class="main-stage">
-        <div class="core-wrapper">
-            <div class="core-glow"></div>
-            <img src="https://cdn-icons-png.flaticon.com/512/6530/6530342.png" id="core" class="main-core-img">
+    <div class="game-zone">
+        <div class="main-target" id="clicker">
+            <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png" alt="anime-icon">
         </div>
     </div>
 
-    <div class="cyber-shop">
-        <div id="shop-content">
+    <div class="anime-shop">
+        <div id="shop-list">
             </div>
     </div>
 
@@ -117,35 +109,47 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // O'yin ma'lumotlari (Struktura)
+        // MA'LUMOTLARNI SAQLASH (Eternal Storage)
         let state = {
-            score: parseInt(localStorage.getItem('cy_score')) || 0,
-            tapPwr: parseInt(localStorage.getItem('cy_tap')) || 1,
-            autoRate: parseInt(localStorage.getItem('cy_auto')) || 0,
-            upgrades: JSON.parse(localStorage.getItem('cy_up')) || { core: 1, miner: 0, cpu: 0 }
+            score: parseFloat(localStorage.getItem('anime_score')) || 0,
+            tapPower: parseInt(localStorage.getItem('anime_tap')) || 1,
+            autoRate: parseFloat(localStorage.getItem('anime_auto')) || 0,
+            upgrades: JSON.parse(localStorage.getItem('anime_upgrades')) || { power: 1, auto: 0 }
         };
 
-        const upgradesData = [
-            { id: 'core', name: 'CORE EVOLUTION', desc: 'Tap kuchini oshiradi', basePrice: 50, growth: 1.7, effect: 2, type: 'tap' },
-            { id: 'miner', name: 'NEURAL MINER', desc: 'Avto-daromad +50/s', basePrice: 500, growth: 1.5, effect: 50, type: 'auto' },
-            { id: 'cpu', name: 'QUANTUM CPU', desc: 'Avto-daromad +200/s', basePrice: 2000, growth: 1.6, effect: 200, type: 'auto' }
+        const shopItems = [
+            { id: 'power', name: 'SUPER STRENGTH', desc: 'Tap kuchini oshirish', base: 50, growth: 1.6, value: 2, type: 'tap' },
+            { id: 'auto', name: 'KAWAII BOT', desc: 'Avtomatik yig‘ish +10/s', base: 200, growth: 1.5, value: 10, type: 'auto' }
         ];
 
+        function saveGame() {
+            localStorage.setItem('anime_score', state.score);
+            localStorage.setItem('anime_tap', state.tapPower);
+            localStorage.setItem('anime_auto', state.autoRate);
+            localStorage.setItem('anime_upgrades', JSON.stringify(state.upgrades));
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = Math.floor(state.score).toLocaleString();
+            document.getElementById('pps').innerText = state.autoRate;
+            renderShop();
+            saveGame();
+        }
+
         function renderShop() {
-            const container = document.getElementById('shop-content');
-            container.innerHTML = '';
-            
-            upgradesData.forEach(item => {
-                let currentLvl = state.upgrades[item.id] || 0;
-                let price = Math.floor(item.basePrice * Math.pow(item.growth, currentLvl));
+            const list = document.getElementById('shop-list');
+            list.innerHTML = '';
+            shopItems.forEach(item => {
+                let lvl = state.upgrades[item.id] || 0;
+                let price = Math.floor(item.base * Math.pow(item.growth, lvl));
                 
-                container.innerHTML += `
-                    <div class="card">
-                        <div class="card-data">
-                            <h3>${item.name} [Lvl ${currentLvl}]</h3>
+                list.innerHTML += `
+                    <div class="upgrade-card">
+                        <div class="card-info">
+                            <h3>${item.name} (Lvl ${lvl})</h3>
                             <p>${item.desc}</p>
                         </div>
-                        <button class="buy-button" onclick="buyUpgrade('${item.id}', ${price})" ${state.score < price ? 'disabled' : ''}>
+                        <button class="btn-buy" onclick="buy('${item.id}', ${price})" ${state.score < price ? 'disabled' : ''}>
                             💰 ${price.toLocaleString()}
                         </button>
                     </div>
@@ -153,53 +157,40 @@
             });
         }
 
-        function buyUpgrade(id, price) {
-            if (state.score >= price) {
+        function buy(id, price) {
+            if(state.score >= price) {
                 state.score -= price;
-                state.upgrades[id] = (state.upgrades[id] || 0) + 1;
-                
-                let item = upgradesData.find(i => i.id === id);
-                if (item.type === 'tap') state.tapPwr += item.effect;
-                if (item.type === 'auto') state.autoRate += item.effect;
-                
+                state.upgrades[id]++;
+                let item = shopItems.find(i => i.id === id);
+                if(item.type === 'tap') state.tapPower += item.value;
+                if(item.type === 'auto') state.autoRate += item.value;
                 tg.HapticFeedback.notificationOccurred('success');
                 updateUI();
             }
         }
 
-        function updateUI() {
-            document.getElementById('balance').innerText = Math.floor(state.score).toLocaleString();
-            document.getElementById('pps').innerText = state.autoRate;
-            renderShop();
-            save();
-        }
-
-        function save() {
-            localStorage.setItem('cy_score', state.score);
-            localStorage.setItem('cy_tap', state.tapPwr);
-            localStorage.setItem('cy_auto', state.autoRate);
-            localStorage.setItem('cy_up', JSON.stringify(state.upgrades));
-        }
-
-        document.getElementById('core').onclick = (e) => {
-            state.score += state.tapPwr;
-            
-            const p = document.createElement('div');
-            p.className = 'tap-particle';
-            p.innerText = `+${state.tapPwr}`;
-            p.style.left = e.clientX + 'px';
-            p.style.top = e.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 700);
-
-            tg.HapticFeedback.impactOccurred('medium');
+        document.getElementById('clicker').onclick = (e) => {
+            state.score += state.tapPower;
+            createPop(e);
+            tg.HapticFeedback.impactOccurred('heavy');
             updateUI();
         };
 
+        function createPop(e) {
+            const p = document.createElement('div');
+            p.className = 'pop-text';
+            p.innerText = `+${state.tapPower}`;
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+        }
+
+        // Avto-mining Loop
         setInterval(() => {
-            state.score += state.autoRate;
+            state.score += (state.autoRate / 10);
             updateUI();
-        }, 1000);
+        }, 100); // Silliq o'sish uchun har 100ms da yangilanadi
 
         updateUI();
     </script>
