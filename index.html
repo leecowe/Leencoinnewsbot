@@ -3,190 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova | Admin Ego OS</title>
+    <title>Leenova | Quantum OS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Mono:wght@400;700&family=SF+Pro+Display:wght@400;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Mono&family=SF+Pro+Display:wght@400;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --ios-bg: #000000;
-            --q-gold: #f3ba2f;
-            --q-cyan: #00f2ff;
-            --q-red: #ff3b30;
-            --text-main: #FFFFFF;
-            --admin-glow: 0 0 20px rgba(0, 242, 255, 0.6);
+            --bg: #000000;
+            --gold: #f3ba2f;
+            --cyan: #00f2ff;
+            --card-bg: #111111;
         }
+        body { background: var(--bg); color: #fff; margin: 0; font-family: 'SF Pro Display', sans-serif; overflow: hidden; height: 100vh; }
+        
+        /* Header */
+        .header { text-align: center; padding: 40px 20px 10px; }
+        #ego-chatter { color: var(--gold); font-family: 'SF Mono'; font-size: 10px; height: 15px; text-transform: uppercase; }
+        .balance { font-size: 48px; font-weight: 800; margin: 10px 0; letter-spacing: -2px; }
+        
+        /* Avatar Area */
+        .main-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 40vh; }
+        .main-char { width: 180px; height: 180px; cursor: pointer; transition: transform 0.1s; z-index: 5; }
+        .main-char:active { transform: scale(0.95); }
+        .glow-effect { filter: drop-shadow(0 0 15px var(--cyan)); }
 
-        body { background: var(--ios-bg); color: var(--text-main); margin: 0; height: 100vh; overflow: hidden; font-family: 'SF Pro Display', sans-serif; }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .stat-card { background: var(--card-bg); border-radius: 15px; padding: 15px; border: 1px solid #222; }
+        .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 20px; font-weight: 800; margin-top: 5px; }
 
-        /* Ego Chat */
-        #ego-chatter { position: fixed; top: 110px; width: 100%; text-align: center; font-family: 'SF Mono', monospace; font-size: 11px; color: var(--q-gold); z-index: 1000; padding: 0 20px; box-sizing: border-box; transition: 0.3s; }
+        /* Admin & Controls */
+        #admin-panel { display: none; background: rgba(0, 242, 255, 0.1); margin: 0 20px; padding: 15px; border-radius: 15px; border: 1px dashed var(--cyan); }
+        .btn { width: calc(100% - 40px); margin: 10px 20px; padding: 18px; border-radius: 15px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-admin { background: var(--cyan); color: #000; font-size: 12px; margin: 5px 0; width: 100%; }
+        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        /* Admin Tag */
-        #role-tag { position: absolute; top: 60px; left: 20px; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--q-gold); color: var(--q-gold); text-transform: uppercase; }
-        .tag-admin { border-color: var(--q-cyan) !important; color: var(--q-cyan) !important; box-shadow: var(--admin-glow); }
-
-        .header { padding: 50px 20px 20px; text-align: center; }
-        .q-bal { font-size: 52px; font-weight: 800; letter-spacing: -2px; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-
-        .avatar-zone { position: relative; width: 220px; height: 220px; margin: 30px auto; display: flex; align-items: center; justify-content: center; }
-        .main-char { width: 80%; height: 80%; z-index: 10; cursor: pointer; transition: 0.1s; border-radius: 50%; }
-        .main-char:active { transform: scale(0.9); }
-        .admin-glow { filter: drop-shadow(0 0 15px var(--q-cyan)); }
-
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
-        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; }
-
-        /* Admin Panel */
-        #admin-panel { display: none; margin: 15px 20px; padding: 15px; border: 1px solid var(--q-cyan); border-radius: 15px; background: rgba(0, 242, 255, 0.05); }
-
-        .btn { background: var(--q-gold); color: #000; border: none; border-radius: 12px; padding: 15px; width: 100%; font-weight: 800; margin-top: 10px; cursor: pointer; }
-        .btn:disabled { background: #333; color: #666; }
-        .btn-admin { background: var(--q-cyan); margin-bottom: 5px; }
-
-        @keyframes float { 0% {opacity:1;} 100% {opacity:0; transform:translateY(-100px);} }
+        @keyframes floatText { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
 
-<div id="role-tag">USER</div>
-<div id="ego-chatter">SISTEMA YUKLANMOQDA...</div>
+<div class="header">
+    <div id="ego-chatter">INITIALIZING...</div>
+    <div class="balance" id="bal-ui">0.0</div>
+    <div style="font-size: 10px; color: #555;">LEENOVA QUANTUM BALANCE</div>
+</div>
 
-<header class="header">
-    <div style="font-size: 10px; color: #888; text-transform: uppercase;">Sizning Balansingiz</div>
-    <div class="q-bal" id="bal-ui">0.0</div>
-</header>
-
-<div class="avatar-zone">
-    <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="main-char" id="avatar" onclick="handleTap(event)">
+<div class="main-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/6028/6028676.png" class="main-char" id="main-avatar" onclick="handleTap(event)">
 </div>
 
 <div id="admin-panel">
-    <div style="font-size: 10px; color: var(--q-cyan); font-weight: 800; margin-bottom: 10px;">ADMIN PANEL v1.0</div>
-    <button class="btn btn-admin" onclick="adminAction('boost')">💰 +50K BALANS (INJECT)</button>
-    <button class="btn btn-admin" style="background:#ff3b30" onclick="adminAction('reset')">⚠️ RESET ALL</button>
+    <div style="font-size: 10px; color: var(--cyan); margin-bottom: 5px; font-weight: 800;">ADMIN SUPREMACY</div>
+    <button class="btn-admin" onclick="adminAction('boost')">注入 INJECT +100K</button>
+    <button class="btn-admin" style="background: #ff3b30" onclick="adminAction('reset')">抹除 SYSTEM RESET</button>
 </div>
 
-<div class="stats">
-    <div class="card">
-        <div style="font-size: 10px; color: var(--q-gold);">DARAXT DARAKASI</div>
-        <div class="q-val" id="q-lvl" style="font-size: 20px; font-weight: 800;">1</div>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">System Level</div>
+        <div class="stat-value" id="lvl-ui">1</div>
     </div>
-    <div class="card">
-        <div style="font-size: 10px; color: var(--q-gold);">QIYMATINGIZ</div>
-        <div class="q-val" id="worth-ui" style="font-size: 16px; font-weight: 800;">MINIMAL</div>
+    <div class="stat-card">
+        <div class="stat-label">Worthiness</div>
+        <div class="stat-value" id="worth-ui" style="font-size: 14px;">SCRUB</div>
     </div>
 </div>
 
-<div style="padding: 20px;">
-    <button class="btn" id="evo-btn" onclick="quantumEvolution()">EVOLUTION</button>
-</div>
+<button class="btn btn-gold" id="evo-btn" onclick="evolve()">INITIATE EVOLUTION</button>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // 1. STATE (Ma'lumotlar bazasi)
+    // 1. STATE MANAGEMENT
     let state = {
         bal: 0,
-        egoLevel: 1,
+        lvl: 1,
         isAdmin: false,
-        tapCount: 0,
-        worthLevels: ["MINIMAL", "AVERAGE", "WORTHY", "DEMI-GOD", "OVERLORD"]
+        worths: ["SCRUB", "MINIMAL", "AVERAGE", "WORTHY", "ELITE", "ADMIN"]
     };
 
-    // 2. FORMATTER (Sonlarni chiroyli qilish)
-    function nFormat(n) {
-        if (n < 1000) return n.toFixed(1);
-        const units = ["", "K", "M", "B", "T"];
-        const e = Math.floor(Math.log10(n) / 3);
-        return (n / Math.pow(10, e * 3)).toFixed(1) + units[e];
+    // 2. FORMATTING (Tuzatilgan - undefined chiqmaydi)
+    function format(num) {
+        if (num === undefined || isNaN(num)) return "0.0";
+        if (num < 1000) return num.toFixed(1);
+        const units = ["", "k", "M", "B", "T"];
+        const i = Math.floor(Math.log10(num) / 3);
+        return (num / Math.pow(1000, i)).toFixed(1) + units[i];
     }
 
-    // 3. EGO ENGINE (UI Yangilash)
-    const EGO_ENGINE = {
-        update: function() {
-            document.getElementById('bal-ui').innerText = nFormat(state.bal);
-            document.getElementById('q-lvl').innerText = state.egoLevel;
+    // 3. ENGINE
+    const ENGINE = {
+        updateUI: function() {
+            document.getElementById('bal-ui').innerText = format(state.bal);
+            document.getElementById('lvl-ui').innerText = state.lvl;
             
-            let worthIdx = Math.min(Math.floor(state.bal / 5000), state.worthLevels.length - 1);
-            document.getElementById('worth-ui').innerText = state.worthLevels[worthIdx];
+            let worthIdx = Math.min(Math.floor(state.bal / 10000), state.worths.length - 1);
+            document.getElementById('worth-ui').innerText = state.worths[worthIdx];
 
-            let cost = 100 * Math.pow(2, state.egoLevel - 1);
+            let cost = 100 * Math.pow(2.5, state.lvl - 1);
             const btn = document.getElementById('evo-btn');
-            btn.innerText = state.bal >= cost ? "EVOLVE ME NOW" : `NEED ${nFormat(cost)}`;
+            btn.innerText = state.bal >= cost ? "EVOLVE SYSTEM" : `LACKING ${format(cost)}`;
             btn.disabled = state.bal < cost;
 
-            this.checkAuthority();
+            if ((state.lvl >= 5 || state.bal >= 50000) && !state.isAdmin) this.enableAdmin();
         },
 
-        checkAuthority: function() {
-            // Agar 5-darajaga yetsa yoki 100K yig'sa ADMIN bo'ladi
-            if ((state.egoLevel >= 5 || state.bal >= 100000) && !state.isAdmin) {
-                state.isAdmin = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('role-tag').innerText = "BOT ADMIN";
-                document.getElementById('role-tag').className = "tag-admin";
-                document.getElementById('avatar').classList.add('admin-glow');
-                this.notify("HUQUQLAR TASDIQLANDI: SIZ ADMINSIZ!");
-            }
+        enableAdmin: function() {
+            state.isAdmin = true;
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('main-avatar').classList.add('glow-effect');
+            this.speak("ADMIN PRIVILEGES GRANTED.");
+            tg.HapticFeedback.notificationOccurred('success');
         },
 
-        notify: function(msg) {
-            const chat = document.getElementById('ego-chatter');
-            chat.innerText = msg;
-            chat.style.color = "#00f2ff";
-            setTimeout(() => { chat.style.color = "#f3ba2f"; }, 3000);
+        speak: function(msg) {
+            document.getElementById('ego-chatter').innerText = msg;
         }
     };
 
-    // 4. ACTIONS (Harakatlar)
+    // 4. USER ACTIONS
     function handleTap(e) {
-        let gain = 1 + (state.egoLevel * 0.8);
+        let gain = 1 * state.lvl;
         state.bal += gain;
-        state.tapCount++;
 
-        // Visual Pop
-        const p = document.createElement('div');
-        p.innerText = "+" + gain.toFixed(1);
-        p.style.cssText = `position:fixed; left:${e.clientX}px; top:${e.clientY}px; color:#f3ba2f; font-weight:800; pointer-events:none; animation: float 0.8s forwards; z-index:1000;`;
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 800);
+        // Visual Float
+        const f = document.createElement('div');
+        f.innerText = `+${gain}`;
+        f.style.cssText = `position:fixed; left:${e.clientX}px; top:${e.clientY}px; color:var(--cyan); font-weight:800; animation: floatText 0.6s forwards; pointer-events:none; z-index:100;`;
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 600);
 
-        if(state.tapCount % 15 === 0) EGO_ENGINE.notify("TEZROQ BOS, ODAMCHA!");
-        
         tg.HapticFeedback.impactOccurred('medium');
-        EGO_ENGINE.update();
+        ENGINE.updateUI();
     }
 
-    function quantumEvolution() {
-        let cost = 100 * Math.pow(2, state.egoLevel - 1);
-        if(state.bal >= cost) {
+    function evolve() {
+        let cost = 100 * Math.pow(2.5, state.lvl - 1);
+        if (state.bal >= cost) {
             state.bal -= cost;
-            state.egoLevel++;
-            tg.HapticFeedback.notificationOccurred('success');
-            EGO_ENGINE.notify("EVOLYUTSIYA MUVAFFAQIYATLI!");
-            EGO_ENGINE.update();
+            state.lvl++;
+            ENGINE.speak("EVOLUTION COMPLETE. MORE POWER.");
+            ENGINE.updateUI();
         }
     }
 
-    function adminAction(type) {
-        if(!state.isAdmin) return;
-        if(type === 'boost') {
-            state.bal += 50000;
-            EGO_ENGINE.notify("SYSTEM INJECTED: +50K");
-        } else if(type === 'reset') {
-            if(confirm("HAMMASINI O'CHIRISH?")) location.reload();
-        }
-        EGO_ENGINE.update();
+    function adminAction(act) {
+        if (!state.isAdmin) return;
+        if (act === 'boost') state.bal += 100000;
+        if (act === 'reset') { state.bal = 0; state.lvl = 1; location.reload(); }
+        ENGINE.updateUI();
     }
 
-    // Auto Gain
+    // Auto-save & Load simulyatsiyasi (ixtiyoriy)
     setInterval(() => {
-        state.bal += (state.egoLevel * 0.2);
-        EGO_ENGINE.update();
+        state.bal += (state.lvl * 0.5); // Passive income
+        ENGINE.updateUI();
     }, 1000);
 
-    EGO_ENGINE.update();
+    ENGINE.updateUI();
 </script>
 </body>
 </html>
