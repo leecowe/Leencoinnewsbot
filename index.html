@@ -3,83 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Turbo</title>
+    <title>Leenova Cyber City</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden; background: #01080e; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* HUD */
-        .hud { padding: 45px 20px 20px; background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--blue); z-index: 101; text-align: center; }
-        .balance { font-family: 'Orbitron'; font-size: 42px; font-weight: 700; text-shadow: 0 0 20px var(--blue); margin: 5px 0; }
-        .stats-row { display: flex; justify-content: center; gap: 10px; }
-        .stat-box { background: rgba(0, 242, 255, 0.05); border: 1px solid var(--blue); padding: 5px 10px; border-radius: 8px; font-family: 'Orbitron'; font-size: 11px; min-width: 100px; }
+        /* DYNAMIC BACKGROUND (Rasmdagidek shahar effekti) */
+        #bg-city { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: brightness(0.6) contrast(1.2); }
 
-        /* WINDOWS */
-        .window { display: none; flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        .window.active { display: block; }
-
-        /* CARDS (Optimallashtirilgan) */
-        .up-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.15); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .progress-track { width: 120px; height: 5px; background: #000; border-radius: 3px; overflow: hidden; margin-top: 5px; }
-        .progress-bar { height: 100%; background: var(--blue); transition: width 0.3s; }
+        /* HUD OVERLAY */
+        .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; }
+        .balance { font-family: 'Orbitron'; font-size: 38px; color: #fff; text-shadow: 0 0 15px var(--blue); letter-spacing: 2px; }
         
-        .buy-btn { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-family: 'Orbitron'; font-size: 11px; min-width: 90px; }
-        .buy-btn:disabled { opacity: 0.3; border-color: #444; }
+        /* CITY VIEW (Main Zone) */
+        .city-zone { flex-grow: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* CYBER CHARACTER / BUTTON */
+        .character-glow { width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(0,242,255,0.2) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; position: relative; }
+        .main-btn { width: 180px; height: 180px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 20px var(--blue)); }
+        .main-btn:active { transform: scale(0.9); }
 
-        /* CLICKER */
-        .main-btn { width: 220px; height: 220px; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 30px var(--blue); display: flex; justify-content: center; align-items: center; margin: 40px auto; transition: transform 0.05s; }
-        .main-btn img { width: 110px; pointer-events: none; }
-        .main-btn:active { transform: scale(0.95); }
+        /* FLOATING UI (Rasmdagi yon tugmalar) */
+        .side-menu { position: absolute; right: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .side-btn { width: 45px; height: 45px; border: 1px solid var(--blue); border-radius: 8px; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--blue); box-shadow: 0 0 10px rgba(0,242,255,0.3); }
+
+        /* SLIDING MARKET (Pastdan chiqadigan panel) */
+        .market-overlay { position: fixed; bottom: -70vh; left: 0; width: 100%; height: 70vh; background: rgba(1, 8, 14, 0.95); border-top: 2px solid var(--blue); border-radius: 25px 25px 0 0; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 2000; padding: 20px; overflow-y: auto; }
+        .market-overlay.open { bottom: 0; }
+        .close-market { text-align: center; color: var(--blue); margin-bottom: 20px; font-family: 'Orbitron'; font-size: 12px; }
+
+        /* CARDS */
+        .up-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,242,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .buy-btn { background: rgba(0,242,255,0.1); border: 1px solid var(--blue); color: #fff; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; }
 
         /* NAV */
-        .nav { display: flex; background: #000; border-top: 1px solid var(--blue); position: fixed; bottom: 0; width: 100%; height: 70px; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 9px; color: #444; }
+        .nav { display: flex; height: 70px; background: #000; border-top: 1px solid var(--blue); position: relative; z-index: 3000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
         .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 3px solid var(--blue); }
-
-        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; text-shadow: 0 0 5px var(--blue); }
-        @keyframes fly { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="hud">
+    <img id="bg-city" src="https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=2070&auto=format&fit=crop" alt="Cyber City">
+
+    <div class="top-hud">
         <div class="balance" id="bal">0</div>
-        <div class="stats-row">
-            <div class="stat-box">T: +<span id="t-pow">0</span></div>
-            <div class="stat-box">A: +<span id="a-pow">0</span>/s</div>
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:5px;">
+            <div style="font-size:12px; color:var(--blue); font-family:Orbitron;">T: +<span id="t-pow">0</span></div>
+            <div style="font-size:12px; color:var(--pink); font-family:Orbitron;">A: +<span id="a-pow">0</span>/s</div>
         </div>
     </div>
 
-    <div id="win-city" class="window active">
-        <div class="main-btn" id="tap-btn"><img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png"></div>
+    <div class="city-zone">
+        <div class="side-menu">
+            <div class="side-btn">⚙️</div>
+            <div class="side-btn">🛡️</div>
+            <div class="side-btn">❓</div>
+            <div class="side-btn">🧪</div>
+        </div>
+
+        <div class="character-glow">
+            <img class="main-btn" id="tap-btn" src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
+        </div>
     </div>
 
-    <div id="win-up" class="window">
+    <div id="market-panel" class="market-overlay">
+        <div class="close-market" onclick="toggleMarket()">▼ MARKETNI YOPISH ▼</div>
         <div id="up-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="tab('win-city', this)">CITY</div>
-        <div class="nav-item" onclick="tab('win-up', this)">MARKET</div>
+        <div class="nav-item active" onclick="toggleMarket(false)">CITY</div>
+        <div class="nav-item" onclick="toggleMarket(true)">UPGRADES</div>
+        <div class="nav-item">NFT</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         let data = {
-            m: parseFloat(localStorage.getItem('turbo_m')) || 781904,
-            l: JSON.parse(localStorage.getItem('turbo_l')) || {u1:20, u2:16, u3:12, u4:11, u5:7, u6:5}
+            m: parseFloat(localStorage.getItem('f_m')) || 222391,
+            l: JSON.parse(localStorage.getItem('f_l')) || {u1:22, u2:17, u3:14, u4:11, u5:9, u6:6}
         };
 
         const ups = [
-            { id: 'u1', name: 'Neural Link', base: 50, val: 15, type: 'tap' },
-            { id: 'u2', name: 'Bento Bot', base: 300, val: 80, type: 'auto' },
-            { id: 'u3', name: 'Cyber Miner', base: 1500, val: 450, type: 'auto' },
-            { id: 'u4', name: 'Nano Pulse', base: 8000, val: 250, type: 'tap' },
-            { id: 'u5', name: 'Quantum Core', base: 45000, val: 2500, type: 'auto' },
-            { id: 'u6', name: 'Titan Server', base: 250000, val: 12000, type: 'auto' }
+            { id: 'u1', name: 'Neural Link', base: 50, val: 20, type: 'tap' },
+            { id: 'u2', name: 'Bento Bot', base: 300, val: 120, type: 'auto' },
+            { id: 'u3', name: 'Cyber Miner', base: 1500, val: 550, type: 'auto' },
+            { id: 'u4', name: 'Nano Pulse', base: 8000, val: 400, type: 'tap' },
+            { id: 'u5', name: 'Quantum Core', base: 45000, val: 3500, type: 'auto' },
+            { id: 'u6', name: 'Titan Server', base: 250000, val: 15000, type: 'auto' }
         ];
 
         function getStats() {
@@ -90,98 +105,53 @@
             return { t, a };
         }
 
-        // Faqat bir marta Marketni chizamiz
-        function initMarket() {
-            const container = document.getElementById('up-list');
-            container.innerHTML = '';
-            ups.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'up-card';
-                div.innerHTML = `
-                    <div>
-                        <b id="name-${u.id}">${u.name} (Lvl ${data.l[u.id]})</b>
-                        <div class="progress-track"><div class="progress-bar" id="bar-${u.id}" style="width: ${(data.l[u.id]%10)*10}%"></div></div>
-                    </div>
-                    <button class="buy-btn" id="btn-${u.id}" onclick="buyU('${u.id}')">0</button>
-                `;
-                container.appendChild(div);
-            });
+        function toggleMarket(open) {
+            const panel = document.getElementById('market-panel');
+            if(open) panel.classList.add('open');
+            else panel.classList.remove('open');
         }
 
-        // Faqat o'zgaruvchan qismlarni yangilaymiz (Qotmasligi uchun)
         function updateUI() {
             const s = getStats();
             document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
             document.getElementById('t-pow').innerText = s.t.toLocaleString();
             document.getElementById('a-pow').innerText = s.a.toLocaleString();
 
+            const container = document.getElementById('up-list');
+            container.innerHTML = '';
             ups.forEach(u => {
-                const cost = Math.floor(u.base * Math.pow(1.5, data.l[u.id]));
-                const btn = document.getElementById(`btn-${u.id}`);
-                const bar = document.getElementById(`bar-${u.id}`);
-                const name = document.getElementById(`name-${u.id}`);
-                
-                if(btn) {
-                    btn.innerText = cost.toLocaleString();
-                    btn.disabled = data.m < cost;
-                }
-                if(bar) bar.style.width = (data.l[u.id] % 10) * 10 + '%';
-                if(name) name.innerText = `${u.name} (Lvl ${data.l[u.id]})`;
+                const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
+                container.innerHTML += `
+                    <div class="up-card">
+                        <div><b>${u.name} (Lvl ${data.l[u.id]})</b></div>
+                        <button class="buy-btn" onclick="buyU('${u.id}', ${cost})">${cost.toLocaleString()}</button>
+                    </div>`;
             });
+            localStorage.setItem('f_m', data.m);
+            localStorage.setItem('f_l', JSON.stringify(data.l));
         }
 
-        window.buyU = (id) => {
-            const u = ups.find(x => x.id === id);
-            const cost = Math.floor(u.base * Math.pow(1.5, data.l[id]));
-            if(data.m >= cost) {
-                data.m -= cost;
-                data.l[id]++;
-                updateUI();
-                save();
-                tg.HapticFeedback.impactOccurred('medium');
+        window.buyU = (id, c) => {
+            if(data.m >= c) {
+                data.m -= c; data.l[id]++;
+                updateUI(); tg.HapticFeedback.impactOccurred('medium');
             }
         };
 
         document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const s = getStats();
-            data.m += s.t;
-            const t = e.touches[0];
-            const p = document.createElement('div');
-            p.className = 'pop'; p.innerText = `+${s.t}`;
-            p.style.left = t.clientX + 'px'; p.style.top = t.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 600);
-            updateUI();
-            tg.HapticFeedback.impactOccurred('light');
+            const s = getStats(); data.m += s.t;
+            updateUI(); tg.HapticFeedback.impactOccurred('light');
         });
 
-        window.tab = (id, el) => {
-            document.querySelectorAll('.window, .nav-item').forEach(x => x.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-        };
-
-        function save() { 
-            localStorage.setItem('turbo_m', data.m); 
-            localStorage.setItem('turbo_l', JSON.stringify(data.l)); 
-        }
-
-        // Avtomatik daromad - faqat raqamni yangilaydi, butun UI ni emas!
         setInterval(() => {
             const s = getStats();
             if(s.a > 0) {
                 data.m += s.a / 10;
                 document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-                // Har soniyada tugmalarni tekshirib turamiz
-                ups.forEach(u => {
-                    const cost = Math.floor(u.base * Math.pow(1.5, data.l[u.id]));
-                    document.getElementById(`btn-${u.id}`).disabled = data.m < cost;
-                });
             }
         }, 100);
 
-        initMarket();
         updateUI();
     </script>
 </body>
