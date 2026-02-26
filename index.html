@@ -3,130 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Cyberpunk</title>
+    <title>Leenova Cyber City</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-blue: #00f2ff; --neon-purple: #bc00ff; --neon-pink: #ff007f; --dark-bg: #020b16; }
-        
+        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #020b16; }
+
         body {
             margin: 0; height: 100vh; display: flex; flex-direction: column;
             font-family: 'Rajdhani', sans-serif; color: #fff; overflow: hidden;
-            background: linear-gradient(rgba(2, 11, 22, 0.8), rgba(2, 11, 22, 0.9)), 
+            /* Siz yuborgan kiber-shahar foni */
+            background: linear-gradient(rgba(2, 11, 22, 0.7), rgba(2, 11, 22, 0.8)), 
                         url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
             background-size: cover;
         }
 
-        /* Top Header Stats */
-        .header {
-            padding: 20px; border-bottom: 2px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-            display: flex; justify-content: space-between; align-items: center;
+        /* 1. TOP HUD: Skrinshotdagi kabi professional o'lchovlar */
+        .hud-top {
+            padding: 25px 20px; display: flex; justify-content: space-between; align-items: flex-start;
+            background: linear-gradient(to bottom, rgba(0,242,255,0.1), transparent);
         }
-        .balance-box { flex-grow: 1; text-align: left; }
-        .balance-label { font-size: 10px; color: var(--neon-blue); letter-spacing: 2px; }
-        .balance-value { font-family: 'Orbitron', sans-serif; font-size: 28px; text-shadow: 0 0 10px var(--neon-blue); }
+        .credits-wrap { border-left: 3px solid var(--blue); padding-left: 12px; }
+        .label { font-family: 'Orbitron'; font-size: 10px; color: var(--blue); letter-spacing: 2px; }
+        .amount { font-family: 'Orbitron'; font-size: 32px; text-shadow: 0 0 15px var(--blue); }
 
-        /* HUD Stats */
-        .hud-stats { display: flex; gap: 10px; margin-top: 5px; }
-        .stat-item { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue); padding: 2px 8px; font-size: 12px; border-radius: 4px; }
+        .mini-stats { display: flex; gap: 8px; margin-top: 10px; }
+        .chip { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue); padding: 2px 10px; font-size: 11px; border-radius: 4px; font-weight: 700; }
 
-        /* Main Game Area */
-        .game-zone { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
-        .cyber-core {
-            width: 200px; height: 200px; position: relative;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.1s;
+        /* 2. CENTER: Animatsion Core */
+        .game-main { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        
+        /* Markaziy Core (Aynan skrinshotdagi neon aylana) */
+        .core-container {
+            width: 220px; height: 220px; position: relative; cursor: pointer;
         }
-        .core-circle {
-            position: absolute; width: 100%; height: 100%;
-            border: 2px solid var(--neon-blue); border-radius: 50%;
-            box-shadow: 0 0 30px var(--neon-blue), inset 0 0 20px var(--neon-blue);
-            animation: pulse 2s infinite;
+        .core-glow {
+            position: absolute; inset: 0; border-radius: 50%;
+            border: 2px solid var(--blue); box-shadow: 0 0 40px var(--blue), inset 0 0 20px var(--blue);
+            animation: pulse 1.5s infinite alternate;
         }
-        .cyber-core img { width: 100px; z-index: 2; filter: drop-shadow(0 0 15px var(--neon-blue)); }
-        .cyber-core:active { transform: scale(0.95); }
+        .core-img {
+            position: absolute; inset: 50px; display: flex; justify-content: center; align-items: center;
+            background: rgba(0, 242, 255, 0.1); border-radius: 10px; transform: rotate(45deg); border: 1px solid var(--blue);
+        }
+        .core-img img { width: 60px; transform: rotate(-45deg); filter: drop-shadow(0 0 10px var(--blue)); }
 
-        /* Shop Panel - Futurist Style */
-        .shop-panel {
-            background: rgba(2, 11, 22, 0.95); border-top: 3px solid var(--neon-blue);
-            border-radius: 30px 30px 0 0; padding: 20px; max-height: 45%; overflow-y: auto;
+        /* 3. SHOP: Skrinshotdagi "System Upgrades" qismi */
+        .shop-box {
+            background: rgba(2, 11, 22, 0.95); border-top: 2px solid var(--blue);
+            border-radius: 30px 30px 0 0; padding: 25px; max-height: 40%; overflow-y: auto;
             box-shadow: 0 -10px 40px rgba(0, 242, 255, 0.2);
         }
-        .shop-title { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 14px; margin-bottom: 15px; letter-spacing: 3px; }
+        .shop-header { font-family: 'Orbitron'; font-size: 14px; color: var(--blue); margin-bottom: 20px; letter-spacing: 2px; }
 
-        .upgrade-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.2);
-            padding: 15px; margin-bottom: 12px; border-radius: 12px;
+        .card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 242, 255, 0.15);
+            border-radius: 15px; padding: 16px; margin-bottom: 12px;
             display: flex; justify-content: space-between; align-items: center;
-            position: relative; overflow: hidden;
         }
-        .card-info h3 { margin: 0; font-size: 16px; color: #fff; text-transform: uppercase; }
-        .progress-container { width: 100px; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
-        .progress-bar { height: 100%; background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); transition: 0.5s; }
-
-        .buy-btn {
-            background: transparent; border: 1px solid var(--neon-blue);
-            color: var(--neon-blue); padding: 8px 15px; border-radius: 5px;
-            font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer;
-            transition: 0.3s;
-        }
-        .buy-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
-        .buy-btn:disabled { border-color: #444; color: #444; }
-
-        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(1); } }
+        .card-meta h4 { margin: 0; font-size: 15px; color: #fff; letter-spacing: 1px; }
+        .lvl-tag { color: var(--blue); font-size: 11px; }
         
-        /* Floating Text */
-        .pop-txt { position: absolute; color: var(--neon-blue); font-weight: 700; font-size: 24px; pointer-events: none; animation: popUp 0.8s forwards; font-family: 'Orbitron'; }
-        @keyframes popUp { to { transform: translateY(-100px); opacity: 0; } }
+        .p-bar-bg { width: 120px; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; position: relative; }
+        .p-bar-fill { height: 100%; background: var(--blue); box-shadow: 0 0 10px var(--blue); border-radius: 2px; transition: 0.4s; }
+
+        .btn-buy {
+            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--blue);
+            color: var(--blue); padding: 10px 18px; border-radius: 8px;
+            font-family: 'Orbitron'; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-buy:disabled { border-color: #333; color: #333; opacity: 0.5; }
+        .btn-buy:active { transform: scale(0.9); background: var(--blue); color: #000; }
+
+        /* FX */
+        @keyframes pulse { from { opacity: 0.4; transform: scale(1); } to { opacity: 1; transform: scale(1.05); } }
+        .tap-fx { position: absolute; color: var(--blue); font-weight: 900; animation: floatUp 0.7s forwards; pointer-events: none; font-family: 'Orbitron'; }
+        @keyframes floatUp { to { transform: translateY(-120px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="balance-box">
-            <div class="balance-label">CREDITS AVAILABLE</div>
-            <div class="balance-value" id="balance">0</div>
-            <div class="hud-stats">
-                <div class="stat-item">T: +<span id="t-stat">1</span></div>
-                <div class="stat-item">A: +<span id="a-stat">0</span>/s</div>
+    <div class="hud-top">
+        <div class="credits-wrap">
+            <div class="label">CREDITS AVAILABLE</div>
+            <div class="amount" id="money">0</div>
+            <div class="mini-stats">
+                <div class="chip">TAP: +<span id="t-val">1</span></div>
+                <div class="chip">AUTO: +<span id="a-val">0</span>/s</div>
+            </div>
+        </div>
+        <div style="color:var(--blue); font-size: 24px;">⚙️</div>
+    </div>
+
+    <div class="game-main">
+        <div class="core-container" id="core">
+            <div class="core-glow"></div>
+            <div class="core-img">
+                <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
             </div>
         </div>
     </div>
 
-    <div class="game-zone">
-        <div class="cyber-core" id="core">
-            <div class="core-circle"></div>
-            <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
-        </div>
-    </div>
-
-    <div class="shop-panel" id="shop">
-        <div class="shop-title">SYSTEM UPGRADES</div>
-        <div id="cards-list"></div>
+    <div class="shop-box">
+        <div class="shop-header">SYSTEM UPGRADES</div>
+        <div id="shop-list"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. ETERNAL STORAGE SYSTEM
-        let game = {
-            credits: parseFloat(localStorage.getItem('cyb_cr_v5')) || 0,
-            lvls: JSON.parse(localStorage.getItem('cyb_lv_v5')) || { u1:0, u2:0, u3:0, u4:0 }
+        let data = {
+            bal: parseFloat(localStorage.getItem('ln_v6_bal')) || 0,
+            lvls: JSON.parse(localStorage.getItem('ln_v6_lvls')) || { s1:0, s2:0, s3:0, s4:0 }
         };
 
         const config = [
-            { id: 'u1', name: 'Neural Link', base: 50, grow: 1.8, val: 2, type: 'tap' },
-            { id: 'u2', name: 'Cyber Miner', base: 500, grow: 1.6, val: 12, type: 'auto' },
-            { id: 'u3', name: 'Quantum CPU', base: 3000, grow: 1.6, val: 100, type: 'auto' },
-            { id: 'u4', name: 'Core Overload', base: 15000, grow: 1.9, val: 200, type: 'tap' }
+            { id: 's1', name: 'NEURAL LINK', base: 50, grow: 1.7, val: 2, type: 'tap' },
+            { id: 's2', name: 'CYBER MINER', base: 450, grow: 1.6, val: 10, type: 'auto' },
+            { id: 's3', name: 'QUANTUM CPU', base: 2500, grow: 1.6, val: 75, type: 'auto' },
+            { id: 's4', name: 'CORE OVERLOAD', base: 12000, grow: 1.8, val: 150, type: 'tap' }
         ];
 
-        function getPower() {
+        function getStats() {
             let t = 1, a = 0;
             config.forEach(c => {
-                let l = game.lvls[c.id] || 0;
+                let l = data.lvls[c.id] || 0;
                 if(c.type === 'tap') t += (l * c.val);
                 if(c.type === 'auto') a += (l * c.val);
             });
@@ -134,73 +136,67 @@
         }
 
         function save() {
-            localStorage.setItem('cyb_cr_v5', game.credits);
-            localStorage.setItem('cyb_lv_v5', JSON.stringify(game.lvls));
+            localStorage.setItem('ln_v6_bal', data.bal);
+            localStorage.setItem('ln_v6_lvls', JSON.stringify(data.lvls));
         }
 
-        function render() {
-            const p = getPower();
-            document.getElementById('balance').innerText = Math.floor(game.credits).toLocaleString();
-            document.getElementById('t-stat').innerText = p.t;
-            document.getElementById('a-stat').innerText = p.a;
+        function refresh() {
+            const s = getStats();
+            document.getElementById('money').innerText = Math.floor(data.bal).toLocaleString();
+            document.getElementById('t-val').innerText = s.t;
+            document.getElementById('a-val').innerText = s.a;
 
-            const list = document.getElementById('cards-list');
+            const list = document.getElementById('shop-list');
             list.innerHTML = '';
+            let showNext = true;
 
-            let canShow = true;
             config.forEach(item => {
-                if (!canShow) return;
-
-                let l = game.lvls[item.id] || 0;
+                if (!showNext) return;
+                let l = data.lvls[item.id] || 0;
                 let price = Math.floor(item.base * Math.pow(item.grow, l));
-                let progress = (l / 10) * 100;
-
+                
                 list.innerHTML += `
-                    <div class="upgrade-card">
-                        <div class="card-info">
-                            <h3>${item.name} <small style="color:var(--neon-blue)">LVL ${l}/10</small></h3>
-                            <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                    <div class="card">
+                        <div class="card-meta">
+                            <h4>${item.name} <span class="lvl-tag">LVL ${l}/10</span></h4>
+                            <div class="p-bar-bg"><div class="p-bar-fill" style="width:${l*10}%"></div></div>
                         </div>
                         ${l < 10 ? 
-                            `<button class="buy-btn" onclick="buy('${item.id}', ${price})" ${game.credits < price ? 'disabled' : ''}>${price}</button>` : 
-                            `<span style="color:var(--neon-pink); font-size:12px; font-weight:bold;">COMPLETED</span>`
-                        }
+                            `<button class="btn-buy" onclick="buy('${item.id}', ${price})" ${data.bal < price ? 'disabled' : ''}>${price}</button>` : 
+                            `<b style="color:var(--pink); font-size:10px;">MAXED</b>`}
                     </div>
                 `;
-                if (l < 10) canShow = false; // Zanjirli ochilish
+                if(l < 10) showNext = false;
             });
             save();
         }
 
-        window.buy = (id, price) => {
-            if(game.credits >= price && game.lvls[id] < 10) {
-                game.credits -= price;
-                game.lvls[id]++;
+        window.buy = (id, p) => {
+            if(data.bal >= p) {
+                data.bal -= p; data.lvls[id]++;
                 tg.HapticFeedback.notificationOccurred('success');
-                render();
+                refresh();
             }
         };
 
         document.getElementById('core').onclick = (e) => {
-            const p = getPower();
-            game.credits += p.t;
-            
-            const txt = document.createElement('div');
-            txt.className = 'pop-txt'; txt.innerText = `+${p.t}`;
-            txt.style.left = e.clientX + 'px'; txt.style.top = e.clientY + 'px';
-            document.body.appendChild(txt);
-            setTimeout(() => txt.remove(), 800);
-
-            tg.HapticFeedback.impactOccurred('heavy');
-            render();
+            const s = getStats();
+            data.bal += s.t;
+            const fx = document.createElement('div');
+            fx.className = 'tap-fx'; fx.innerText = `+${s.t}`;
+            fx.style.left = e.clientX + 'px'; fx.style.top = e.clientY + 'px';
+            document.body.appendChild(fx);
+            setTimeout(() => fx.remove(), 700);
+            tg.HapticFeedback.impactOccurred('medium');
+            refresh();
         };
 
         setInterval(() => {
-            const p = getPower();
-            if(p.a > 0) { game.credits += (p.a / 10); render(); }
+            const s = getStats();
+            if(s.a > 0) { data.bal += (s.a / 10); refresh(); }
         }, 100);
 
-        render();
+        refresh();
     </script>
 </body>
 </html>
