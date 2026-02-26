@@ -3,89 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Cyber City</title>
+    <title>Leenova Ultimate</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --blue: #00f2ff; --pink: #ff007f; --dark: #01080e; --gold: #ffcc00; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; height: 100vh; font-family: 'Rajdhani', sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* DYNAMIC BACKGROUND (Rasmdagidek shahar effekti) */
-        #bg-city { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; filter: brightness(0.6) contrast(1.2); }
+        /* 1. DYNAMIC CANVAS BACKGROUND */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* HUD OVERLAY */
-        .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; }
-        .balance { font-family: 'Orbitron'; font-size: 38px; color: #fff; text-shadow: 0 0 15px var(--blue); letter-spacing: 2px; }
-        
-        /* CITY VIEW (Main Zone) */
-        .city-zone { flex-grow: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
-        /* CYBER CHARACTER / BUTTON */
-        .character-glow { width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(0,242,255,0.2) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; position: relative; }
-        .main-btn { width: 180px; height: 180px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 20px var(--blue)); }
-        .main-btn:active { transform: scale(0.9); }
+        /* HUD */
+        .top-hud { padding: 40px 20px 10px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); text-align: center; z-index: 100; }
+        .balance { font-family: 'Orbitron'; font-size: 42px; text-shadow: 0 0 20px var(--blue); margin-bottom: 5px; transition: 0.3s; }
+        .balance.boost { color: var(--gold); text-shadow: 0 0 30px var(--gold); transform: scale(1.1); }
 
-        /* FLOATING UI (Rasmdagi yon tugmalar) */
-        .side-menu { position: absolute; right: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .side-btn { width: 45px; height: 45px; border: 1px solid var(--blue); border-radius: 8px; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--blue); box-shadow: 0 0 10px rgba(0,242,255,0.3); }
+        /* 3. CYBER AVATAR ZONE */
+        .hero-zone { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        .avatar-container { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .avatar-img { width: 200px; z-index: 2; filter: drop-shadow(0 0 20px var(--blue)); pointer-events: none; }
+        .neon-ring { position: absolute; width: 100%; height: 100%; border: 2px solid var(--blue); border-radius: 50%; box-shadow: 0 0 30px var(--blue); animation: rotate 10s linear infinite; opacity: 0.5; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* SLIDING MARKET (Pastdan chiqadigan panel) */
-        .market-overlay { position: fixed; bottom: -70vh; left: 0; width: 100%; height: 70vh; background: rgba(1, 8, 14, 0.95); border-top: 2px solid var(--blue); border-radius: 25px 25px 0 0; transition: 0.4s cubic-bezier(0.1, 0.7, 0.1, 1); z-index: 2000; padding: 20px; overflow-y: auto; }
-        .market-overlay.open { bottom: 0; }
-        .close-market { text-align: center; color: var(--blue); margin-bottom: 20px; font-family: 'Orbitron'; font-size: 12px; }
+        /* 2. OVERLOAD BUTTON */
+        #overload-btn { position: absolute; top: 20%; right: 20px; background: rgba(255,0,127,0.2); border: 2px solid var(--pink); color: var(--pink); padding: 10px; border-radius: 12px; font-family: 'Orbitron'; font-size: 10px; display: none; animation: pulse 1s infinite; z-index: 500; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
 
-        /* CARDS */
-        .up-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,242,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .buy-btn { background: rgba(0,242,255,0.1); border: 1px solid var(--blue); color: #fff; padding: 8px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; }
+        /* MARKET SLIDER */
+        .market-panel { position: fixed; bottom: -75vh; left: 0; width: 100%; height: 75vh; background: rgba(1, 8, 14, 0.98); border-top: 3px solid var(--blue); border-radius: 30px 30px 0 0; transition: 0.5s cubic-bezier(0.1, 0.8, 0.2, 1); z-index: 2000; padding: 25px; overflow-y: auto; }
+        .market-panel.open { bottom: 0; }
+        .up-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,242,255,0.1); border-radius: 15px; padding: 18px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
         /* NAV */
-        .nav { display: flex; height: 70px; background: #000; border-top: 1px solid var(--blue); position: relative; z-index: 3000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; }
-        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 3px solid var(--blue); }
+        .nav { display: flex; height: 80px; background: #000; border-top: 2px solid var(--blue); z-index: 3000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; color: #444; letter-spacing: 1px; }
+        .nav-item.active { color: var(--blue); background: rgba(0,242,255,0.1); border-top: 4px solid var(--blue); }
+
+        .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; pointer-events: none; animation: fly 0.6s forwards; z-index: 4000; }
+        @keyframes fly { to { transform: translateY(-120px) scale(1.5); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <img id="bg-city" src="https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=2070&auto=format&fit=crop" alt="Cyber City">
+    <canvas id="bg-canvas"></canvas>
 
     <div class="top-hud">
         <div class="balance" id="bal">0</div>
-        <div style="display:flex; justify-content:center; gap:10px; margin-top:5px;">
-            <div style="font-size:12px; color:var(--blue); font-family:Orbitron;">T: +<span id="t-pow">0</span></div>
-            <div style="font-size:12px; color:var(--pink); font-family:Orbitron;">A: +<span id="a-pow">0</span>/s</div>
+        <div style="display:flex; justify-content:center; gap:15px; font-family:Orbitron; font-size:12px;">
+            <div style="color:var(--blue)">TAP: +<span id="t-pow">0</span></div>
+            <div style="color:var(--pink)">AUTO: +<span id="a-pow">0</span>/s</div>
         </div>
     </div>
 
-    <div class="city-zone">
-        <div class="side-menu">
-            <div class="side-btn">⚙️</div>
-            <div class="side-btn">🛡️</div>
-            <div class="side-btn">❓</div>
-            <div class="side-btn">🧪</div>
-        </div>
-
-        <div class="character-glow">
-            <img class="main-btn" id="tap-btn" src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
+    <div class="hero-zone">
+        <button id="overload-btn" onclick="startOverload()">⚡ SYSTEM OVERLOAD (x10)</button>
+        
+        <div class="avatar-container" id="tap-btn">
+            <div class="neon-ring"></div>
+            <img class="avatar-img" id="hero-img" src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
         </div>
     </div>
 
-    <div id="market-panel" class="market-overlay">
-        <div class="close-market" onclick="toggleMarket()">▼ MARKETNI YOPISH ▼</div>
+    <div id="market-panel" class="market-panel">
+        <h3 style="text-align:center; font-family:Orbitron; color:var(--blue); margin-bottom:20px;">CYBER MARKET</h3>
         <div id="up-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="toggleMarket(false)">CITY</div>
-        <div class="nav-item" onclick="toggleMarket(true)">UPGRADES</div>
+        <div class="nav-item active" onclick="toggleM(false)">CITY</div>
+        <div class="nav-item" onclick="toggleM(true)">MARKET</div>
         <div class="nav-item">NFT</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         let data = {
-            m: parseFloat(localStorage.getItem('f_m')) || 222391,
-            l: JSON.parse(localStorage.getItem('f_l')) || {u1:22, u2:17, u3:14, u4:11, u5:9, u6:6}
+            m: parseFloat(localStorage.getItem('ult_m')) || 4066435, // Oxirgi balans
+            l: JSON.parse(localStorage.getItem('ult_l')) || {u1:22, u2:17, u3:14, u4:11, u5:9, u6:6},
+            isBoosted: false
         };
 
         const ups = [
@@ -97,62 +93,125 @@
             { id: 'u6', name: 'Titan Server', base: 250000, val: 15000, type: 'auto' }
         ];
 
+        // 1. DYNAMIC BACKGROUND ENGINE
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = Array.from({length: 100}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                s: Math.random() * 2,
+                v: Math.random() * 0.5 + 0.1
+            }));
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = data.isBoosted ? '#ff007f' : '#00f2ff';
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
+                ctx.fill();
+                s.y += s.v;
+                if(s.y > canvas.height) s.y = 0;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        // 2. OVERLOAD LOGIC (x10)
+        function startOverload() {
+            data.isBoosted = true;
+            document.getElementById('overload-btn').style.display = 'none';
+            document.getElementById('bal').classList.add('boost');
+            tg.HapticFeedback.notificationOccurred('warning');
+            setTimeout(() => {
+                data.isBoosted = false;
+                document.getElementById('bal').classList.remove('boost');
+            }, 10000);
+        }
+
+        setInterval(() => {
+            if(!data.isBoosted && Math.random() > 0.98) {
+                document.getElementById('overload-btn').style.display = 'block';
+            }
+        }, 5000);
+
         function getStats() {
             let t = 1, a = 0;
             ups.forEach(u => { 
-                if(u.type==='tap') t += data.l[u.id]*u.val; else a += data.l[u.id]*u.val;
+                let mult = data.isBoosted ? 10 : 1;
+                if(u.type==='tap') t += data.l[u.id]*u.val*mult; 
+                else a += data.l[u.id]*u.val*mult;
             });
             return { t, a };
         }
 
-        function toggleMarket(open) {
-            const panel = document.getElementById('market-panel');
-            if(open) panel.classList.add('open');
-            else panel.classList.remove('open');
+        function toggleM(open) {
+            document.getElementById('market-panel').classList.toggle('open', open);
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if(!open) document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+            else document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+            updateUI(true);
         }
 
-        function updateUI() {
+        function updateUI(full = false) {
             const s = getStats();
             document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
             document.getElementById('t-pow').innerText = s.t.toLocaleString();
             document.getElementById('a-pow').innerText = s.a.toLocaleString();
 
-            const container = document.getElementById('up-list');
-            container.innerHTML = '';
-            ups.forEach(u => {
-                const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
-                container.innerHTML += `
-                    <div class="up-card">
-                        <div><b>${u.name} (Lvl ${data.l[u.id]})</b></div>
-                        <button class="buy-btn" onclick="buyU('${u.id}', ${cost})">${cost.toLocaleString()}</button>
-                    </div>`;
-            });
-            localStorage.setItem('f_m', data.m);
-            localStorage.setItem('f_l', JSON.stringify(data.l));
+            if(full) {
+                const container = document.getElementById('up-list');
+                container.innerHTML = '';
+                ups.forEach(u => {
+                    const cost = Math.floor(u.base * Math.pow(1.6, data.l[u.id]));
+                    container.innerHTML += `
+                        <div class="up-card">
+                            <div><b>${u.name} (Lvl ${data.l[u.id]})</b></div>
+                            <button class="buy-btn" onclick="buyU('${u.id}', ${cost})" ${data.m < cost ? 'disabled' : ''} 
+                                style="background:rgba(0,242,255,${data.m >= cost ? '0.2' : '0.05'})">
+                                ${cost.toLocaleString()}
+                            </button>
+                        </div>`;
+                });
+            }
+            localStorage.setItem('ult_m', data.m);
+            localStorage.setItem('ult_l', JSON.stringify(data.l));
         }
 
         window.buyU = (id, c) => {
             if(data.m >= c) {
                 data.m -= c; data.l[id]++;
-                updateUI(); tg.HapticFeedback.impactOccurred('medium');
+                updateUI(true);
+                tg.HapticFeedback.impactOccurred('heavy');
             }
         };
 
         document.getElementById('tap-btn').addEventListener('touchstart', (e) => {
             e.preventDefault();
             const s = getStats(); data.m += s.t;
-            updateUI(); tg.HapticFeedback.impactOccurred('light');
+            const touch = e.touches[0];
+            const p = document.createElement('div');
+            p.className = 'pop'; p.innerText = `+${s.t}`;
+            p.style.left = touch.clientX + 'px'; p.style.top = touch.clientY + 'px';
+            document.body.appendChild(p); setTimeout(() => p.remove(), 600);
+            updateUI();
+            tg.HapticFeedback.impactOccurred('light');
         });
 
         setInterval(() => {
             const s = getStats();
-            if(s.a > 0) {
-                data.m += s.a / 10;
-                document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
-            }
+            data.m += s.a / 10;
+            document.getElementById('bal').innerText = Math.floor(data.m).toLocaleString();
         }, 100);
 
-        updateUI();
+        initStars();
+        drawStars();
+        updateUI(true);
     </script>
 </body>
 </html>
