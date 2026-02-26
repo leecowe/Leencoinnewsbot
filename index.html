@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Ultra Edition</title>
+    <title>Aira Protocol | Cosmic Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #00f2ff; --accent: #7000ff; --bg: #0a0b10; 
-            --card-bg: rgba(22, 24, 33, 0.9); --text-main: #ffffff; 
-            --text-dim: #a0a0b0; --border-color: rgba(255, 255, 255, 0.08); 
+            --primary: #00f2ff; --accent: #7000ff; --bg: #06070d; 
+            --card-bg: rgba(22, 24, 33, 0.8); --text-main: #ffffff; 
+            --text-dim: #a0a0b0; --border-color: rgba(255, 255, 255, 0.1); 
             --gold: #ffcf4b; --success: #4cd137; 
         }
 
@@ -20,70 +20,94 @@
             background: var(--bg); color: var(--text-main); 
             font-family: 'Outfit', sans-serif; margin: 0; 
             height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
+            /* Orqa fon manzarasi */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 40%);
         }
 
-        /* UI Elements */
+        /* Fon uchun animatsiya qatlami */
+        .bg-stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.3; z-index: -1; pointer-events: none;
+        }
+
         .header { 
-            padding: 45px 20px 25px; text-align: center; 
-            background: radial-gradient(circle at top, rgba(0, 242, 255, 0.1) 0%, var(--bg) 100%); 
-            border-bottom: 1px solid var(--border-color); 
+            padding: 40px 20px 20px; text-align: center; 
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color); z-index: 10;
         }
 
-        .bal-val { font-size: 40px; font-weight: 800; letter-spacing: -1px; margin: 10px 0; display: block; text-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        .bal-val { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; display: block; text-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; z-index: 5; }
+        .view-content.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Oyun elementlari */
+        .tap-zone {
+            flex: 1; display: flex; align-items: center; justify-content: center; position: relative;
+        }
+
+        .tap-circle {
+            width: 220px; height: 220px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 50px rgba(112, 0, 255, 0.4);
+            cursor: pointer; position: relative; transition: 0.1s;
+            border: 8px solid rgba(255,255,255,0.1);
+        }
+
+        .tap-circle:active { transform: scale(0.92); filter: brightness(1.2); }
+        .tap-circle img { width: 120px; pointer-events: none; filter: drop-shadow(0 0 10px #fff); }
+
+        .floating-text {
+            position: absolute; color: var(--primary); font-weight: 800; font-size: 24px;
+            pointer-events: none; animation: floatUp 0.8s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
 
         .rank-card { 
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); 
-            border-radius: 20px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border-color); 
+            background: var(--card-bg); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); 
         }
 
-        .progress-container { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 12px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--primary); }
-        
-        .rank-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .view-content.active { display: block; animation: fadeIn 0.4s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); width: 0%; transition: width 0.5s ease; }
 
         .btn-upgrade { 
             background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; 
             padding: 15px; border-radius: 18px; width: 100%; margin-top: 10px; 
             display: flex; justify-content: space-between; align-items: center; 
-            font-weight: 600; cursor: pointer; transition: 0.2s;
+            font-weight: 600; cursor: pointer; backdrop-filter: blur(5px);
         }
-        .btn-upgrade:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
 
-        /* Leaderboard */
-        .leader-item { 
-            display: flex; align-items: center; padding: 12px 16px; 
-            background: var(--card-bg); border-radius: 16px; 
-            border: 1px solid var(--border-color); margin-bottom: 10px; 
-        }
-        .leader-item.me { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); box-shadow: 0 0 15px rgba(0, 242, 255, 0.1); }
-        .leader-rank { width: 30px; font-weight: 800; color: var(--text-dim); }
-        .leader-avatar { 
-            width: 36px; height: 36px; background: linear-gradient(45deg, var(--accent), var(--primary)); 
-            border-radius: 10px; margin-right: 12px; display: flex; align-items: center; 
-            justify-content: center; font-size: 12px; font-weight: 800; color: #fff; 
-        }
-        .leader-info { flex: 1; }
-        .leader-name { font-size: 14px; font-weight: 600; display: block; }
-        .leader-score { font-size: 12px; color: var(--gold); font-weight: 800; }
-
-        .nav { height: 75px; background: rgba(13, 15, 23, 0.95); display: flex; border-top: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .nav { height: 75px; background: rgba(10, 11, 16, 0.9); display: flex; border-top: 1px solid var(--border-color); backdrop-filter: blur(15px); }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #4e5471; font-size: 10px; font-weight: 700; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
-        .nav-item svg { margin-bottom: 4px; fill: currentColor; transition: 0.3s; }
+        .nav-item svg { margin-bottom: 4px; fill: currentColor; }
+
+        .leader-item { 
+            display: flex; align-items: center; padding: 12px; 
+            background: var(--card-bg); border-radius: 15px; margin-bottom: 8px; border: 1px solid var(--border-color); 
+        }
+        .leader-item.me { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
 
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
 <body>
 
+    <div class="bg-stars"></div>
+
     <header class="header">
         <div id="user-display-name" style="font-size: 12px; color: var(--text-dim); margin-bottom: 5px; font-weight: 600;">@username</div>
-        <div id="career-badge" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">LOADING...</div>
+        <div id="career-badge" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">BRONZE</div>
         <span class="bal-val" id="total-bal">0</span>
         <div style="font-size: 12px; color: var(--success); font-weight: 700;" id="profit-val">+0/s</div>
     </header>
@@ -94,12 +118,8 @@
                 <span id="current-rank-name">Bronze</span>
                 <span id="next-rank-name" style="color: var(--text-dim)">Silver</span>
             </div>
-            <div class="progress-container">
-                <div class="progress-bar" id="rank-progress"></div>
-            </div>
-            <div style="text-align: center; font-size: 10px; color: var(--text-dim);">
-                KEYINGI RANK: <span id="needed-bal" style="color: #fff">0</span> AIRA
-            </div>
+            <div class="progress-container"><div class="progress-bar" id="rank-progress"></div></div>
+            <div style="text-align: center; font-size: 10px; color: var(--text-dim);">KEYINGI RANK: <span id="needed-bal" style="color: #fff">0</span></div>
         </div>
 
         <button class="btn-upgrade" onclick="upgradeFarm()">
@@ -112,16 +132,25 @@
             <span style="color: var(--primary)" id="stake-cost">500</span>
         </button>
 
-        <div style="margin-top: 20px;">
-            <button id="stake-btn" onclick="startStake()" style="width: 100%; padding: 18px; border-radius: 20px; border: none; background: var(--primary); color: #000; font-weight: 800; text-transform: uppercase; font-size: 14px; cursor: pointer;">
-                STAKE ALL (<span id="stake-timer">TAYYOR</span>)
-            </button>
+        <button id="stake-btn" onclick="startStake()" style="margin-top: 15px; width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--primary); color: #000; font-weight: 800; text-transform: uppercase; cursor: pointer;">
+            STAKE ALL (<span id="stake-timer">TAYYOR</span>)
+        </button>
+    </div>
+
+    <div id="view-games" class="view-content">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">AIRA TAP</h3>
+            <p style="font-size: 12px; color: var(--text-dim);">Logotipni bosing va AIRA yig'ing!</p>
+        </div>
+        <div class="tap-zone">
+            <div class="tap-circle" onclick="handleTap(event)">
+                <img src="https://cdn-icons-png.flaticon.com/512/2592/2592201.png" alt="Aira Logo">
+            </div>
         </div>
     </div>
 
     <div id="view-rank" class="view-content">
-        <h3 style="margin: 0 0 5px 0; font-weight: 800;">GLOBAL REYTING</h3>
-        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 20px;">Eng yaxshi natija ko'rsatganlar</p>
+        <h3 style="margin: 0 0 15px 0;">GLOBAL REYTING</h3>
         <div class="leader-list" id="leader-list"></div>
     </div>
 
@@ -130,9 +159,13 @@
             <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
             TERMINAL
         </div>
+        <div class="nav-item" onclick="switchTab('games', this)">
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            GAMES
+        </div>
         <div class="nav-item" onclick="switchTab('rank', this)">
             <svg width="22" height="22" viewBox="0 0 24 24"><path d="M16 11V5h4v6h-4zm-6 4V9h4v6h-4zm-6 4V13h4v6H4z"/></svg>
-            REYTINQ
+            REYTING
         </div>
     </nav>
 
@@ -141,14 +174,12 @@
     tg.ready();
     tg.expand();
 
-    // 1. Foydalanuvchi Identity mantig'i
     const user = tg.initDataUnsafe?.user || { first_name: "O'yinchi", last_name: "", username: "Guest" };
     const fullName = (user.first_name + " " + (user.last_name || "")).trim();
     const userInitials = (user.first_name[0] + (user.last_name ? user.last_name[0] : (user.first_name[1] || "P"))).toUpperCase();
     
     document.getElementById('user-display-name').innerText = user.username ? "@" + user.username : fullName;
 
-    // 2. O'yin holati
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
     let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
@@ -170,6 +201,24 @@
         return (val % 1 === 0 ? val : val.toFixed(1)) + s[e];
     }
 
+    // --- GAME LOGIC ---
+    function handleTap(e) {
+        let reward = 1 + (farmLevel * 0.5);
+        balance += reward;
+        tg.HapticFeedback.impactOccurred('light');
+        
+        // Floating Text Effect
+        const floating = document.createElement('div');
+        floating.className = 'floating-text';
+        floating.innerText = `+${reward.toFixed(1)}`;
+        floating.style.left = `${e.clientX - 20}px`;
+        floating.style.top = `${e.clientY - 40}px`;
+        document.body.appendChild(floating);
+        setTimeout(() => floating.remove(), 800);
+        
+        updateUI();
+    }
+
     function updateRankUX() {
         let currentRank = ranks[0], nextRank = ranks[1];
         for (let i = 0; i < ranks.length; i++) {
@@ -188,7 +237,6 @@
         document.getElementById('needed-bal').innerText = f(Math.max(nextRank.max - balance, 0));
     }
 
-    // 3. O'yin mexanikasi
     setInterval(() => {
         let aps = 50 * Math.pow(1.15, farmLevel - 1);
         balance += (aps / 10);
@@ -198,12 +246,28 @@
         if (Math.random() > 0.98) save(); 
     }, 100);
 
+    function upgradeFarm() {
+        let cost = 500 * Math.pow(1.18, farmLevel - 1);
+        if(balance >= cost) {
+            balance -= cost; farmLevel++;
+            tg.HapticFeedback.impactOccurred('medium');
+            updateUI();
+        } else tg.showAlert("Mablag' yetarli emas!");
+    }
+
+    function upgradeStake() {
+        let cost = 500 * Math.pow(1.2, stakeLevel);
+        if(balance >= cost) {
+            balance -= cost; stakeLevel++;
+            tg.HapticFeedback.impactOccurred('medium');
+            updateUI();
+        } else tg.showAlert("Mablag' yetarli emas!");
+    }
+
     function startStake() {
         if (isStaking || balance < 10) return;
-        tg.HapticFeedback.impactOccurred('medium');
         isStaking = true;
         let amt = balance; balance = 0;
-        document.getElementById('stake-btn').style.opacity = "0.5";
         document.getElementById('stake-btn').disabled = true;
         let t = 10;
         const count = setInterval(() => {
@@ -214,7 +278,6 @@
                 balance += amt * (1.05 + (stakeLevel * 0.02));
                 isStaking = false;
                 document.getElementById('stake-timer').innerText = "TAYYOR";
-                document.getElementById('stake-btn').style.opacity = "1";
                 document.getElementById('stake-btn').disabled = false;
                 tg.HapticFeedback.notificationOccurred('success');
                 updateUI();
@@ -222,51 +285,21 @@
         }, 1000);
     }
 
-    function upgradeFarm() {
-        let cost = 500 * Math.pow(1.18, farmLevel - 1);
-        if(balance >= cost) {
-            balance -= cost; farmLevel++;
-            tg.HapticFeedback.impactOccurred('light');
-            updateUI();
-        } else tg.showAlert("Mablag' yetarli emas!");
-    }
-
-    function upgradeStake() {
-        let cost = 500 * Math.pow(1.2, stakeLevel);
-        if(balance >= cost) {
-            balance -= cost; stakeLevel++;
-            tg.HapticFeedback.impactOccurred('light');
-            updateUI();
-        } else tg.showAlert("Mablag' yetarli emas!");
-    }
-
-    function updateUI() {
-        document.getElementById('farm-lvl').innerText = farmLevel;
-        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.18, farmLevel - 1));
-        document.getElementById('stake-lvl').innerText = stakeLevel;
-        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.2, stakeLevel));
-        save();
-    }
-
-    // 4. Dinamik Leaderboard (Sizni ro'yxatga qo'shadi)
     function loadLeaderboard() {
         const list = document.getElementById('leader-list');
-        const fakePlayers = [
+        const players = [
             { n: "CryptoWhale", s: 50000000, i: "CW" },
             { n: "Aira_Dev", s: 12000000, i: "AD" },
-            { n: "Shadow_Hunter", s: 1500000, i: "SH" },
-            { n: "NodeRunner", s: 800000, i: "NR" }
-        ];
+            { n: fullName, s: balance, i: userInitials, me: true },
+            { n: "Shadow_Hunter", s: 1500000, i: "SH" }
+        ].sort((a,b) => b.s - a.s);
 
-        const allPlayers = [...fakePlayers, { n: fullName, s: balance, i: userInitials, me: true }];
-        allPlayers.sort((a,b) => b.s - a.s);
-
-        list.innerHTML = allPlayers.map((p, i) => `
+        list.innerHTML = players.map((p, i) => `
             <div class="leader-item ${p.me ? 'me' : ''}">
                 <div class="leader-rank">#${i+1}</div>
                 <div class="leader-avatar">${p.i}</div>
                 <div class="leader-info">
-                    <span class="leader-name">${p.n} ${p.me ? '(Siz)' : ''}</span>
+                    <span class="leader-name">${p.n}</span>
                     <span class="leader-score">${f(p.s)} AIRA</span>
                 </div>
             </div>
@@ -288,7 +321,14 @@
         localStorage.setItem('aira_stake', stakeLevel);
     }
 
-    // Birinchi yuklash
+    function updateUI() {
+        document.getElementById('farm-lvl').innerText = farmLevel;
+        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.18, farmLevel - 1));
+        document.getElementById('stake-lvl').innerText = stakeLevel;
+        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.2, stakeLevel));
+        save();
+    }
+
     window.onload = () => { updateUI(); updateRankUX(); };
 </script>
 </body>
