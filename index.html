@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Farm & Stake</title>
+    <title>Aira Protocol | Fixed</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -21,27 +21,28 @@
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
+        /* TEST REJIMI BANNER */
         .test-banner {
             background: rgba(255, 0, 127, 0.2); color: var(--pink); text-align: center;
-            font-family: 'Orbitron'; font-size: 9px; padding: 10px; border-bottom: 1px solid var(--pink);
+            font-family: 'Orbitron'; font-size: 10px; padding: 10px; border-bottom: 1px solid var(--pink);
         }
 
         .header { padding: 20px; text-align: center; }
-        .bal-val { font-family: 'Orbitron'; font-size: 40px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
+        .bal-val { font-family: 'Orbitron'; font-size: 42px; font-weight: 900; text-shadow: 0 0 15px var(--primary); }
 
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; align-items: center; flex-direction: column; }
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; flex-direction: column; align-items: center; }
         .view-content.active { display: flex; }
 
-        /* MINING FARM STYLE */
-        .farm-card {
+        /* MINING & STAKING CARDS */
+        .card {
             width: 100%; background: var(--glass); border: 1px solid var(--border);
-            border-radius: 20px; padding: 15px; margin-bottom: 10px; display: flex;
-            justify-content: space-between; align-items: center;
+            border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 15px;
         }
 
-        .btn-action {
-            background: var(--primary); color: #000; border: none; padding: 12px;
-            border-radius: 10px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
+        .btn-main {
+            background: var(--primary); color: #000; border: none; padding: 15px;
+            border-radius: 12px; font-family: 'Orbitron'; font-weight: 900; width: 100%; cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
 
         .nav { height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); }
@@ -51,101 +52,102 @@
 </head>
 <body>
 
-    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANMAYDI!</div>
+    <div class="test-banner">⚠️ TEST REJIMI: MA'LUMOTLAR SAQLANIB QOLMAYDI!</div>
 
     <header class="header">
-        <div class="bal-val" id="total-balance">0</div>
-        <div style="font-size: 12px; color: var(--primary); font-family: 'Orbitron';">AUTO MINING: <span id="aps">0.0</span>/s</div>
+        <div class="bal-val" id="total-bal">0.0</div>
+        <div style="font-family:'Orbitron'; font-size:12px; color:var(--primary); margin-top:5px;">
+            STAKED: <span id="staked-display">0</span>
+        </div>
     </header>
 
     <div id="view-hack" class="view-content active">
-        <div id="status-msg" style="margin-bottom:20px; font-family:'Orbitron'; color:var(--primary);">MININGNI BOSHLANG</div>
-        <button class="btn-action" onclick="claimMining()" id="mining-btn">MININGNI YIG'ISH (0)</button>
-    </div>
-
-    <div id="view-stake" class="view-content">
-        <div class="farm-card" style="flex-direction: column; gap: 10px;">
-            <h3 style="margin:0; font-family:'Orbitron'; color:var(--primary);">1 DAQIQA STAKING</h3>
-            <p style="font-size:12px; margin:0;">Tikilgan summa 1 daqiqadan so'ng +10% bo'ladi.</p>
-            <div id="stake-timer" style="color: var(--pink); font-family: 'Orbitron';">TAYYOR</div>
-            <button class="btn-action" onclick="startOneMinStake()">STAKE ALL</button>
+        <div class="card">
+            <h3 style="font-family:'Orbitron'; color:var(--primary);">MINING CORE</h3>
+            <p id="mining-status">ACHKO YIG'ISHGA TAYYOR</p>
+            <div style="font-size:30px; font-family:'Orbitron'; margin:15px 0;" id="current-session">0.0</div>
+            <button class="btn-main" onclick="claimCoins()">COINLARNI YIG'ISH</button>
         </div>
     </div>
 
-    <div id="view-farm" class="view-content">
-        <div class="farm-card">
-            <div>
-                <b style="color:var(--primary)">GPU UNIT V1</b><br>
-                <small>+0.5/s mining</small>
-            </div>
-            <button onclick="buyFarm(1000, 0.5)" style="background:var(--pink); color:#fff; border:none; padding:8px; border-radius:5px;">1000 COINS</button>
+    <div id="view-stake" class="view-content">
+        <div class="card">
+            <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">STAKING HUB</h2>
+            <p style="font-size:14px; opacity:0.7;">Har 1 daqiqada +10% daromad</p>
+            <div id="timer" style="font-size:24px; color:var(--pink); font-family:'Orbitron'; margin:10px 0;">TAYYOR</div>
+            <button class="btn-main" id="stake-btn" onclick="startFastStake()">STAKE ALL ASSETS</button>
+        </div>
+        
+        <div class="card" style="border-color: var(--pink);">
+            <h4 style="font-family:'Orbitron'; color:var(--pink); margin:0;">ROADMAP V4.0</h4>
+            <p style="font-size:11px; opacity:0.6; margin:5px 0;">PvP Janglar • NFT Bozor • AI Bot</p>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="switchTab('hack', this)">CORE</div>
         <div class="nav-item" onclick="switchTab('stake', this)">STAKING</div>
-        <div class="nav-item" onclick="switchTab('farm', this)">FARM</div>
+        <div class="nav-item" onclick="tg.showAlert('Tez kunda!')">INFO</div>
     </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    let balance = 0;
-    let farmAPS = 0; // Auto per second
-    let currentMining = 0;
+    let balance = 0.0;
+    let stakedAmount = 0;
+    let sessionCoins = 0.0;
     let isStaking = false;
 
-    // 1. MINING FERMA TIZIMI
+    // 1. AUTO MINING (Xatoliklar to'g'rilangan)
     setInterval(() => {
-        currentMining += farmAPS / 10;
-        document.getElementById('mining-btn').innerText = `MININGNI YIG'ISH (${currentMining.toFixed(1)})`;
-        document.getElementById('aps').innerText = farmAPS.toFixed(1);
+        sessionCoins += 0.1; // Har soniyada 1.0 achko qo'shiladi
+        document.getElementById('current-session').innerText = sessionCoins.toFixed(1);
     }, 100);
 
-    function claimMining() {
-        balance += currentMining;
-        currentMining = 0;
+    function claimCoins() {
+        balance += sessionCoins;
+        sessionCoins = 0;
         updateUI();
-        tg.HapticFeedback.impactOccurred('light');
+        tg.HapticFeedback.impactOccurred('medium');
     }
 
-    function buyFarm(cost, power) {
-        if(balance >= cost) {
-            balance -= cost;
-            farmAPS += power;
-            updateUI();
-            tg.showAlert("Ferma darajasi oshirildi!");
-        } else {
-            tg.showAlert("Mablag' yetarli emas!");
+    // 2. 1 DAQIQA STAKING (60 soniya)
+    function startFastStake() {
+        if (isStaking || balance <= 0) {
+            tg.showAlert(balance <= 0 ? "Mablag' yetarli emas!" : "Staking davom etmoqda...");
+            return;
         }
-    }
 
-    // 2. 1 DAQIQA STAKING TIZIMI
-    function startOneMinStake() {
-        if(isStaking || balance <= 0) return;
-        
-        let amount = balance;
+        stakedAmount = Math.floor(balance);
         balance = 0;
         isStaking = true;
         updateUI();
 
-        let seconds = 60;
-        const timer = setInterval(() => {
-            seconds--;
-            document.getElementById('stake-timer').innerText = seconds + "s";
-            if(seconds <= 0) {
-                clearInterval(timer);
-                balance += amount * 1.1; // +10% foyda
+        let timeLeft = 60; // 1 daqiqa
+        const stakeBtn = document.getElementById('stake-btn');
+        stakeBtn.disabled = true;
+        stakeBtn.style.opacity = "0.5";
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft + "s";
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                balance += stakedAmount * 1.1; // +10% daromad
+                stakedAmount = 0;
                 isStaking = false;
-                document.getElementById('stake-timer').innerText = "TAYYOR";
+                document.getElementById('timer').innerText = "TAYYOR";
+                stakeBtn.disabled = false;
+                stakeBtn.style.opacity = "1";
                 updateUI();
-                tg.showPopup({title: "Staking tugadi", message: "Foyda yig'ildi!"});
+                tg.showPopup({ title: "Staking Tugadi!", message: "Siz +10% foyda oldingiz!" });
             }
         }, 1000);
     }
 
     function updateUI() {
-        document.getElementById('total-balance').innerText = Math.floor(balance);
+        document.getElementById('total-bal').innerText = balance.toFixed(1);
+        document.getElementById('staked-display').innerText = stakedAmount;
     }
 
     function switchTab(tab, el) {
