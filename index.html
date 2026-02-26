@@ -3,186 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Leenova Anime: Eternal</title>
+    <title>Leenova Anime: Perfect</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #ff007f; --c: #00e5ff; --v: #7000ff; }
+        :root { --p: #ff007f; --c: #00e5ff; --v: #7000ff; --glass: rgba(0,0,0,0.8); }
         
         body {
             margin: 0; height: 100vh; display: flex; flex-direction: column;
             font-family: 'Poppins', sans-serif; color: #fff; overflow: hidden;
-            /* Anime Fon: Kiber-shahar tuni */
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                         url('https://images.alphacoders.com/131/1314605.png') no-repeat center center;
             background-size: cover;
         }
 
+        /* Dashboard */
         .header {
-            padding: 30px 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-            border-bottom: 3px solid var(--p); text-align: center;
+            padding: 25px 20px; background: var(--glass); backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--p); text-align: center;
         }
         .score { 
-            font-family: 'Fredoka One', cursive; font-size: 50px; margin: 0;
-            color: #fff; text-shadow: 0 0 15px var(--p), 0 0 30px var(--v);
+            font-family: 'Fredoka One', cursive; font-size: 55px; margin: 0;
+            background: linear-gradient(to bottom, #fff, #ffb3d9);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px var(--p));
         }
-        .stats { font-size: 12px; color: var(--c); letter-spacing: 1.5px; margin-top: 5px; }
 
-        .game-zone { flex-grow: 1; display: flex; justify-content: center; align-items: center; }
-        .target-btn {
-            width: 220px; height: 220px; border-radius: 50%;
+        /* Game Area */
+        .game-zone { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .main-button {
+            width: 200px; height: 200px; border-radius: 50%;
             background: radial-gradient(circle, var(--p), var(--v));
-            border: 6px solid #fff; box-shadow: 0 0 40px var(--p);
+            border: 4px solid #fff; box-shadow: 0 0 30px var(--p);
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.1s;
+            cursor: pointer; transition: 0.1s transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
         }
-        .target-btn:active { transform: scale(0.9) rotate(-3deg); }
-        .target-btn img { width: 130px; filter: drop-shadow(0 0 10px #fff); }
+        .main-button:active { transform: scale(0.92); }
+        .main-button img { width: 110px; filter: drop-shadow(0 0 10px #fff); }
 
-        .anime-shop {
-            background: rgba(0,0,0,0.85); border-radius: 35px 35px 0 0;
-            padding: 25px; border-top: 4px solid var(--c); max-height: 45%; overflow-y: auto;
+        /* Shop System */
+        .shop-panel {
+            background: var(--glass); border-radius: 40px 40px 0 0;
+            padding: 20px; border-top: 3px solid var(--c);
+            max-height: 45%; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
         }
-
         .card {
-            background: rgba(255, 255, 255, 0.07); border-radius: 20px;
-            padding: 15px; margin-bottom: 12px; display: flex;
-            justify-content: space-between; align-items: center;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            animation: slideIn 0.5s ease;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 20px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-
-        .card-info h3 { margin: 0; font-size: 16px; color: var(--p); text-transform: uppercase; }
-        .card-info p { margin: 3px 0 0; font-size: 11px; color: #ccc; }
-
-        .buy-btn {
-            background: linear-gradient(45deg, var(--c), var(--v));
-            border: none; padding: 12px 20px; border-radius: 14px;
-            color: #fff; font-weight: 900; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+        .card-info { flex-grow: 1; text-align: left; }
+        .card-info h3 { margin: 0; font-size: 15px; color: var(--c); text-transform: uppercase; }
+        
+        /* Progress Bar */
+        .lvl-progress {
+            width: 100px; height: 6px; background: #222; border-radius: 3px;
+            margin-top: 8px; overflow: hidden;
         }
-        .buy-btn:disabled { filter: grayscale(1); opacity: 0.4; }
-        .max-tag { color: var(--p); font-weight: 900; font-size: 14px; }
+        .fill { height: 100%; background: var(--p); transition: 0.3s; }
 
-        .pop {
-            position: absolute; color: #fff; font-weight: 900; font-size: 32px;
-            pointer-events: none; animation: popUp 0.6s ease-out forwards;
-            text-shadow: 2px 2px 0px var(--p);
+        .btn-buy {
+            background: linear-gradient(45deg, var(--p), var(--v));
+            border: none; padding: 12px 18px; border-radius: 12px;
+            color: #fff; font-weight: 700; cursor: pointer; min-width: 80px;
         }
-        @keyframes popUp { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+        .btn-buy:disabled { opacity: 0.3; filter: grayscale(1); }
+
+        /* Pop-up Text */
+        .tap-effect {
+            position: absolute; color: #fff; font-weight: 900; font-size: 35px;
+            pointer-events: none; animation: animeUp 0.7s forwards;
+            text-shadow: 2px 2px 0 var(--p); z-index: 20;
+        }
+        @keyframes animeUp { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.4); } }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1 class="score" id="score">0</h1>
-        <div class="stats">ENERGY: +<span id="pps">0</span>/SEC | TAP: +<span id="pwt">1</span></div>
+        <div style="font-size: 11px; color: var(--c); letter-spacing: 2px; margin-top: 5px;">
+            TAP: +<span id="tap-val">1</span> | AUTO: +<span id="auto-val">0</span>/s
+        </div>
     </div>
 
     <div class="game-zone">
-        <div class="target-btn" id="main-click">
+        <div class="main-button" id="clicker">
             <img src="https://cdn-icons-png.flaticon.com/512/11550/11550085.png">
         </div>
     </div>
 
-    <div class="anime-shop" id="shop">
+    <div class="shop-panel" id="shop">
         </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Eternal Data: Brauzer yangilansa ham o'chmaydi
-        let data = {
-            score: parseFloat(localStorage.getItem('ln_score')) || 0,
-            lvls: JSON.parse(localStorage.getItem('ln_lvls')) || { s1: 0, s2: 0, s3: 0 }
+        // 1. MUSTAHKAM SAQLASH TIZIMI
+        let state = {
+            score: parseFloat(localStorage.getItem('leeno_sc')) || 0,
+            lvls: JSON.parse(localStorage.getItem('leeno_lv')) || { p1: 0, p2: 0, p3: 0 }
         };
 
-        const config = [
-            { id: 's1', name: 'Kawaii Power', desc: 'Tap kuchini oshiradi', base: 50, mult: 1.8, val: 2, type: 'tap' },
-            { id: 's2', name: 'Neko Miner', desc: 'Avto-yig‘ish +15/s', base: 500, mult: 1.6, val: 15, type: 'auto' },
-            { id: 's3', name: 'Cyber Sensei', desc: 'Global daromad +100/s', base: 2500, mult: 1.7, val: 100, type: 'auto' }
+        const upgrades = [
+            { id: 'p1', name: 'Neko Strike', desc: 'Tap kuchini oshirish', base: 40, grow: 1.7, val: 2, type: 'tap' },
+            { id: 'p2', name: 'Bento Bot', desc: 'Avtomatik yig‘ish +12/s', base: 400, grow: 1.6, val: 12, type: 'auto' },
+            { id: 'p3', name: 'Cyber Sensei', desc: 'Global daromad +80/s', base: 2000, grow: 1.6, val: 80, type: 'auto' }
         ];
 
-        function calculateStats() {
-            let tap = 1;
-            let auto = 0;
-            config.forEach(item => {
-                let l = data.lvls[item.id] || 0;
-                if(item.type === 'tap') tap += (l * item.val);
-                if(item.type === 'auto') auto += (l * item.val);
+        function getStats() {
+            let t = 1, a = 0;
+            upgrades.forEach(u => {
+                let l = state.lvls[u.id] || 0;
+                if(u.type === 'tap') t += (l * u.val);
+                if(u.type === 'auto') a += (l * u.val);
             });
-            return { tap, auto };
+            return { t, a };
         }
 
-        function save() {
-            localStorage.setItem('ln_score', data.score);
-            localStorage.setItem('ln_lvls', JSON.stringify(data.lvls));
+        function sync() {
+            localStorage.setItem('leeno_sc', state.score);
+            localStorage.setItem('leeno_lv', JSON.stringify(state.lvls));
         }
 
         function render() {
-            let stats = calculateStats();
-            document.getElementById('score').innerText = Math.floor(data.score).toLocaleString();
-            document.getElementById('pps').innerText = stats.auto;
-            document.getElementById('pwt').innerText = stats.tap;
+            let s = getStats();
+            document.getElementById('score').innerText = Math.floor(state.score).toLocaleString();
+            document.getElementById('tap-val').innerText = s.t;
+            document.getElementById('auto-val').innerText = s.a;
 
             const shop = document.getElementById('shop');
             shop.innerHTML = '';
 
-            let canShowNext = true;
-            config.forEach((item, index) => {
-                if (!canShowNext) return;
+            let canShow = true;
+            upgrades.forEach(item => {
+                if (!canShow) return;
 
-                let l = data.lvls[item.id] || 0;
-                let price = Math.floor(item.base * Math.pow(item.mult, l));
-                
-                let cardHTML = `
+                let l = state.lvls[item.id] || 0;
+                let price = Math.floor(item.base * Math.pow(item.grow, l));
+                let progress = (l / 10) * 100;
+
+                shop.innerHTML += `
                     <div class="card">
                         <div class="card-info">
-                            <h3>${item.name} [Lvl ${l}/10]</h3>
-                            <p>${item.desc}</p>
+                            <h3>${item.name} (LVL ${l}/10)</h3>
+                            <div class="lvl-progress"><div class="fill" style="width: ${progress}%"></div></div>
                         </div>
                         ${l < 10 ? 
-                            `<button class="buy-btn" onclick="buy('${item.id}', ${price})" ${data.score < price ? 'disabled' : ''}>💰 ${price}</button>` : 
-                            `<span class="max-tag">MAXED OUT ✨</span>`
+                            `<button class="btn-buy" onclick="buy('${item.id}', ${price})" ${state.score < price ? 'disabled' : ''}>💰 ${price}</button>` : 
+                            `<span style="color:var(--p); font-weight:900;">MAX!</span>`
                         }
                     </div>
                 `;
-                shop.innerHTML += cardHTML;
-
-                // AGAR JORIY ELEMENT 10 BO'LMASA, KEYINGISINI KO'RSATMA
-                if (l < 10) canShowNext = false;
+                if (l < 10) canShow = false; // Zanjirli ochilish logikasi
             });
-            save();
+            sync();
         }
 
         function buy(id, price) {
-            if(data.score >= price && data.lvls[id] < 10) {
-                data.score -= price;
-                data.lvls[id]++;
+            if(state.score >= price && state.lvls[id] < 10) {
+                state.score -= price;
+                state.lvls[id]++;
                 tg.HapticFeedback.notificationOccurred('success');
                 render();
             }
         }
 
-        document.getElementById('main-click').onclick = (e) => {
-            let stats = calculateStats();
-            data.score += stats.tap;
+        document.getElementById('clicker').onclick = (e) => {
+            let s = getStats();
+            state.score += s.t;
             
-            let p = document.createElement('div');
-            p.className = 'pop'; p.innerText = `+${stats.tap}`;
+            const p = document.createElement('div');
+            p.className = 'tap-effect'; p.innerText = `+${s.t}`;
             p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
             document.body.appendChild(p);
-            setTimeout(() => p.remove(), 600);
-            
+            setTimeout(() => p.remove(), 700);
+
             tg.HapticFeedback.impactOccurred('medium');
             render();
         };
 
+        // Silliq avto-mining
         setInterval(() => {
-            let stats = calculateStats();
-            data.score += (stats.auto / 10);
+            let s = getStats();
+            state.score += (s.a / 10);
             render();
         }, 100);
 
