@@ -11,95 +11,106 @@
         :root {
             --bio-pink: #ff007a;
             --bio-cyan: #00f2ff;
-            --cell-void: #020205;
-            --blood-dark: #20000a;
+            --cell-void: #000000;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         body { background: var(--cell-void); color: #fff; font-family: 'Orbitron', sans-serif; height: 100vh; overflow: hidden; }
         
-        #bg-canvas { position: fixed; inset: 0; z-index: 1; opacity: 0.6; }
+        /* 3D Orqa fon */
+        #bg-canvas { position: fixed; inset: 0; z-index: 1; }
 
-        .ui-root { position: relative; z-index: 10; pointer-events: none; height: 100vh; display: flex; flex-direction: column; }
+        .ui-root { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; pointer-events: none; }
         .ui-root * { pointer-events: auto; }
 
-        .top-hud { padding: 45px 20px; display: flex; justify-content: space-between; }
+        /* HUD dizayni rasmdagidek */
+        .top-hud { padding: 50px 20px 20px; display: flex; justify-content: space-between; }
         .life-sign { 
             background: rgba(255, 0, 122, 0.1); border: 1px solid var(--bio-pink);
-            padding: 6px 15px; border-radius: 50px; font-size: 10px; color: var(--bio-pink);
-            box-shadow: 0 0 15px var(--bio-pink); animation: heartbeat 1.5s infinite;
+            padding: 8px 16px; border-radius: 20px; font-size: 10px; color: var(--bio-pink);
+            box-shadow: 0 0 10px var(--bio-pink); text-transform: uppercase;
         }
-        @keyframes heartbeat { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
 
-        .balance-box { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin-top: 20px; }
+        .balance-box { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .ariai-count { 
-            font-family: 'Cinzel'; font-size: 55px; font-weight: 900;
+            font-family: 'Cinzel'; font-size: 60px; font-weight: 900;
             background: linear-gradient(to bottom, #fff, var(--bio-pink));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px var(--bio-pink));
         }
-        .stats-label { font-size: 9px; letter-spacing: 4px; color: var(--bio-cyan); opacity: 0.7; }
+        .stats-label { font-size: 10px; letter-spacing: 2px; color: var(--bio-cyan); margin-top: 10px; }
 
-        .footer-hud { padding: 25px; padding-bottom: 110px; background: linear-gradient(transparent, var(--blood-dark)); }
-        .bar-wrap { margin-bottom: 15px; }
-        .bar-info { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 5px; color: var(--bio-cyan); }
-        .bar-rail { height: 5px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; position: relative; }
-        .bar-flow { height: 100%; transition: 0.4s; position: relative; }
-        .bar-pulse { position: absolute; top: 0; right: 0; bottom: 0; width: 20px; background: #fff; filter: blur(5px); opacity: 0.5; animation: flow 2s infinite; }
-        @keyframes flow { 0% { left: -10%; } 100% { left: 110%; } }
+        /* Asosiy Bosish Maydoni (Tap Zone) */
+        #tap-zone {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 300px; height: 300px; border-radius: 50%; z-index: 5;
+            cursor: pointer;
+        }
 
-        .nav { position: fixed; bottom: 0; width: 100%; display: flex; background: rgba(0,0,0,0.95); padding: 15px 10px 40px; z-index: 1000; border-top: 1px solid var(--bio-pink); }
-        .nav-btn { flex: 1; text-align: center; color: #555; font-size: 10px; font-weight: 900; transition: 0.3s; background: none; border: none; }
+        .footer-hud { padding: 20px; padding-bottom: 120px; }
+        .bar-wrap { margin-bottom: 12px; }
+        .bar-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--bio-cyan); margin-bottom: 6px; }
+        .bar-rail { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        .bar-flow { height: 100%; transition: 0.3s ease; }
+
+        /* Navigatsiya */
+        .nav { 
+            position: fixed; bottom: 0; width: 100%; display: flex; 
+            background: rgba(0,0,0,0.9); padding: 20px 10px 40px; 
+            z-index: 1000; border-top: 1px solid rgba(255,0,122,0.3);
+        }
+        .nav-btn { flex: 1; text-align: center; color: #666; font-size: 11px; font-weight: 900; background: none; border: none; cursor: pointer; }
         .nav-btn.active { color: #fff; text-shadow: 0 0 10px var(--bio-pink); }
 
-        .panel { position: fixed; bottom: -110%; left: 0; width: 100%; height: 85vh; background: rgba(5,0,5,0.98); border-top: 2px solid var(--bio-pink); border-radius: 30px 30px 0 0; z-index: 500; padding: 25px 20px; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; }
+        /* Panel */
+        .panel { 
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 80vh; 
+            background: #050505; border-top: 2px solid var(--bio-pink); 
+            border-radius: 25px 25px 0 0; z-index: 1100; padding: 25px; 
+            transition: 0.5s cubic-bezier(0, 0.5, 0.5, 1); overflow-y: auto;
+        }
         .panel.active { bottom: 0; }
-        .cell-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cell-card { background: #0a050a; border: 1px solid #201015; padding: 20px; border-radius: 15px; text-align: center; position: relative; }
 
-        #res-ui { position: fixed; inset: 0; z-index: 2000; background: #000; display: none; }
-        #res-msg { position: absolute; top: 60px; width: 100%; text-align: center; color: var(--bio-pink); font-family: 'Cinzel'; font-size: 20px; }
-        
-        .dna-pop { position: fixed; pointer-events: none; z-index: 9999; color: #fff; font-family: 'Cinzel'; font-weight: 900; animation: popUp 0.7s forwards; }
-        @keyframes popUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(2) rotate(10deg); } }
+        .dna-pop { position: fixed; pointer-events: none; z-index: 2000; color: #fff; font-weight: 900; animation: popUp 0.6s ease-out forwards; }
+        @keyframes popUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-80px); } }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
-
-    <div id="res-ui">
-        <div id="res-msg">REVIVING NEURONS: <span id="res-score">0</span></div>
-        <div id="res-canvas-container" style="width: 100%; height: 100%;"></div>
-    </div>
+    <div id="tap-zone"></div>
 
     <div class="ui-root">
         <div class="top-hud">
-            <div class="life-sign">BIO-SIGN: STABLE</div>
+            <div class="life-sign" id="life-status">BIO-SIGN: STABLE</div>
             <div class="life-sign" style="border-color: var(--bio-cyan); color: var(--bio-cyan);">DNA: x<span id="mult-ui">1.0</span></div>
         </div>
+
         <div class="balance-box">
             <h1 class="ariai-count" id="ariai-bal">0.00</h1>
             <p class="stats-label">TOTAL $ARIAI SYNCED</p>
         </div>
+
         <div class="footer-hud">
             <div class="bar-wrap">
-                <div class="bar-info"><span>PLASMA</span><span id="mana-text">1000/1000</span></div>
-                <div class="bar-rail"><div class="bar-flow" id="mana-bar" style="background: var(--bio-cyan); width: 100%"><div class="bar-pulse"></div></div></div>
+                <div class="bar-info"><span>PLASMA</span><span id="mana-text">1000 / 1000</span></div>
+                <div class="bar-rail"><div class="bar-flow" id="mana-bar" style="background: var(--bio-cyan); width: 100%;"></div></div>
             </div>
             <div class="bar-wrap">
                 <div class="bar-info"><span>EVOLUTION</span><span id="xp-text">LVL 1</span></div>
-                <div class="bar-rail"><div class="bar-flow" id="xp-bar" style="background: var(--bio-pink); width: 0%"><div class="bar-pulse"></div></div></div>
+                <div class="bar-rail"><div class="bar-flow" id="xp-bar" style="background: var(--bio-pink); width: 0%;"></div></div>
             </div>
         </div>
     </div>
 
-    <div id="sheet-genome" class="panel">
-        <h2 style="font-family: 'Cinzel'; color: var(--bio-pink); text-align: center; margin-bottom: 25px;">NEURAL RESURRECTION</h2>
-        <div class="cell-grid" id="cell-list"></div>
+    <div id="panel-genome" class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-family: 'Cinzel'; color: var(--bio-pink);">GENOME</h2>
+            <button onclick="closePanel()" style="background:none; border:none; color:#fff; font-size:20px;">×</button>
+        </div>
+        <div id="cell-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
     </div>
 
     <nav class="nav">
-        <button class="nav-btn active" onclick="tab('main', this)">CORE</button>
+        <button class="nav-btn active" onclick="tab('core', this)">CORE</button>
         <button class="nav-btn" onclick="tab('genome', this)">GENOME</button>
     </nav>
 
@@ -107,89 +118,119 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let state = JSON.parse(localStorage.getItem('ariai_live_v1')) || {
-            ariai: 0, pwr: 1.0, mana: 1000, max: 1000, lvl: 1, xp: 0, unlocked: 1
+        let state = JSON.parse(localStorage.getItem('ariai_db')) || {
+            bal: 0, pwr: 1.0, mana: 1000, lvl: 1, xp: 0, unlocked: 1
         };
 
-        let scene, camera, renderer, coreNode;
-        function initBioScene() {
+        // 3D Engine
+        let scene, camera, renderer, core;
+        function init3D() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            const coreGeo = new THREE.IcosahedronGeometry(2.2, 1);
-            const coreMat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
-            coreNode = new THREE.Mesh(coreGeo, coreMat);
-            scene.add(coreNode);
+            const geo = new THREE.IcosahedronGeometry(2, 1);
+            const mat = new THREE.MeshPhongMaterial({ color: 0xff007a, wireframe: true });
+            core = new THREE.Mesh(geo, mat);
+            scene.add(core);
 
-            const light = new THREE.PointLight(0xff007a, 2, 10);
-            light.position.set(2,2,5);
-            scene.add(light);
-            scene.add(new THREE.AmbientLight(0x222222));
-            camera.position.z = 8;
+            const l = new THREE.PointLight(0xff007a, 2, 10);
+            l.position.set(2, 2, 5);
+            scene.add(l, new THREE.AmbientLight(0x404040));
+            camera.position.z = 6;
 
             function animate() {
                 requestAnimationFrame(animate);
-                coreNode.rotation.y += 0.005;
-                const s = 1 + Math.sin(Date.now() * 0.0015) * 0.08;
-                coreNode.scale.set(s, s, s);
+                core.rotation.y += 0.01;
+                core.rotation.x += 0.005;
+                let s = 1 + Math.sin(Date.now() * 0.002) * 0.1;
+                core.scale.set(s, s, s);
                 renderer.render(scene, camera);
             }
             animate();
         }
 
-        window.onclick = (e) => {
-            if (e.target.closest('.panel') || e.target.closest('.nav') || e.target.closest('#res-ui')) return;
-            if (state.mana < 2) return tg.HapticFeedback.notificationOccurred('error');
-
-            state.ariai += state.pwr;
-            state.mana -= 2;
-            state.xp += 20;
-
-            const div = document.createElement('div');
-            div.className = 'dna-pop';
-            div.innerText = `🧬 +${state.pwr.toFixed(1)}`;
-            div.style.left = e.clientX + 'px'; div.style.top = e.clientY + 'px';
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 700);
-
-            if (state.xp >= state.lvl * 1000) {
-                state.lvl++; state.xp = 0; state.pwr += 0.4;
+        // Tap Logic
+        document.getElementById('tap-zone').onclick = (e) => {
+            if (state.mana < 2) {
+                tg.HapticFeedback.notificationOccurred('error');
+                return;
             }
-            updateUI();
+
+            state.bal += state.pwr;
+            state.mana -= 2;
+            state.xp += 10;
+
+            if (state.xp >= state.lvl * 500) {
+                state.lvl++;
+                state.xp = 0;
+                state.pwr += 0.2;
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+
+            // Pop-up effekti
+            const pop = document.createElement('div');
+            pop.className = 'dna-pop';
+            pop.innerText = `+${state.pwr.toFixed(1)}`;
+            pop.style.left = e.clientX + 'px';
+            pop.style.top = e.clientY + 'px';
+            document.body.appendChild(pop);
+            setTimeout(() => pop.remove(), 600);
+
+            core.scale.set(1.5, 1.5, 1.5);
             tg.HapticFeedback.impactOccurred('medium');
+            updateUI();
         };
 
-        let resActive = false, resNodes = [];
-        let resScene, resCamera, resRenderer;
+        function updateUI() {
+            document.getElementById('ariai-bal').innerText = state.bal.toFixed(2);
+            document.getElementById('mana-text').innerText = `${Math.floor(state.mana)} / 1000`;
+            document.getElementById('mana-bar').style.width = (state.mana / 10).toFixed(0) + '%';
+            document.getElementById('xp-text').innerText = `LVL ${state.lvl}`;
+            document.getElementById('xp-bar').style.width = (state.xp / (state.lvl * 5)).toFixed(0) + '%';
+            document.getElementById('mult-ui').innerText = state.pwr.toFixed(1);
+            localStorage.setItem('ariai_db', JSON.stringify(state));
+        }
 
-        function startResurrection(id) {
-            resActive = true;
-            document.getElementById('res-ui').style.display = 'block';
-            let score = 0, goal = 10 + (id * 2);
-            document.getElementById('res-score').innerText = `0 / ${goal}`;
-
-            const container = document.getElementById('res-canvas-container');
-            container.innerHTML = '';
-            resScene = new THREE.Scene();
-            resCamera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            resRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            resRenderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(resRenderer.domElement);
-            resCamera.position.z = 10;
-
-            function spawnCell() {
-                const geo = new THREE.SphereGeometry(0.7, 16, 16);
-                const mat = new THREE.MeshPhongMaterial({ color: 0x00f2ff, wireframe: true });
-                const cell = new THREE.Mesh(geo, mat);
-                cell.position.set((Math.random()-0.5)*12, 10, (Math.random()-0.5)*5);
-                resScene.add(cell);
-                resNodes.push(cell);
+        function tab(t, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (t === 'genome') {
+                document.getElementById('panel-genome').classList.add('active');
+                renderCells();
+            } else {
+                closePanel();
             }
-            for(let i=0; i<5; i++) spawnCell();
+        }
 
-            const ray = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
+        function closePanel() {
+            document.getElementById('panel-genome').classList.remove('active');
+        }
 
-            container.onclick = (e) => {
+        function renderCells() {
+            const list = document.getElementById('cell-list');
+            list.innerHTML = '';
+            for(let i=1; i<=10; i++) {
+                const div = document.createElement('div');
+                div.style = "background:#111; padding:15px; border-radius:10px; text-align:center; border:1px solid #222";
+                div.innerHTML = `
+                    <div style="font-size:10px; color:var(--bio-pink)">GENE ${i}</div>
+                    <div style="font-size:12px; margin:5px 0;">UPGRADE</div>
+                    <div style="font-size:9px; color:var(--bio-cyan)">COST: ${i * 100}</div>
+                `;
+                list.appendChild(div);
+            }
+        }
+
+        setInterval(() => {
+            if (state.mana < 1000) {
+                state.mana = Math.min(1000, state.mana + 1);
+                updateUI();
+            }
+        }, 1000);
+
+        window.onload = () => { init3D(); updateUI(); };
+    </script>
+</body>
+</html>
