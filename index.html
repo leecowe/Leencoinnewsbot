@@ -3,27 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker Game</title>
+    <title>Leenova Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; text-align: center; font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; }
-        .coin { width: 200px; height: 200px; background: radial-gradient(circle, #ffcc00, #ff9900); border-radius: 50%; box-shadow: 0 0 30px #ff9900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 80px; user-select: none; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
-        .coin:active { transform: scale(0.9); }
-        h1 { font-size: 60px; margin: 20px 0; color: gold; }
+        body { 
+            background: radial-gradient(circle, #1a1a1a, #000); 
+            color: #fff; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; height: 100vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; overflow: hidden; user-select: none;
+        }
+        .score-container { font-size: 50px; font-weight: bold; margin-bottom: 20px; color: #ffcc00; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
+        .coin { 
+            width: 220px; height: 220px; 
+            background: radial-gradient(circle, #ffcc00, #ff9900); 
+            border-radius: 50%; box-shadow: 0 0 40px #ff9900; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-size: 90px; transition: transform 0.05s; -webkit-tap-highlight-color: transparent;
+            border: 8px solid #e6b800;
+        }
+        .coin:active { transform: scale(0.92); }
+        .tap-effect {
+            position: absolute; color: #ffcc00; font-size: 24px; font-weight: bold;
+            pointer-events: none; animation: flyUp 0.6s ease-out forwards;
+        }
+        @keyframes flyUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
-    <h1 id="score">0</h1>
+    <div class="score-container" id="score">0</div>
     <div class="coin" id="tap">💰</div>
-    <p>Tangani bosing!</p>
+    <p style="margin-top: 20px; color: #aaa;">Ochkolaringiz saqlanadi!</p>
+
     <script>
         let tg = window.Telegram.WebApp;
-        let score = 0;
+        let score = parseInt(localStorage.getItem('userScore')) || 0;
+        
         tg.expand();
-        document.getElementById('tap').onclick = () => {
+        document.getElementById('score').innerText = score;
+
+        const tapBtn = document.getElementById('tap');
+        const scoreDisplay = document.getElementById('score');
+
+        tapBtn.onclick = (e) => {
             score++;
-            document.getElementById('score').innerText = score;
+            scoreDisplay.innerText = score;
+            localStorage.setItem('userScore', score); // Ochkoni saqlash
+            
             tg.HapticFeedback.impactOccurred('medium');
+
+            // +1 effekti
+            const rect = tapBtn.getBoundingClientRect();
+            const x = e.clientX || rect.left + rect.width / 2;
+            const y = e.clientY || rect.top;
+
+            const effect = document.createElement('div');
+            effect.innerText = '+1';
+            effect.className = 'tap-effect';
+            effect.style.left = x + 'px';
+            effect.style.top = y + 'px';
+            document.body.appendChild(effect);
+
+            setTimeout(() => effect.remove(), 600);
         };
     </script>
 </body>
