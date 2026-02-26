@@ -1,106 +1,123 @@
-<style>
-    /* Admin Mode Styles */
-    .admin-glow { box-shadow: 0 0 50px var(--q-cyan) !important; border: 2px solid var(--q-cyan) !important; }
-    #admin-panel { 
-        display: none; 
-        background: rgba(0, 242, 255, 0.05); 
-        border: 1px solid var(--q-cyan); 
-        margin: 15px; 
-        padding: 15px; 
-        border-radius: 20px; 
-        animation: slideIn 0.5s ease;
+// 🛠 TIZIMNI TO'LIQ TUZATISH VA ADMIN PANEL INTEGRATSIYASI
+
+// 1. Avvalgi xatoliklarni (undefined) oldini olish uchun state-ni tekshiramiz
+let state = {
+    bal: 0,
+    egoLevel: 1,
+    isAdmin: false,
+    tapCount: 0,
+    worthLevels: ["MINIMAL", "PATHETIC", "AVERAGE", "INTERESTING", "WORTHY", "DEMI-GOD"]
+};
+
+// 🧠 EGO ENGINE - Barcha hisob-kitoblar markazi
+const EGO_ENGINE = {
+    update: function() {
+        // "undefined" chiqmasligi uchun qiymatni tekshirib formatlaymiz
+        const balanceElement = document.getElementById('bal-ui');
+        if (balanceElement) {
+            balanceElement.innerText = this.format(state.bal || 0);
+        }
+
+        const lvlElement = document.getElementById('q-lvl');
+        if (lvlElement) {
+            lvlElement.innerText = state.egoLevel || 1;
+        }
+        
+        // Worth (Qiymat) hisoblash
+        let worthIdx = Math.min(Math.floor((state.bal || 0) / 5000), state.worthLevels.length - 1);
+        const worthElement = document.getElementById('worth-ui');
+        if (worthElement) {
+            worthElement.innerText = state.worthLevels[worthIdx];
+        }
+
+        // Evolyutsiya tugmasi mantiqi
+        let cost = 100 * Math.pow(2, (state.egoLevel - 1));
+        const btn = document.getElementById('evo-btn');
+        if (btn) {
+            btn.innerText = state.bal >= cost ? "EVOLVE ME NOW" : `NEED ${this.format(cost)} TO CARE`;
+            btn.disabled = state.bal < cost;
+        }
+
+        // Admin huquqini tekshirish
+        AUTHORITY_SYSTEM.checkRights();
+    },
+
+    format: function(n) {
+        if (isNaN(n) || n === undefined) return "0.0"; // Xatolikni oldini olish
+        if (n < 1000) return n.toFixed(1);
+        const units = ["", "K", "M", "B", "T", "MAX"];
+        const e = Math.floor(Math.log10(n) / 3);
+        return (n / Math.pow(10, e * 3)).toFixed(1) + units[e];
+    },
+
+    notify: function(msg) {
+        const chat = document.getElementById('ego-chatter');
+        if (chat) {
+            chat.innerText = msg;
+            chat.style.color = "#00f2ff";
+            setTimeout(() => { chat.style.color = "#f3ba2f"; }, 3000);
+        }
     }
-    .status-tag { 
-        font-size: 9px; 
-        padding: 2px 8px; 
-        border-radius: 4px; 
-        margin-left: 10px; 
-        vertical-align: middle;
-    }
-    .tag-user { background: #444; color: #eee; }
-    .tag-admin { background: var(--q-cyan); color: #000; font-weight: 800; animation: blink 1s infinite; }
-    
-    @keyframes blink { 50% { opacity: 0.5; } }
-    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-</style>
+};
 
-<header class="quantum-header">
-    <div class="q-label">
-        <span id="user-name">LOADING SLAVE...</span>
-        <span id="role-tag" class="status-tag tag-user">USER</span>
-    </div>
-    <div class="q-bal" id="bal-ui">0.00</div>
-</header>
+// 🛡 AUTHORITY SYSTEM - Bot huquqlarini boshqarish
+const AUTHORITY_SYSTEM = {
+    checkRights: function() {
+        // Adminlik sharti: Masalan 10-daraja yoki 100K balans
+        if ((state.egoLevel >= 10 || state.bal >= 100000) && !state.isAdmin) {
+            this.grantAdmin();
+        }
+    },
 
-<div id="admin-panel">
-    <div class="q-label" style="color: var(--q-cyan);">BOT CONTROL INTERFACE</div>
-    <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button class="q-card" style="flex: 1; font-size: 10px; color: var(--q-cyan);" onclick="adminAction('boost')">CORE BOOST</button>
-        <button class="q-card" style="flex: 1; font-size: 10px; color: var(--q-cyan);" onclick="adminAction('reset')">DANGER: RESET</button>
-    </div>
-</div>
+    grantAdmin: function() {
+        state.isAdmin = true;
+        const panel = document.getElementById('admin-panel');
+        const tag = document.getElementById('role-tag');
+        const avatar = document.querySelector('.main-char');
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    // 1. Foydalanuvchi ma'lumotlarini olish (Telegramdan)
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-        document.getElementById('user-name').innerText = user.first_name.toUpperCase();
-    }
-
-    let state = {
-        bal: 0,
-        egoLevel: 1,
-        isAdmin: false,
-        // ... (oldingi state o'zgaruvchilari)
-    };
-
-    const AUTHORITY_SYSTEM = {
-        // Bot huquqini olish mantiqi
-        checkRights: function() {
-            // Masalan: Balans 50k dan oshsa yoki daraja 5 bo'lsa Adminlik ochiladi
-            if (state.egoLevel >= 5 && !state.isAdmin) {
-                this.grantAdmin();
-            }
-        },
-
-        grantAdmin: function() {
-            state.isAdmin = true;
-            document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('role-tag').innerText = "BOT ADMIN";
-            document.getElementById('role-tag').className = "status-tag tag-admin";
-            document.querySelector('.main-char').classList.add('admin-glow');
-            
-            EGO_ENGINE.notify("HUQUQLAR OLINDI: BOT BOSHQARUVI SIZDA!");
+        if (panel) panel.style.display = 'block';
+        if (tag) {
+            tag.innerText = "BOT ADMIN";
+            tag.className = "status-tag tag-admin";
+        }
+        if (avatar) avatar.classList.add('admin-glow');
+        
+        EGO_ENGINE.notify("HUQUQLAR TASDIQLANDI: SIZ ENDI ADMINSIZ!");
+        if (window.Telegram?.WebApp?.HapticFeedback) {
             tg.HapticFeedback.notificationOccurred('success');
         }
-    };
+    }
+};
 
-    // Admin funksiyalari
-    function adminAction(type) {
-        if (!state.isAdmin) return;
-        
-        if (type === 'boost') {
-            state.bal *= 2;
-            EGO_ENGINE.notify("CORE BOOSTED X2");
-        } else if (type === 'reset') {
-            if(confirm("Haqiqatan ham barcha ma'lumotlarni o'chirmoqchimisiz?")) {
-                state.bal = 0;
-                state.egoLevel = 1;
+// ⚡ ADMIN BUYRUQLARI
+function adminAction(type) {
+    if (!state.isAdmin) return;
+    
+    switch(type) {
+        case 'boost':
+            state.bal += 50000; // Admin sovg'asi
+            EGO_ENGINE.notify("SYSTEM INJECTED: +50K BAL");
+            break;
+        case 'reset':
+            if(confirm("Barcha ma'lumotlarni o'chirishni xohlaysizmi?")) {
+                localStorage.clear();
                 location.reload();
             }
-        }
-        EGO_ENGINE.update();
+            break;
     }
+    EGO_ENGINE.update();
+}
 
-    // handleTap funksiyasini yangilaymiz
-    function handleTap(e) {
-        // ... (oldingi tap mantiqi)
-        AUTHORITY_SYSTEM.checkRights(); // Har tapda huquqni tekshirish
-        EGO_ENGINE.update();
+// 🖱 TAP MANTIQI
+function handleTap(e) {
+    let gain = 1 + (state.egoLevel * 0.8);
+    state.bal += gain;
+    state.tapCount++;
+
+    // "undefined" xatosini oldini olish uchun har doim update qilamiz
+    EGO_ENGINE.update();
+    
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('medium');
     }
-
-    // ... (qolgan EGO_ENGINE va loop mantiqlari)
-</script>
+}
