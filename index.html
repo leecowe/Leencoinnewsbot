@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova | Cyber Ego</title>
+    <title>Leenova | Cyber Ego OS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
     <style>
@@ -25,7 +25,7 @@
             background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
         }
 
-        /* Glitch Effekti */
+        /* Glitch Effect */
         .glitch {
             text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan);
             animation: glitch-anim 2s infinite linear alternate-reverse;
@@ -86,7 +86,7 @@
         }
         .main-char:active { transform: scale(0.85) rotate(5deg); }
         
-        .admin-mode .main-char { filter: drop-shadow(0 0 25px var(--neon-cyan)); }
+        .admin-glow { filter: drop-shadow(0 0 25px var(--neon-cyan)) !important; }
 
         /* Stats Card */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
@@ -147,10 +147,10 @@
         }
     </style>
 </head>
-<body class="user-mode">
+<body>
 
     <div class="header">
-        <div id="ego-chatter" class="glitch">SYSTEM READY...</div>
+        <div id="ego-chatter" class="glitch">SYNCING WITH CLOUD...</div>
         <div class="balance-container">
             <div class="balance" id="bal-ui">0.0</div>
         </div>
@@ -164,10 +164,10 @@
     </div>
 
     <div id="admin-panel">
-        <div style="font-size: 9px; color: var(--neon-cyan); margin-bottom: 8px;">CORE ACCESS GRANTED</div>
+        <div style="font-size: 9px; color: var(--neon-cyan); margin-bottom: 8px; font-weight: 800;">ADMIN CORE ACCESS</div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-cyan);" onclick="adminAction('boost')">BOOTSTRAP +100K</button>
-            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-pink);" onclick="adminAction('reset')">PURGE ALL</button>
+            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-cyan); color:#000;" onclick="adminAction('boost')">INJECT +100K</button>
+            <button class="btn" style="padding: 10px; font-size: 10px; background: var(--neon-pink); color:#fff;" onclick="adminAction('reset')">WIPE ALL</button>
         </div>
     </div>
 
@@ -177,31 +177,83 @@
             <div class="stat-value" id="lvl-ui">1</div>
         </div>
         <div class="stat-card" style="border-left-color: var(--neon-cyan);">
-            <div class="stat-label">AI Status</div>
+            <div class="stat-label">System Status</div>
             <div class="stat-value" id="worth-ui" style="font-size: 12px;">NEOPHYTE</div>
         </div>
     </div>
 
     <div class="controls">
-        <button class="btn btn-evolve" id="evo-btn" onclick="evolve()">Unlock Potential</button>
+        <button class="btn btn-evolve" id="evo-btn" onclick="evolve()">Evolve System</button>
     </div>
 
 <script>
+    // 1. INITIALIZATION
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.backgroundColor = "#050505";
+    tg.ready();
 
     let state = {
         bal: 0,
         lvl: 1,
         isAdmin: false,
         tapCount: 0,
-        phrases: [
-            "Yana bos!", "Sekinsan-ku?", "Adminlik yaqin...", 
-            "Evolyutsiya qil!", "Tizim qizimoqda", "Sening darajang past"
-        ]
+        phrases: ["Yana bos!", "Menga ko'proq kerak!", "Adminlik sari...", "Evolyutsiya vaqti!"]
     };
 
+    // 2. DATA PERSISTENCE (Cloud & Local)
+    function saveToCloud() {
+        const dataStr = JSON.stringify({
+            bal: state.bal,
+            lvl: state.lvl,
+            isAdmin: state.isAdmin
+        });
+        
+        // LocalStorage ga saqlash
+        localStorage.setItem('leenova_data', dataStr);
+        
+        // Telegram CloudStorage ga saqlash (Agar ruxsat bo'lsa)
+        if (tg.CloudStorage) {
+            tg.CloudStorage.setItem('game_state', dataStr, (err, success) => {
+                if (err) console.error("Cloud save failed");
+            });
+        }
+    }
+
+    function loadFromCloud() {
+        // Avval LocalStorage dan tekshirish (Tezroq)
+        const localData = localStorage.getItem('leenova_data');
+        if (localData) {
+            applyData(localData);
+        }
+
+        // Keyin Cloud dan tekshirish (Ishonchliroq)
+        if (tg.CloudStorage) {
+            tg.CloudStorage.getItem('game_state', (err, value) => {
+                if (!err && value) {
+                    applyData(value);
+                    ENGINE.updateUI();
+                }
+            });
+        }
+    }
+
+    function applyData(jsonStr) {
+        try {
+            const data = JSON.parse(jsonStr);
+            state.bal = data.bal || 0;
+            state.lvl = data.lvl || 1;
+            state.isAdmin = data.isAdmin || false;
+            
+            if (state.isAdmin) {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('main-avatar').classList.add('admin-glow');
+            }
+        } catch (e) {
+            console.error("Data parsing error");
+        }
+    }
+
+    // 3. CORE ENGINE
     function format(n) {
         if (n < 1000) return n.toFixed(1);
         const u = ["", "k", "M", "B", "T"];
@@ -214,12 +266,10 @@
             document.getElementById('bal-ui').innerText = format(state.bal);
             document.getElementById('lvl-ui').innerText = state.lvl;
             
-            // Progress bar mantiqi
             let cost = 100 * Math.pow(2.2, state.lvl - 1);
             let progress = Math.min((state.bal / cost) * 100, 100);
             document.getElementById('xp-progress').style.width = progress + "%";
 
-            // Status yangilash
             const statusMap = ["NEOPHYTE", "CYPHER", "REBEL", "GHOST", "OVERLORD", "ARCHITECT"];
             let idx = Math.min(Math.floor(state.lvl / 2), statusMap.length - 1);
             document.getElementById('worth-ui').innerText = statusMap[idx];
@@ -229,30 +279,31 @@
             btn.disabled = state.bal < cost;
 
             if (state.lvl >= 10 && !state.isAdmin) this.enableAdmin();
+            
+            saveToCloud(); // Har bir o'zgarishda saqlash
         },
 
         enableAdmin: function() {
             state.isAdmin = true;
-            document.body.classList.replace('user-mode', 'admin-mode');
             document.getElementById('admin-panel').style.display = 'block';
-            this.speak("STATUS: ARCHITECT. SYSTEM IS YOURS.");
+            document.getElementById('main-avatar').classList.add('admin-glow');
+            this.speak("ADMIN ACCESS GRANTED.");
             tg.HapticFeedback.notificationOccurred('success');
+            saveToCloud();
         },
 
         speak: function(msg) {
             const chat = document.getElementById('ego-chatter');
             chat.innerText = msg;
-            chat.classList.add('glitch');
-            setTimeout(() => chat.classList.remove('glitch'), 500);
         }
     };
 
+    // 4. INTERACTION
     function handleTap(e) {
         let gain = 1 * (1 + (state.lvl * 0.5));
         state.bal += gain;
         state.tapCount++;
 
-        // Floating Number
         const float = document.createElement('div');
         float.className = 'tap-msg';
         float.innerText = `+${gain.toFixed(1)}`;
@@ -261,13 +312,11 @@
         document.body.appendChild(float);
         setTimeout(() => float.remove(), 800);
 
-        // Random Chatter
-        if (state.tapCount % 20 === 0) {
-            let p = state.phrases[Math.floor(Math.random() * state.phrases.length)];
-            ENGINE.speak(p);
+        if (state.tapCount % 25 === 0) {
+            ENGINE.speak(state.phrases[Math.floor(Math.random() * state.phrases.length)]);
         }
 
-        tg.HapticFeedback.impactOccurred('light');
+        tg.HapticFeedback.impactOccurred('medium');
         ENGINE.updateUI();
     }
 
@@ -276,7 +325,7 @@
         if (state.bal >= cost) {
             state.bal -= cost;
             state.lvl++;
-            ENGINE.speak(`LEVEL ${state.lvl} REACHED. ACCESS EXPANDED.`);
+            ENGINE.speak("LEVEL UP: SYSTEM STRENGTHENED.");
             tg.HapticFeedback.notificationOccurred('success');
             ENGINE.updateUI();
         }
@@ -284,22 +333,30 @@
 
     function adminAction(type) {
         if (!state.isAdmin) return;
-        if (type === 'boost') state.bal += 100000;
+        if (type === 'boost') {
+            state.bal += 100000;
+            ENGINE.speak("CORE INJECTION SUCCESS.");
+        }
         if (type === 'reset') {
-            if(confirm("FULL SYSTEM WIPE?")) {
-                state.bal = 0; state.lvl = 1; location.reload();
+            if(confirm("WIPE ALL DATA?")) {
+                localStorage.clear();
+                if(tg.CloudStorage) tg.CloudStorage.removeItem('game_state');
+                location.reload();
             }
         }
         ENGINE.updateUI();
     }
 
+    // Start
+    loadFromCloud();
+    ENGINE.updateUI();
+
     // Passive Income
     setInterval(() => {
-        state.bal += (state.lvl * 0.2);
+        state.bal += (state.lvl * 0.1);
         ENGINE.updateUI();
-    }, 1000);
+    }, 2000);
 
-    ENGINE.updateUI();
 </script>
 </body>
 </html>
