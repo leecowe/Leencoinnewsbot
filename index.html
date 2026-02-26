@@ -25,22 +25,21 @@
 
         /* CORE */
         .hero-zone { flex-grow: 1; display: flex; align-items: center; justify-content: center; }
-        .character-container { position: relative; width: 280px; height: 280px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .aira-core { width: 100%; height: 100%; filter: drop-shadow(0 0 20px var(--blue)); animation: floating 4s ease-in-out infinite; }
+        .character-container { position: relative; width: 260px; height: 260px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 4px solid var(--blue); box-shadow: 0 0 20px var(--blue); background: rgba(0,242,255,0.05); }
+        .character-img { width: 80%; height: 80%; object-fit: contain; }
 
-        /* MARKET (Mukammallashtirilgan) */
-        .up-card { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        /* MARKET */
+        .up-card { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .up-info b { font-family: 'Orbitron'; font-size: 14px; display: block; }
         .up-info span { color: #888; font-size: 11px; }
-        .buy-btn { background: #222; border: 1px solid #444; color: #666; padding: 10px 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 13px; min-width: 90px; transition: 0.3s; }
-        .buy-btn.active { border-color: var(--blue); color: #fff; background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
+        .buy-btn { background: #222; border: 1px solid #444; color: #666; padding: 10px 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 13px; min-width: 90px; }
+        .buy-btn.active { border-color: var(--blue); color: #fff; background: rgba(0, 242, 255, 0.1); }
 
         /* NAV */
         .nav { display: flex; height: 85px; border-top: 1px solid rgba(0, 242, 255, 0.2); background: #000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; color: #444; cursor: pointer; transition: 0.3s; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; color: #444; cursor: pointer; }
         .nav-item.active { color: var(--blue); background: linear-gradient(to top, rgba(0,242,255,0.1), transparent); border-top: 3px solid var(--blue); }
 
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .pop { position: absolute; color: var(--blue); font-family: 'Orbitron'; font-weight: bold; font-size: 24px; pointer-events: none; animation: fly 0.6s forwards; z-index: 5000; }
         @keyframes fly { to { transform: translateY(-150px); opacity: 0; } }
     </style>
@@ -61,20 +60,7 @@
     <div id="core-sec" class="section active">
         <div class="hero-zone">
             <div class="character-container" id="tap-btn">
-                <svg class="aira-core" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" style="stop-color:var(--blue);stop-opacity:0.2" />
-                            <stop offset="100%" style="stop-color:transparent;stop-opacity:0" />
-                        </radialGradient>
-                    </defs>
-                    <circle cx="100" cy="100" r="95" fill="url(#grad1)" />
-                    <circle cx="100" cy="100" r="80" fill="none" stroke="var(--blue)" stroke-width="1" stroke-dasharray="10 5" opacity="0.3" />
-                    <rect x="60" y="60" width="80" height="80" rx="20" fill="none" stroke="var(--blue)" stroke-width="4" />
-                    <path d="M75 100 Q100 130 125 100" stroke="var(--blue)" stroke-width="3" fill="none" stroke-linecap="round" />
-                    <circle cx="85" cy="85" r="6" fill="var(--blue)"><animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/></circle>
-                    <circle cx="115" cy="85" r="6" fill="var(--blue)"><animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/></circle>
-                </svg>
+                <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Aira" class="character-img" alt="Aira">
             </div>
         </div>
     </div>
@@ -101,10 +87,9 @@
 
         let data = {
             m: parseFloat(localStorage.getItem('aira_m')) || 0,
-            l: JSON.parse(localStorage.getItem('aira_l')) || {u1:0, u2:0, u3:0, u4:0}
+            l: JSON.parse(localStorage.getItem('aira_l')) || {}
         };
 
-        // Yangilangan Marketplace bazasi
         const upgrades = [
             { id: 'u1', name: 'Neural Link', desc: 'Tap kuchini oshiradi', basePrice: 100, bonus: 2, type: 'tap' },
             { id: 'u2', name: 'Aira Drone', desc: 'Avto-daromadni boshlaydi', basePrice: 500, bonus: 5, type: 'auto' },
@@ -145,9 +130,9 @@
                 const canAfford = data.m >= cost;
 
                 list.innerHTML += `
-                    <div class="up-card" style="border-color: ${canAfford ? 'var(--blue)' : '#222'}">
+                    <div class="up-card">
                         <div class="up-info">
-                            <b style="color: ${canAfford ? '#fff' : '#555'}">${u.name}</b>
+                            <b>${u.name}</b>
                             <span>${u.desc}</span>
                             <div style="color: var(--pink); font-size: 11px; margin-top: 4px;">
                                 Lvl: ${lvl} | +${u.bonus}${u.type==='tap'?' per Tap':'/s'}
@@ -195,13 +180,13 @@
             tg.HapticFeedback.impactOccurred('medium');
         });
 
-        // Background
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         let stars = Array.from({length: 60}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: Math.random()*0.4 }));
         function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
             stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, Math.PI*2); ctx.fill(); s.y += s.v; if(s.y > canvas.height) s.y = 0; });
             requestAnimationFrame(draw);
         }
