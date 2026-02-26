@@ -3,81 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol - 10MB Force</title>
+    <title>Aira Protocol V1.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --c: #00f2ff; --p: #ff007f; --b: #050a10; }
-        body { background: var(--b); color: #fff; font-family: 'Rajdhani'; margin: 0; height: 100vh; overflow: hidden; }
-        .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(0,242,255,0.2); }
-        .bal { font-family: 'Orbitron'; font-size: 60px; font-weight: 900; text-shadow: 0 0 20px var(--c); margin: 10px 0; }
-        .stage { height: 45vh; display: flex; align-items: center; justify-content: center; }
-        .orb { 
-            width: 220px; height: 220px; border-radius: 50%; border: 3px solid var(--c);
-            background: radial-gradient(circle, #0a1520, #000); box-shadow: 0 0 30px var(--c);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        :root {
+            --c: #00f2ff;
+            --p: #ff007f;
+            --b: #050a10;
+            --g: rgba(0, 242, 255, 0.15);
         }
-        .robot { width: 110px; fill: var(--c); }
-        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #000; border-top: 1px solid var(--c); display: flex; }
-        .n-btn { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 12px; }
-        .n-btn.active { color: var(--c); }
+
+        body {
+            background: var(--b);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* STATS HEADER */
+        .h { padding: 45px 20px 20px; text-align: center; }
+        .t { font-family: 'Orbitron'; font-size: 14px; color: var(--c); letter-spacing: 3px; }
+        .v { font-family: 'Orbitron'; font-size: 65px; font-weight: 900; text-shadow: 0 0 20px var(--c); margin: 10px 0; }
+        .s { display: flex; justify-content: center; gap: 20px; font-size: 14px; font-family: 'Orbitron'; }
+
+        /* CORE VIEW */
+        #core { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .o { 
+            width: 260px; height: 260px; border-radius: 50%; border: 3px solid var(--c);
+            background: radial-gradient(circle, #4d8ccf 0%, #1a2a3a 100%); 
+            box-shadow: 0 0 40px var(--g); display: flex; align-items: center; justify-content: center;
+            transition: 0.1s; cursor: pointer;
+        }
+        .o:active { transform: scale(0.94); }
+        .r { width: 100px; height: 70px; background: #1a2a3a; border-radius: 35px 35px 15px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--c); }
+        .e { display: flex; gap: 15px; } .ey { width: 14px; height: 14px; background: var(--c); border-radius: 50%; box-shadow: 0 0 10px var(--c); }
+        .m { width: 35px; height: 4px; background: #000; border-radius: 2px; }
+
+        /* MARKET VIEW */
+        #market, #nft { display: none; flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        .st { font-family: 'Orbitron'; font-size: 26px; text-align: center; color: var(--c); margin-bottom: 25px; }
+        .cd { background: rgba(255,255,255,0.03); border: 1px solid var(--g); border-radius: 15px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: rgba(255,255,255,0.05); border: 1px solid var(--c); color: #fff; padding: 8px 18px; border-radius: 10px; font-family: 'Orbitron'; font-weight: 700; }
+
+        /* NAVIGATION */
+        .nv { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; border-top: 1px solid var(--g); }
+        .ni { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; font-family: 'Orbitron'; font-size: 11px; transition: 0.3s; }
+        .ni.a { color: var(--c); background: linear-gradient(0deg, rgba(0,242,255,0.1), transparent); border-top: 2px solid var(--c); }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div style="font-size:10px; color:var(--c); letter-spacing:3px;">AIRA PROTOCOL V1.0</div>
-    <div class="bal" id="v">0.00</div>
-    <div style="display:flex; justify-content:center; gap:20px; font-size:14px; font-family:'Orbitron';">
-        <span style="color:var(--c)">T: +<span id="t">1</span></span>
-        <span style="color:var(--p)">A: <span id="a">0</span>/s</span>
+    <div class="h">
+        <div class="t">AIRA PROTOCOL V1.0</div>
+        <div class="v" id="balance">0</div>
+        <div class="s">
+            <div style="color:var(--c)">TAP: +<span id="tp">1</span></div>
+            <div style="color:var(--p)">AUTO: <span id="ap">0</span>/s</div>
+        </div>
     </div>
-</div>
 
-<div class="stage">
-    <div class="orb" id="b">
-        <svg class="robot" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3"/>
-            <rect x="30" y="35" width="15" height="15" rx="3"/>
-            <rect x="55" y="35" width="15" height="15" rx="3"/>
-            <path d="M35 65 Q50 80 65 65" stroke="currentColor" fill="none" stroke-width="4" stroke-linecap="round"/>
-        </svg>
+    <div id="core" class="active-view">
+        <div class="o" id="c-btn">
+            <div class="r">
+                <div class="e"><div class="ey"></div><div class="ey"></div></div>
+                <div class="m"></div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="nav">
-    <div class="n-btn active">CORE</div>
-    <div class="n-btn">MARKET</div>
-    <div class="n-btn">NFT</div>
-</div>
+    <div id="market">
+        <div class="st">SYSTEM MARKET</div>
+        <div id="m-list"></div>
+    </div>
+
+    <div id="nft">
+        <div class="st" style="color:var(--p)">NFT GEAR</div>
+        <div style="text-align:center; color:#333; margin-top:100px; font-size:24px; font-family:'Orbitron'">COMING SOON</div>
+    </div>
+
+    <div class="nv">
+        <div class="ni a" onclick="sw('core', this)">CORE</div>
+        <div class="ni" onclick="sw('market', this)">MARKET</div>
+        <div class="ni" onclick="sw('nft', this)">NFT</div>
+    </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    let coins = 0, tap = 1, auto = 0;
-    function f(n) {
-        if (n < 1e3) return n.toFixed(2);
-        if (n < 1e6) return (n / 1e3).toFixed(2) + 'K';
-        return (n / 1e6).toFixed(2) + 'M';
-    }
-    function up() {
-        document.getElementById('v').innerText = f(coins);
-        document.getElementById('t').innerText = f(tap);
-        document.getElementById('a').innerText = f(auto);
-    }
-    document.getElementById('b').onpointerdown = () => {
-        coins += tap; up(); tg.HapticFeedback.impactOccurred('medium');
+    tg.expand();
+
+    let d = { c: 0, t: 1, a: 0 };
+    let up = {
+        n: { t: "Neural Link", c: 225, p: 2, l: 0 },
+        d: { t: "Aira Drone", c: 750, p: 5, l: 0 },
+        q: { t: "Quantum CPU", c: 2000, p: 20, l: 0 }
     };
-    setInterval(() => { coins += auto/10; up(); }, 100);
-</script>
 
-<script id="giga-payload">
-    const SYSTEM_DATABASE_LOGS = `
-    [DENSE_DATA_START]
-    ${"AIRA_PROTOCOL_ENCRYPTED_SECTOR_BLOCK_ID_0987654321_DAT_LOAD_".repeat(180000)}
-    [DENSE_DATA_END]
-    `;
-    console.log("Memory allocated: 11.2 MB");
-</script>
+    function fmt(n) {
+        if (n < 1000) return n.toFixed(0);
+        return (n/1000).toFixed(1) + 'K';
+    }
 
+    function refresh() {
+        document.getElementById('balance').innerText = fmt(d.c);
+        document.getElementById('tp').innerText = fmt(d.t);
+        document.getElementById('ap').innerText = fmt(d.a);
+    }
+
+    document.getElementById('c-btn').onpointerdown = () => {
+        d.c += d.t; refresh(); tg.HapticFeedback.impactOccurred('medium');
+    };
+
+    function sw(v, el) {
+        ['core','market','nft'].forEach(x => document.getElementById(x).style.display = 'none');
+        document.querySelectorAll('.ni').forEach(x => x.classList.remove('a'));
+        document.getElementById(v).style.display = (v === 'core') ? 'flex' : 'block';
+        el.classList.add('a');
+        if(v === 'market') renderM();
+    }
+
+    function renderM() {
+        const l = document.getElementById('m-list'); l.innerHTML = '';
+        for(let k in up) {
+            let i = up[k];
+            l.innerHTML += `<div class="cd"><div><b>${i.t}</b><br><small>Lvl ${i.l} | +${i.p}</small></div>
+            <div class="btn" onclick="buy('${k}')">${fmt(i.c)}</div></div>`;
+        }
+    }
+
+    window.buy = (k) => {
+        let i = up[k];
+        if(d.c >= i.c) {
+            d.c -= i.c; i.l++;
+            if(k==='n') d.t += i.p; else d.a += i.p;
+            i.c = Math.floor(i.c * 1.6);
+            refresh(); renderM(); tg.HapticFeedback.notificationOccurred('success');
+        }
+    };
+
+    setInterval(() => { if(d.a > 0) { d.c += d.a/10; refresh(); } }, 100);
+</script>
 </body>
 </html>
