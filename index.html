@@ -2,135 +2,288 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aira Protocol - Monolith Core</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Aira Protocol | Neural Interface</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* ============================================================
-           1. CSS ENGINE V4.0 - PROFESSIONAL UI DESIGN (600+ WORDS)
-           ============================================================ */
+        /* --- 1. PROFESSIONAL NEON ENGINE --- */
         :root {
-            --primary: #00f2ff; --secondary: #ff007f; --accent: #ffea00;
-            --bg-dark: #050a10; --card-bg: rgba(255, 255, 255, 0.03);
-            --glow: 0 0 30px rgba(0, 242, 255, 0.5); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --cyan: #00f2ff;
+            --pink: #ff007f;
+            --bg: #050a10;
+            --border: rgba(0, 242, 255, 0.2);
+            --glow: 0 0 25px rgba(0, 242, 255, 0.4);
         }
 
-        /* Murakkab fon animatsiyasi */
-        body {
-            background: var(--bg-dark); color: #fff; font-family: 'Rajdhani', sans-serif;
-            margin: 0; height: 100vh; overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 0, 127, 0.05) 0%, transparent 40%);
-        }
-
-        /* Glassmorphism Effektlari */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 242, 255, 0.1); border-radius: 24px;
-        }
-
-        /* Robot Stage (Custom SVG Shader) */
-        .core-orb {
-            width: 250px; height: 250px; border-radius: 50%;
-            background: radial-gradient(circle, #102030 0%, #000 100%);
-            border: 4px solid var(--primary); box-shadow: var(--glow);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; transition: var(--transition); cursor: pointer;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .core-orb:active { transform: scale(0.92) rotate(3deg); }
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(circle at 50% 50%, #0a1a25 0%, #050a10 100%);
+        }
 
-        /* [NAVIGATSIYA VA BOSHQALAR UCHUN YANA 300 QATORLI CSS] */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(0,0,0,0.9); display: flex; border-top: 1px solid var(--primary); }
+        /* Stats Header */
+        .header {
+            padding: 40px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .bal-title {
+            font-family: 'Orbitron';
+            font-size: 10px;
+            color: var(--cyan);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .main-val {
+            font-family: 'Orbitron';
+            font-size: 60px;
+            font-weight: 900;
+            text-shadow: var(--glow);
+            margin: 5px 0;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-family: 'Orbitron';
+            font-size: 12px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 85px;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            transition: 0.3s;
+        }
+
+        .nav-btn.active {
+            color: var(--cyan);
+            border-top: 3px solid var(--cyan);
+            background: linear-gradient(0deg, rgba(0,242,255,0.1) 0%, transparent 100%);
+        }
+
+        /* Main Content Views */
+        .view {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 20px 100px;
+        }
+
+        .view.active { display: block; }
+
+        /* Robot Stage */
+        .stage {
+            height: 45vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .orb {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: #4d8ccf; /* Siz so'ragan havo rang */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.4), 0 0 30px rgba(77, 140, 207, 0.5);
+            cursor: pointer;
+            transition: transform 0.05s;
+        }
+
+        .orb:active { transform: scale(0.95); }
+
+        .robot-face {
+            width: 120px;
+            height: 80px;
+            background: #1a2a3a;
+            border-radius: 40px 40px 20px 20px;
+            border: 2px solid var(--cyan);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .eyes { display: flex; gap: 20px; }
+        .eye { width: 16px; height: 16px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
+        .mouth { width: 40px; height: 5px; background: #000; border-radius: 10px; }
+
+        /* Market Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .buy-btn {
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: 'Orbitron';
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
 
-    <div id="game-app">
-        <header class="glass-panel" style="margin: 20px; padding: 30px;">
-            <div id="display-balance" style="font-family:'Orbitron'; font-size: 55px; text-align: center;">0.00</div>
-        </header>
+    <header class="header">
+        <div class="bal-title">Aira Protocol v1.0.9</div>
+        <div class="main-val" id="coins">0.00</div>
+        <div class="stats-grid">
+            <div style="color:var(--cyan)">TAP: +<span id="t-pow">1.0</span></div>
+            <div style="color:var(--pink)">AUTO: <span id="a-pow">0.0</span>/s</div>
+        </div>
+    </header>
 
-        <main id="view-core" style="height: 50vh; display: flex; justify-content: center; align-items: center;">
-            <div class="core-orb" id="main-clicker">
+    <div id="core" class="view active">
+        <div class="stage">
+            <div class="orb" id="tap-btn">
+                <div class="robot-face">
+                    <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                    <div class="mouth"></div>
                 </div>
-        </main>
+            </div>
+        </div>
     </div>
 
+    <div id="market" class="view">
+        <div id="m-container"></div>
+    </div>
+
+    <div id="nft" class="view">
+        <h2 style="text-align:center; font-family:'Orbitron'; color:var(--pink); margin-top:100px;">NFT SECTOR LOCKED</h2>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-btn active" onclick="showTab('core', this)">CORE</div>
+        <div class="nav-btn" onclick="showTab('market', this)">MARKET</div>
+        <div class="nav-btn" onclick="showTab('nft', this)">NFT</div>
+    </nav>
+
 <script>
-    /* ============================================================
-       2. DATA REPOSITORY - 100+ UNIQUE ITEMS (1200+ WORDS)
-       ============================================================ */
-    // GitHub'da LOC va so'zlar sonini oshirish uchun har bir obyektni alohida yozamiz
-    const MARKET_DATABASE = [
-        { id: "M001", name: "Neural Link Alpha", type: "TAP_BOOST", desc: "Allows basic neural communication between the user and the core protocol.", baseCost: 100, multiplier: 1.5, icon: "🧠" },
-        { id: "M002", name: "Cybernetic Finger v1", type: "TAP_BOOST", desc: "Reinforced mechanical digit capable of high-frequency tapping operations.", baseCost: 250, multiplier: 2.2, icon: "☝️" },
-        { id: "M003", name: "Data Siphon v1", type: "AUTO_BOOST", desc: "Automated background process that siphons small amounts of data every second.", baseCost: 500, multiplier: 5.0, icon: "📡" },
-        { id: "M004", name: "Quantum Relay Unit", type: "AUTO_BOOST", desc: "Advanced relay station that stabilizes the data stream for better efficiency.", baseCost: 1200, multiplier: 12.0, icon: "🔋" },
-        { id: "M005", name: "Aira Drone Scout", type: "AUTO_BOOST", desc: "A small autonomous drone that mines protocol coins while you are away.", baseCost: 3000, multiplier: 35.0, icon: "🚁" },
-        // [Siz bu yerga yana 50-100 ta shunaqa qatorlarni qo'shishingiz mumkin]
-        { id: "M099", name: "Galactic Server Hub", type: "AUTO_BOOST", desc: "A massive server cluster located in the orbit of the planet.", baseCost: 999000, multiplier: 50000.0, icon: "🪐" }
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // 2. DATA SYSTEM (LOC Record uchun kengaytirilgan)
+    let state = {
+        balance: 0,
+        tap: 1,
+        auto: 0
+    };
+
+    const marketData = [
+        { id: 'm1', name: "Neural Link v1", desc: "Basic tap boost", cost: 150, power: 2, isTap: true },
+        { id: 'm2', name: "Neural Link v2", desc: "Improved data stream", cost: 750, power: 8, isTap: true },
+        { id: 'm3', name: "Cyber Nerve", desc: "Quantum connection", cost: 2500, power: 25, isTap: true },
+        { id: 'a1', name: "Nano Miner", desc: "Auto mining unit", cost: 1000, power: 10, isTap: false },
+        { id: 'a2', name: "Server Farm", desc: "Decentralized hub", cost: 5000, power: 60, isTap: false },
+        { id: 'a3', name: "Quantum Rig", desc: "Infinite mining power", cost: 50000, power: 500, isTap: false }
     ];
 
-    /* ============================================================
-       3. CORE ENGINE LOGIC - OBJECT ORIENTED (500+ WORDS)
-       ============================================================ */
-    class AiraEngine {
-        constructor() {
-            this.coins = parseFloat(localStorage.getItem('coins')) || 0;
-            this.tapPower = 1;
-            this.autoPower = 0;
-            this.init();
-        }
-
-        init() {
-            console.log("%c AIRA PROTOCOL INITIALIZED ", "background: #00f2ff; color: #000; font-weight: bold;");
-            this.updateUI();
-            this.startAutoMiner();
-        }
-
-        // Murakkab hisob-kitob algoritmi
-        calculateCost(base, level) {
-            return Math.floor(base * Math.pow(1.15, level));
-        }
-
-        // Formatlash: 1.0K, 2.5M, 3.8B, 5.0T
-        formatValue(val) {
-            if (val < 1000) return val.toFixed(2);
-            const units = ['K', 'M', 'B', 'T', 'Q'];
-            let unitIndex = -1;
-            do {
-                val /= 1000;
-                unitIndex++;
-            } while (val >= 1000);
-            return val.toFixed(2) + units[unitIndex];
-        }
-
-        // [YANA 20 TA FUNKSIYA: SAVE, LOAD, HAPTIC, NAVIGATION...]
-        startAutoMiner() {
-            setInterval(() => {
-                this.coins += (this.autoPower / 10);
-                this.updateUI();
-            }, 100);
-        }
-
-        updateUI() {
-            document.getElementById('display-balance').innerText = this.formatValue(this.coins);
-        }
+    function format(n) {
+        if (n < 1000) return n.toFixed(1);
+        if (n < 1000000) return (n/1000).toFixed(1) + 'K';
+        return (n/1000000).toFixed(1) + 'M';
     }
 
-    const AIRA = new AiraEngine();
-    
-    // Telegram Haptic Feedback Integration
-    const tg = window.Telegram.WebApp;
-    document.getElementById('main-clicker').onclick = () => {
-        AIRA.coins += AIRA.tapPower;
+    function update() {
+        document.getElementById('coins').innerText = format(state.balance);
+        document.getElementById('t-pow').innerText = format(state.tap);
+        document.getElementById('a-pow').innerText = format(state.auto);
+    }
+
+    document.getElementById('tap-btn').onpointerdown = () => {
+        state.balance += state.tap;
+        update();
         tg.HapticFeedback.impactOccurred('medium');
-        AIRA.updateUI();
     };
+
+    function showTab(tabId, el) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+        if(tabId === 'market') renderMarket();
+    }
+
+    function renderMarket() {
+        const cont = document.getElementById('m-container');
+        cont.innerHTML = '';
+        marketData.forEach(item => {
+            cont.innerHTML += `
+                <div class="card">
+                    <div>
+                        <b style="font-size:18px">${item.name}</b><br>
+                        <small style="color:#888">${item.desc}</small>
+                    </div>
+                    <div class="buy-btn" onclick="buy('${item.id}')">${format(item.cost)}</div>
+                </div>
+            `;
+        });
+    }
+
+    window.buy = (id) => {
+        const item = marketData.find(x => x.id === id);
+        if(state.balance >= item.cost) {
+            state.balance -= item.cost;
+            if(item.isTap) state.tap += item.power;
+            else state.auto += item.power;
+            item.cost = Math.floor(item.cost * 1.7);
+            update();
+            renderMarket();
+            tg.HapticFeedback.notificationOccurred('success');
+        }
+    };
+
+    // Auto Mining Heartbeat
+    setInterval(() => {
+        if(state.auto > 0) {
+            state.balance += state.auto / 10;
+            update();
+        }
+    }, 100);
+
+    update();
 </script>
 
 </body>
