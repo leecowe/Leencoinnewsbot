@@ -3,281 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aira Protocol | Cosmic Edition</title>
+    <title>Aira Protocol | iOS Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #00f2ff; --accent: #7000ff; --bg: #06070d; 
-            --card-bg: rgba(22, 24, 33, 0.8); --text-main: #ffffff; 
-            --text-dim: #a0a0b0; --border-color: rgba(255, 255, 255, 0.1); 
-            --gold: #ffcf4b; --success: #4cd137; 
+            --ios-bg: #000000;
+            --ios-card: rgba(28, 28, 30, 0.75);
+            --ios-blue: #0A84FF;
+            --ios-green: #32D74B;
+            --ios-purple: #BF5AF2;
+            --ios-orange: #FF9F0A;
+            --ios-border: rgba(255, 255, 255, 0.12);
+            --text-main: #FFFFFF;
+            --text-secondary: #8E8E93;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'SF Pro Display', -apple-system, sans-serif; }
         
         body { 
-            background: var(--bg); color: var(--text-main); 
-            font-family: 'Outfit', sans-serif; margin: 0; 
-            height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
-            /* Orqa fon manzarasi */
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 40%);
+            background: var(--ios-bg); color: var(--text-main); margin: 0; 
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+            background-image: radial-gradient(circle at 50% -20%, #1c1c1e 0%, #000000 100%);
         }
 
-        /* Fon uchun animatsiya qatlami */
-        .bg-stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.3; z-index: -1; pointer-events: none;
+        .bg-glow { position: fixed; width: 300px; height: 300px; background: var(--ios-purple); filter: blur(120px); opacity: 0.12; top: 10%; right: -50px; z-index: -1; }
+
+        .header { padding: 60px 20px 20px; text-align: center; backdrop-filter: blur(30px); border-bottom: 0.5px solid var(--ios-border); z-index: 10; }
+        .bal-val { font-size: 42px; font-weight: 700; letter-spacing: -1.5px; margin: 2px 0; display: block; }
+        .profit-badge { background: rgba(50, 215, 75, 0.15); color: var(--ios-green); padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; }
+
+        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
+        .view-content.active { display: block; animation: ios-in 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes ios-in { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .ios-card { background: var(--ios-card); backdrop-filter: blur(25px); border-radius: 22px; border: 0.5px solid var(--ios-border); padding: 18px; margin-bottom: 16px; }
+        
+        /* Wheel UI */
+        .wheel-box { text-align: center; position: relative; }
+        .wheel-container { position: relative; width: 180px; height: 180px; margin: 10px auto 20px; }
+        .wheel { 
+            width: 100%; height: 100%; border: 6px solid #2c2c2e; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 44px; 
+            background: conic-gradient(from 0deg, #1c1c1e, #2c2c2e, #3a3a3c, #2c2c2e, #1c1c1e);
+            transition: transform 3.5s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+        .wheel-pointer { 
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
+            border-top: 20px solid var(--ios-blue); z-index: 2;
         }
 
-        .header { 
-            padding: 40px 20px 20px; text-align: center; 
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color); z-index: 10;
+        .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .ios-btn { background: var(--ios-card); border: 0.5px solid var(--ios-border); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; }
+        .ios-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
+        .ios-btn .icon { font-size: 24px; margin-bottom: 8px; }
+        .ios-btn .label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+        .ios-btn .value { font-size: 17px; font-weight: 700; margin: 4px 0; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .grid-item { aspect-ratio: 1; background: rgba(255,255,255,0.04); border-radius: 14px; border: 0.5px solid var(--ios-border); transition: 0.2s; }
+        .grid-item.active { background: var(--ios-blue); box-shadow: 0 0 20px rgba(10, 132, 255, 0.5); border: none; }
+
+        .tap-target { 
+            width: 170px; height: 170px; background: radial-gradient(circle, #2c2c2e 0%, #1c1c1e 100%); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            margin: 20px auto; border: 8px solid #252527; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: 0.1s;
         }
+        .tap-target:active { transform: scale(0.92); }
 
-        .bal-val { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; display: block; text-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+        .action-btn { background: var(--ios-blue); color: white; width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 17px; font-weight: 700; transition: 0.2s; cursor: pointer; }
+        .action-btn:active { opacity: 0.85; transform: scale(0.98); }
+        .action-btn:disabled { background: #1c1c1e; color: #555; cursor: not-allowed; }
 
-        .view-content { flex: 1; display: none; padding: 20px; overflow-y: auto; z-index: 5; }
-        .view-content.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(30px); border-top: 0.5px solid var(--ios-border); display: flex; justify-content: space-around; padding-bottom: 25px; z-index: 100; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 11px; font-weight: 500; transition: 0.2s; cursor: pointer; }
+        .nav-item.active { color: var(--ios-blue); }
+        .nav-item svg { width: 26px; height: 26px; margin-bottom: 5px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-
-        /* Oyun elementlari */
-        .tap-zone {
-            flex: 1; display: flex; align-items: center; justify-content: center; position: relative;
-        }
-
-        .tap-circle {
-            width: 220px; height: 220px;
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 50px rgba(112, 0, 255, 0.4);
-            cursor: pointer; position: relative; transition: 0.1s;
-            border: 8px solid rgba(255,255,255,0.1);
-        }
-
-        .tap-circle:active { transform: scale(0.92); filter: brightness(1.2); }
-        .tap-circle img { width: 120px; pointer-events: none; filter: drop-shadow(0 0 10px #fff); }
-
-        .floating-text {
-            position: absolute; color: var(--primary); font-weight: 800; font-size: 24px;
-            pointer-events: none; animation: floatUp 0.8s ease-out forwards;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
-        }
-
-        .rank-card { 
-            background: var(--card-bg); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); 
-        }
-
-        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 10px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); width: 0%; transition: width 0.5s ease; }
-
-        .btn-upgrade { 
-            background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; 
-            padding: 15px; border-radius: 18px; width: 100%; margin-top: 10px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            font-weight: 600; cursor: pointer; backdrop-filter: blur(5px);
-        }
-
-        .nav { height: 75px; background: rgba(10, 11, 16, 0.9); display: flex; border-top: 1px solid var(--border-color); backdrop-filter: blur(15px); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #4e5471; font-size: 10px; font-weight: 700; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item svg { margin-bottom: 4px; fill: currentColor; }
-
-        .leader-item { 
-            display: flex; align-items: center; padding: 12px; 
-            background: var(--card-bg); border-radius: 15px; margin-bottom: 8px; border: 1px solid var(--border-color); 
-        }
-        .leader-item.me { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
-
-        ::-webkit-scrollbar { width: 0; }
+        .floating-text { position: absolute; color: var(--ios-blue); font-weight: 700; font-size: 28px; pointer-events: none; animation: ios-float 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards; z-index: 1000; }
+        @keyframes ios-float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
     </style>
 </head>
 <body>
 
-    <div class="bg-stars"></div>
+<div class="bg-glow"></div>
 
-    <header class="header">
-        <div id="user-display-name" style="font-size: 12px; color: var(--text-dim); margin-bottom: 5px; font-weight: 600;">@username</div>
-        <div id="career-badge" style="font-size: 10px; font-weight: 800; color: var(--primary); letter-spacing: 2px;">BRONZE</div>
-        <span class="bal-val" id="total-bal">0</span>
-        <div style="font-size: 12px; color: var(--success); font-weight: 700;" id="profit-val">+0/s</div>
-    </header>
+<header class="header">
+    <div id="career-badge" style="font-size: 12px; font-weight: 700; color: var(--ios-purple); text-transform: uppercase; letter-spacing: 1px;">Aira Platinum</div>
+    <span class="bal-val" id="total-bal">0</span>
+    <div class="profit-badge" id="profit-val">+0/s</div>
+</header>
 
-    <div id="view-core" class="view-content active">
-        <div class="rank-card">
-            <div class="rank-labels">
-                <span id="current-rank-name">Bronze</span>
-                <span id="next-rank-name" style="color: var(--text-dim)">Silver</span>
-            </div>
-            <div class="progress-container"><div class="progress-bar" id="rank-progress"></div></div>
-            <div style="text-align: center; font-size: 10px; color: var(--text-dim);">KEYINGI RANK: <span id="needed-bal" style="color: #fff">0</span></div>
+<div id="view-core" class="view-content active">
+    <div class="ios-card">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px;">
+            <span style="color: var(--text-secondary)">Milestone Progress</span>
+            <span id="next-rank-label" style="font-weight: 600;">Gold Level</span>
         </div>
-
-        <button class="btn-upgrade" onclick="upgradeFarm()">
-            <span>🚜 FARMING LVL <b id="farm-lvl">1</b></span>
-            <span style="color: var(--primary)" id="farm-cost">500</span>
-        </button>
-
-        <button class="btn-upgrade" onclick="upgradeStake()">
-            <span>🏦 STAKING LVL <b id="stake-lvl">0</b></span>
-            <span style="color: var(--primary)" id="stake-cost">500</span>
-        </button>
-
-        <button id="stake-btn" onclick="startStake()" style="margin-top: 15px; width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--primary); color: #000; font-weight: 800; text-transform: uppercase; cursor: pointer;">
-            STAKE ALL (<span id="stake-timer">TAYYOR</span>)
-        </button>
-    </div>
-
-    <div id="view-games" class="view-content">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h3 style="margin: 0;">AIRA TAP</h3>
-            <p style="font-size: 12px; color: var(--text-dim);">Logotipni bosing va AIRA yig'ing!</p>
-        </div>
-        <div class="tap-zone">
-            <div class="tap-circle" onclick="handleTap(event)">
-                <img src="https://cdn-icons-png.flaticon.com/512/2592/2592201.png" alt="Aira Logo">
-            </div>
+        <div style="width: 100%; height: 7px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+            <div id="rank-progress" style="height: 100%; background: var(--ios-blue); width: 0%; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
         </div>
     </div>
 
-    <div id="view-rank" class="view-content">
-        <h3 style="margin: 0 0 15px 0;">GLOBAL REYTING</h3>
-        <div class="leader-list" id="leader-list"></div>
+    <div class="widget-grid">
+        <div class="ios-btn" onclick="upgradeFarm()">
+            <span class="icon">💎</span>
+            <span class="label">Mining Power</span>
+            <span class="value" id="farm-lvl">Lvl 1</span>
+            <span style="font-size: 13px; color: var(--ios-blue); font-weight: 600;" id="farm-cost">500</span>
+        </div>
+        <div class="ios-btn" onclick="upgradeStake()">
+            <span class="icon">🏦</span>
+            <span class="label">Yield Staking</span>
+            <span class="value" id="stake-lvl">Lvl 0</span>
+            <span style="font-size: 13px; color: var(--ios-blue); font-weight: 600;" id="stake-cost">500</span>
+        </div>
     </div>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="switchTab('core', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-            TERMINAL
+    <div class="ios-card" style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Network Volatility</div>
+            <div id="trend-val" style="font-size: 18px; font-weight: 700; color: var(--ios-green);">+5.8%</div>
         </div>
-        <div class="nav-item" onclick="switchTab('games', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            GAMES
+        <div style="font-size: 24px;">📈</div>
+    </div>
+
+    <button class="action-btn" id="stake-btn" onclick="startStake()">
+        Deposit Assets to Pool (<span id="stake-timer">Ready</span>)
+    </button>
+</div>
+
+<div id="view-games" class="view-content">
+    <div class="ios-card wheel-box">
+        <div style="font-size: 16px; margin-bottom: 15px; font-weight: 700;">Aira Fortune Wheel</div>
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel-obj">🎁</div>
         </div>
-        <div class="nav-item" onclick="switchTab('rank', this)">
-            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M16 11V5h4v6h-4zm-6 4V9h4v6h-4zm-6 4V13h4v6H4z"/></svg>
-            REYTING
+        <button class="action-btn" id="spin-btn" onclick="spinWheel()" style="background: linear-gradient(135deg, var(--ios-purple), #8e44ad);">Spin (250 AIRA)</button>
+    </div>
+
+    <div style="padding: 0 5px 12px; font-weight: 700; color: var(--text-secondary); font-size: 13px; text-transform: uppercase;">Grid Reflex Test</div>
+    <div class="ios-card">
+        <div class="grid-container" id="grid-parent">
+            <div class="grid-item" onclick="checkGrid(0, event)"></div>
+            <div class="grid-item" onclick="checkGrid(1, event)"></div>
+            <div class="grid-item" onclick="checkGrid(2, event)"></div>
+            <div class="grid-item" onclick="checkGrid(3, event)"></div>
+            <div class="grid-item" onclick="checkGrid(4, event)"></div>
+            <div class="grid-item" onclick="checkGrid(5, event)"></div>
+            <div class="grid-item" onclick="checkGrid(6, event)"></div>
+            <div class="grid-item" onclick="checkGrid(7, event)"></div>
+            <div class="grid-item" onclick="checkGrid(8, event)"></div>
         </div>
-    </nav>
+    </div>
+
+    <div class="tap-target" onclick="handleTap(event)">
+        <img src="https://cdn-icons-png.flaticon.com/512/2592/2592201.png" style="width: 85px; filter: drop-shadow(0 0 10px rgba(10, 132, 255, 0.3));">
+    </div>
+</div>
+
+<nav class="nav">
+    <div class="nav-item active" onclick="switchTab('core', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+    </div>
+    <div class="nav-item" onclick="switchTab('games', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5zM7 7h2v2H7V7zm0 4h2v2H7v-2zm0 4h2v2H7v-2z"/></svg>
+        Arcade
+    </div>
+</nav>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    const user = tg.initDataUnsafe?.user || { first_name: "O'yinchi", last_name: "", username: "Guest" };
-    const fullName = (user.first_name + " " + (user.last_name || "")).trim();
-    const userInitials = (user.first_name[0] + (user.last_name ? user.last_name[0] : (user.first_name[1] || "P"))).toUpperCase();
-    
-    document.getElementById('user-display-name').innerText = user.username ? "@" + user.username : fullName;
-
+    // State
     let balance = parseFloat(localStorage.getItem('aira_bal')) || 0;
     let farmLevel = parseInt(localStorage.getItem('aira_farm')) || 1;
     let stakeLevel = parseInt(localStorage.getItem('aira_stake')) || 0;
-    let isStaking = false;
+    let activeGridIndex = -1;
 
-    const ranks = [
-        { name: "BRONZE", min: 0, max: 10000, color: "#cd7f32" },
-        { name: "SILVER", min: 10000, max: 100000, color: "#c0c0c0" },
-        { name: "GOLD", min: 100000, max: 1000000, color: "#ffcf4b" },
-        { name: "DIAMOND", min: 1000000, max: 10000000, color: "#00f2ff" },
-        { name: "IMPERATOR", min: 10000000, max: 999999999, color: "#ff00ff" }
-    ];
-
+    // Formatting
     function f(n) {
         if (n < 1000) return Math.floor(n).toString();
         const s = ["", "K", "M", "B", "T"];
         const e = Math.floor(Math.log10(n) / 3);
-        const val = n / Math.pow(1000, e);
-        return (val % 1 === 0 ? val : val.toFixed(1)) + s[e];
+        return (n / Math.pow(1000, e)).toFixed(1) + s[e];
     }
 
-    // --- GAME LOGIC ---
+    // --- WHEEL GAME ---
+    function spinWheel() {
+        if (balance < 250) { 
+            tg.HapticFeedback.notificationOccurred('error');
+            tg.showAlert("Balans yetarli emas (250 AIRA kerak)"); 
+            return; 
+        }
+        balance -= 250;
+        const btn = document.getElementById('spin-btn');
+        const wheel = document.getElementById('wheel-obj');
+        btn.disabled = true;
+        tg.HapticFeedback.impactOccurred('medium');
+        
+        let rotation = 1800 + Math.floor(Math.random() * 360);
+        wheel.style.transform = `rotate(${rotation}deg)`;
+        
+        setTimeout(() => {
+            const prizes = [1000, 0, 500, 50, 5000, 100];
+            const emojis = ['💰', '💨', '💎', '🥉', '👑', '🪙'];
+            const idx = Math.floor(Math.random() * prizes.length);
+            const win = prizes[idx];
+            
+            balance += win;
+            wheel.innerText = emojis[idx];
+            
+            if(win > 0) {
+                tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                tg.HapticFeedback.notificationOccurred('warning');
+            }
+
+            btn.disabled = false;
+            setTimeout(() => {
+                wheel.style.transition = "none";
+                wheel.style.transform = "rotate(0deg)";
+                setTimeout(() => wheel.style.transition = "transform 3.5s cubic-bezier(0.15, 0, 0.15, 1)", 50);
+            }, 1500);
+            updateUI();
+        }, 3600);
+    }
+
+    // --- GRID GAME ---
+    function startGridGame() {
+        const items = document.querySelectorAll('.grid-item');
+        items.forEach(i => i.classList.remove('active'));
+        activeGridIndex = Math.floor(Math.random() * 9);
+        items[activeGridIndex].classList.add('active');
+    }
+
+    function checkGrid(idx, e) {
+        if (idx === activeGridIndex) {
+            let win = 15 * farmLevel;
+            balance += win;
+            tg.HapticFeedback.impactOccurred('light');
+            createFloatingText(e, `+${win}`);
+            startGridGame();
+            updateUI();
+        } else {
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+    }
+
+    // --- TAP ACTION ---
     function handleTap(e) {
-        let reward = 1 + (farmLevel * 0.5);
+        let reward = 1 + (farmLevel * 0.4);
         balance += reward;
         tg.HapticFeedback.impactOccurred('light');
-        
-        // Floating Text Effect
-        const floating = document.createElement('div');
-        floating.className = 'floating-text';
-        floating.innerText = `+${reward.toFixed(1)}`;
-        floating.style.left = `${e.clientX - 20}px`;
-        floating.style.top = `${e.clientY - 40}px`;
-        document.body.appendChild(floating);
-        setTimeout(() => floating.remove(), 800);
-        
+        createFloatingText(e, `+${reward.toFixed(1)}`);
         updateUI();
     }
 
-    function updateRankUX() {
-        let currentRank = ranks[0], nextRank = ranks[1];
-        for (let i = 0; i < ranks.length; i++) {
-            if (balance >= ranks[i].min) {
-                currentRank = ranks[i];
-                nextRank = ranks[i + 1] || ranks[i];
-            }
-        }
-        document.getElementById('career-badge').innerText = currentRank.name;
-        document.getElementById('career-badge').style.color = currentRank.color;
-        document.getElementById('current-rank-name').innerText = currentRank.name;
-        document.getElementById('next-rank-name').innerText = nextRank.name;
-
-        let progress = ((balance - currentRank.min) / (nextRank.max - currentRank.min)) * 100;
-        document.getElementById('rank-progress').style.width = Math.min(progress, 100) + "%";
-        document.getElementById('needed-bal').innerText = f(Math.max(nextRank.max - balance, 0));
+    function createFloatingText(e, text) {
+        const el = document.createElement('div');
+        el.className = 'floating-text';
+        el.innerText = text;
+        
+        // Handle touch or click
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        el.style.left = `${clientX - 20}px`;
+        el.style.top = `${clientY - 20}px`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
     }
 
+    // --- SYSTEM LOOP ---
     setInterval(() => {
-        let aps = 50 * Math.pow(1.15, farmLevel - 1);
+        let aps = 55 * Math.pow(1.15, farmLevel - 1);
         balance += (aps / 10);
         document.getElementById('total-bal').innerText = f(balance);
         document.getElementById('profit-val').innerText = "+" + f(aps) + "/s";
-        updateRankUX();
-        if (Math.random() > 0.98) save(); 
+        
+        // Progress bar logic
+        let progress = (balance / 150000) * 100;
+        document.getElementById('rank-progress').style.width = Math.min(progress, 100) + "%";
+        
+        // Market logic
+        if (Math.random() > 0.98) {
+            let trend = (Math.random() * 14 - 6).toFixed(1);
+            const tEl = document.getElementById('trend-val');
+            tEl.innerText = (trend > 0 ? "+" : "") + trend + "%";
+            tEl.style.color = trend > 0 ? "var(--ios-green)" : "var(--ios-orange)";
+        }
     }, 100);
 
     function upgradeFarm() {
-        let cost = 500 * Math.pow(1.18, farmLevel - 1);
-        if(balance >= cost) {
-            balance -= cost; farmLevel++;
-            tg.HapticFeedback.impactOccurred('medium');
-            updateUI();
+        let cost = 500 * Math.pow(1.2, farmLevel - 1);
+        if (balance >= cost) { 
+            balance -= cost; farmLevel++; 
+            tg.HapticFeedback.notificationOccurred('success'); 
+            updateUI(); 
         } else tg.showAlert("Mablag' yetarli emas!");
     }
 
     function upgradeStake() {
-        let cost = 500 * Math.pow(1.2, stakeLevel);
-        if(balance >= cost) {
-            balance -= cost; stakeLevel++;
-            tg.HapticFeedback.impactOccurred('medium');
-            updateUI();
+        let cost = 500 * Math.pow(1.25, stakeLevel);
+        if (balance >= cost) { 
+            balance -= cost; stakeLevel++; 
+            tg.HapticFeedback.notificationOccurred('success'); 
+            updateUI(); 
         } else tg.showAlert("Mablag' yetarli emas!");
     }
 
     function startStake() {
-        if (isStaking || balance < 10) return;
-        isStaking = true;
+        if (balance < 100) { tg.showAlert("Kamida 100 AIRA kerak!"); return; }
         let amt = balance; balance = 0;
         document.getElementById('stake-btn').disabled = true;
+        tg.HapticFeedback.impactOccurred('heavy');
         let t = 10;
-        const count = setInterval(() => {
+        const timer = setInterval(() => {
             t--;
-            document.getElementById('stake-timer').innerText = t + "S";
-            if(t <= 0) {
-                clearInterval(count);
-                balance += amt * (1.05 + (stakeLevel * 0.02));
-                isStaking = false;
-                document.getElementById('stake-timer').innerText = "TAYYOR";
+            document.getElementById('stake-timer').innerText = t + "s";
+            if (t <= 0) {
+                clearInterval(timer);
+                balance += amt * (1.25 + (stakeLevel * 0.08));
+                document.getElementById('stake-timer').innerText = "Ready";
                 document.getElementById('stake-btn').disabled = false;
                 tg.HapticFeedback.notificationOccurred('success');
                 updateUI();
@@ -285,51 +338,26 @@
         }, 1000);
     }
 
-    function loadLeaderboard() {
-        const list = document.getElementById('leader-list');
-        const players = [
-            { n: "CryptoWhale", s: 50000000, i: "CW" },
-            { n: "Aira_Dev", s: 12000000, i: "AD" },
-            { n: fullName, s: balance, i: userInitials, me: true },
-            { n: "Shadow_Hunter", s: 1500000, i: "SH" }
-        ].sort((a,b) => b.s - a.s);
-
-        list.innerHTML = players.map((p, i) => `
-            <div class="leader-item ${p.me ? 'me' : ''}">
-                <div class="leader-rank">#${i+1}</div>
-                <div class="leader-avatar">${p.i}</div>
-                <div class="leader-info">
-                    <span class="leader-name">${p.n}</span>
-                    <span class="leader-score">${f(p.s)} AIRA</span>
-                </div>
-            </div>
-        `).join('');
-    }
-
     function switchTab(tab, el) {
         document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById('view-' + tab).classList.add('active');
         el.classList.add('active');
-        if(tab === 'rank') loadLeaderboard();
-        tg.HapticFeedback.impactOccurred('light');
+        if (tab === 'games') startGridGame();
+        tg.HapticFeedback.impactOccurred('selectionChanged');
     }
 
-    function save() {
+    function updateUI() {
+        document.getElementById('farm-lvl').innerText = `Lvl ${farmLevel}`;
+        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.2, farmLevel - 1));
+        document.getElementById('stake-lvl').innerText = `Lvl ${stakeLevel}`;
+        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.25, stakeLevel));
         localStorage.setItem('aira_bal', balance);
         localStorage.setItem('aira_farm', farmLevel);
         localStorage.setItem('aira_stake', stakeLevel);
     }
 
-    function updateUI() {
-        document.getElementById('farm-lvl').innerText = farmLevel;
-        document.getElementById('farm-cost').innerText = f(500 * Math.pow(1.18, farmLevel - 1));
-        document.getElementById('stake-lvl').innerText = stakeLevel;
-        document.getElementById('stake-cost').innerText = f(500 * Math.pow(1.2, stakeLevel));
-        save();
-    }
-
-    window.onload = () => { updateUI(); updateRankUX(); };
+    window.onload = updateUI;
 </script>
 </body>
 </html>
