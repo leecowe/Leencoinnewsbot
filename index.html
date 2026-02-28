@@ -3,284 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mega Farm AI - Pro</title>
+    <title>Mega Farm - Simple & Fast</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #f3ba2f;
-            --bg: #0f0f0f;
-            --surface: #1e1e1e;
-            --text: #ffffff;
-            --text-dim: #999;
+            --gold: #f3ba2f;
+            --bg: #121212;
+            --card: #1e1e1e;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
+        
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
+            color: white;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            user-select: none;
         }
 
-        /* Top Bar */
-        .top-bar {
-            padding: 20px;
+        /* Tepada balans */
+        .header {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .balance-label { font-size: 14px; color: #888; margin-bottom: 5px; }
+        .balance-value { font-size: 48px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .coin { width: 40px; height: 40px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 20px rgba(243, 186, 47, 0.4); }
+
+        /* Asosiy bosish maydoni */
+        .click-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-circle {
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, #2a2a2a 0%, #151515 100%);
+            border-radius: 50%;
+            border: 10px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 110px;
+            cursor: pointer;
+            transition: transform 0.05s;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .main-circle:active { transform: scale(0.94); }
+
+        /* Pastki statisika va upgrade */
+        .footer {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+        }
+
+        .stats { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
+        .stat-val { display: block; font-size: 18px; font-weight: bold; color: var(--gold); }
+        .stat-name { font-size: 11px; color: #888; text-transform: uppercase; }
+
+        .upgrade-btn {
+            width: 100%;
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to bottom, #1a1a1a, transparent);
-        }
-
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800; }
-
-        /* Balance Section */
-        .balance-section {
-            text-align: center;
-            padding: 10px 0;
-        }
-        .balance-amount {
-            font-size: 42px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        .coin-glow {
-            width: 35px; height: 35px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 20px var(--primary);
-        }
-
-        /* Main Game Area */
-        .game-canvas {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .clicker-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 4px solid rgba(243, 186, 47, 0.1);
-        }
-
-        .main-btn {
-            width: 240px;
-            height: 240px;
-            background: radial-gradient(circle, #333 0%, #111 100%);
-            border-radius: 50%;
-            font-size: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            z-index: 2;
         }
 
-        .main-btn:active { transform: scale(0.92); }
+        .upgrade-btn:disabled { background: #444; color: #777; }
 
-        /* Stats Card */
-        .hud {
-            width: 90%;
-            background: var(--surface);
-            margin: 20px auto;
-            border-radius: 20px;
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .stat-box { text-align: center; }
-        .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 16px; font-weight: 600; color: var(--primary); }
-
-        /* Bottom Menu */
-        .nav-menu {
-            height: 80px;
-            background: #151515;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding-bottom: 15px;
-            border-top: 1px solid #222;
-        }
-        .nav-item { text-align: center; color: var(--text-dim); font-size: 11px; text-decoration: none; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; display: block; }
-
-        /* Animations */
-        .tap-pop {
+        /* Tap effekti */
+        .tap {
             position: absolute;
-            color: #fff;
-            font-weight: 800;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
             pointer-events: none;
-            z-index: 10;
-            animation: floatOut 0.8s ease-out forwards;
+            animation: fly 0.7s forwards;
+            z-index: 100;
         }
 
-        @keyframes floatOut {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-140px) scale(1.5); opacity: 0; }
+        @keyframes fly {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-120px); }
         }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="user-info">
-            <div class="avatar" id="avatar-initial">F</div>
-            <div class="name-box">
-                <div style="font-size: 14px; font-weight: 600;" id="user-display">Farmer</div>
-                <div style="font-size: 10px; color: var(--text-dim);">Bronze Level</div>
+    <div class="header">
+        <p class="balance-label">Sizning balansingiz</p>
+        <div class="balance-value">
+            <div class="coin"></div>
+            <span id="bal">0</span>
+        </div>
+    </div>
+
+    <div class="click-area">
+        <div class="main-circle" id="tap">🚜</div>
+    </div>
+
+    <div class="footer">
+        <div class="stats">
+            <div>
+                <span class="stat-name">Har soniya</span>
+                <span class="stat-val" id="pps">+0</span>
+            </div>
+            <div>
+                <span class="stat-name">Har bir bosish</span>
+                <span class="stat-val" id="pwr">1</span>
             </div>
         </div>
-        <div style="font-size: 20px;">⚙️</div>
-    </div>
 
-    <div class="balance-section">
-        <div class="balance-amount">
-            <div class="coin-glow"></div>
-            <span id="balance">0</span>
-        </div>
+        <button class="upgrade-btn" id="buy">
+            <span>Avto-Kombayn 🤖</span>
+            <span id="cost">50</span>
+        </button>
     </div>
-
-    <div class="game-canvas" id="game-area">
-        <div class="clicker-container">
-            <div class="main-btn" id="clicker">🚜</div>
-        </div>
-    </div>
-
-    <div class="hud">
-        <div class="stat-box">
-            <div class="stat-label">Profit per sec</div>
-            <div class="stat-value" id="pps-val">+0</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Tap Power</div>
-            <div class="stat-value" id="tap-val">1</div>
-        </div>
-    </div>
-
-    <nav class="nav-menu">
-        <div class="nav-item active">
-            <span class="nav-icon">🏠</span>Exchange
-        </div>
-        <div class="nav-item" onclick="showUpgrade()">
-            <span class="nav-icon">⚒️</span>Upgrades
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">👥</span>Friends
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">💰</span>Airdrop
-        </div>
-    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
 
-        // App State
-        let state = JSON.parse(localStorage.getItem('farmDataPro')) || {
+        let data = JSON.parse(localStorage.getItem('megaFarm')) || {
             coins: 0,
             pps: 0,
-            tapPower: 1,
-            level: 1
+            pwr: 1,
+            cost: 50
         };
 
-        const elements = {
-            balance: document.getElementById('balance'),
-            pps: document.getElementById('pps-val'),
-            tap: document.getElementById('tap-val'),
-            clicker: document.getElementById('clicker'),
-            gameArea: document.getElementById('game-area')
-        };
-
-        function updateUI() {
-            elements.balance.innerText = Math.floor(state.coins).toLocaleString();
-            elements.pps.innerText = `+${state.pps}`;
-            elements.tap.innerText = state.tapPower;
-            localStorage.setItem('farmDataPro', JSON.stringify(state));
+        function ui() {
+            document.getElementById('bal').innerText = Math.floor(data.coins).toLocaleString();
+            document.getElementById('pps').innerText = "+" + data.pps;
+            document.getElementById('pwr').innerText = data.pwr;
+            document.getElementById('cost').innerText = data.cost;
+            document.getElementById('buy').disabled = data.coins < data.cost;
+            localStorage.setItem('megaFarm', JSON.stringify(data));
         }
 
-        // Multi-touch Clicking
-        elements.clicker.addEventListener('touchstart', (e) => {
+        // Clicker - Multi-touch qo'shildi
+        document.getElementById('tap').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            
-            // Har bir teginish uchun (Multi-touch)
             for (let i = 0; i < e.targetTouches.length; i++) {
-                const touch = e.targetTouches[i];
-                state.coins += state.tapPower;
-                createTapEffect(touch.clientX, touch.clientY);
+                data.coins += data.pwr;
+                const t = e.targetTouches[i];
+                const anim = document.createElement('div');
+                anim.className = 'tap';
+                anim.innerText = "+" + data.pwr;
+                anim.style.left = t.clientX + "px";
+                anim.style.top = t.clientY + "px";
+                document.body.appendChild(anim);
+                setTimeout(() => anim.remove(), 700);
             }
-
             tg.HapticFeedback.impactOccurred('medium');
-            updateUI();
+            ui();
         });
 
-        function createTapEffect(x, y) {
-            const el = document.createElement('div');
-            el.className = 'tap-pop';
-            el.innerText = `+${state.tapPower}`;
-            el.style.left = `${x - 20}px`;
-            el.style.top = `${y - 40}px`;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
+        // Upgrade
+        document.getElementById('buy').onclick = () => {
+            if (data.coins >= data.cost) {
+                data.coins -= data.cost;
+                data.pps += 1;
+                data.cost = Math.floor(data.cost * 1.5);
+                tg.HapticFeedback.notificationOccurred('success');
+                ui();
+            }
+        };
 
-        function showUpgrade() {
-            const cost = Math.floor(50 * Math.pow(1.5, state.pps));
-            tg.showConfirm(`Avto-Kombayn sotib olasizmi?\nNarxi: ${cost} 💰`, (ok) => {
-                if(ok && state.coins >= cost) {
-                    state.coins -= cost;
-                    state.pps += 1;
-                    tg.HapticFeedback.notificationOccurred('success');
-                    updateUI();
-                } else if (ok) {
-                    tg.showAlert("Mablag' yetarli emas!");
-                }
-            });
-        }
-
-        // Auto Passive Income
+        // Avto-daromad
         setInterval(() => {
-            if (state.pps > 0) {
-                state.coins += state.pps;
-                updateUI();
+            if (data.pps > 0) {
+                data.coins += data.pps;
+                ui();
             }
         }, 1000);
 
-        // Telegram User Init
-        const user = tg.initDataUnsafe?.user;
-        if(user) {
-            document.getElementById('user-display').innerText = user.first_name;
-            document.getElementById('avatar-initial').innerText = user.first_name[0];
-        }
-
-        updateUI();
+        ui();
     </script>
 </body>
 </html>
