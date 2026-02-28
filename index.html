@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mega Farm 3D - Test Mode</title>
+    <title>Mega Farm 3D Ultra</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root { --gold: #f3ba2f; --bg: #0a0a0a; --card: #161616; }
+        :root { --gold: #f3ba2f; --bg: #050505; --panel: rgba(255, 255, 255, 0.05); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
         
         body {
-            font-family: -apple-system, system-ui, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
             color: white;
             height: 100vh;
@@ -20,204 +20,217 @@
             overflow: hidden;
         }
 
-        /* Test Mode Badge */
         .test-badge {
-            position: fixed; top: 10px; right: 10px;
-            background: red; color: white; font-size: 10px;
-            padding: 2px 8px; border-radius: 10px; font-weight: bold; z-index: 1000;
+            position: fixed; top: 15px; left: 15px;
+            background: rgba(255, 0, 0, 0.6); backdrop-filter: blur(5px);
+            padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; z-index: 1000;
+            border: 1px solid rgba(255, 0, 0, 0.3);
         }
 
-        .header { padding: 25px 20px; text-align: center; }
-        .balance-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 44px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--gold); }
-
-        /* 3D Canvas Area */
-        #canvas-container {
-            flex-grow: 1;
-            position: relative;
-            cursor: pointer;
-            touch-action: none;
+        /* UI Overlay */
+        .ui-container {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; pointer-events: none; z-index: 10;
         }
+
+        .header { padding: 40px 20px; text-align: center; }
+        .balance-card {
+            background: var(--panel); backdrop-filter: blur(15px);
+            display: inline-block; padding: 10px 30px; border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .balance-value { font-size: 40px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(243, 186, 47, 0.5); }
+
+        #canvas-container { flex-grow: 1; position: relative; touch-action: none; pointer-events: auto; }
 
         .footer {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 25px 25px 0 0;
-            border-top: 1px solid #222;
+            padding: 30px 20px; pointer-events: auto;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
         }
 
-        .stats { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .stat-val { display: block; font-size: 18px; font-weight: bold; }
-        .stat-name { font-size: 10px; color: #666; text-transform: uppercase; }
+        .hud {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--panel); backdrop-filter: blur(10px);
+            padding: 15px; border-radius: 20px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-val { display: block; font-size: 20px; font-weight: 800; color: #fff; }
+        .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
 
         .upgrade-btn {
-            width: 100%;
-            background: var(--gold);
-            color: black;
-            border: none;
-            padding: 16px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 800;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 100%; background: var(--gold); color: #000;
+            border: none; padding: 20px; border-radius: 22px;
+            font-size: 18px; font-weight: 900; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 5px 20px rgba(243, 186, 47, 0.3);
+            transition: 0.2s;
         }
+        .upgrade-btn:active { transform: scale(0.95); box-shadow: none; }
+        .upgrade-btn:disabled { background: #333; color: #666; box-shadow: none; }
 
-        .upgrade-btn:active { transform: scale(0.98); }
-        .upgrade-btn:disabled { background: #333; color: #555; }
-
-        .tap-pop {
-            position: absolute; font-size: 30px; font-weight: 900; color: white;
-            pointer-events: none; animation: fly 0.6s ease-out forwards; z-index: 500;
+        /* Floating numbers */
+        .floating-n {
+            position: absolute; font-size: 35px; font-weight: 900; color: #fff;
+            pointer-events: none; animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 0 10px var(--gold);
         }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        @keyframes floatUp {
+            0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -150px) scale(1.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="test-badge">TEST MODE: ON</div>
+    <div class="test-badge">DEBUG: TEST_MODE_ACTIVE</div>
 
-    <div class="header">
-        <p class="balance-label">Jami Tanga</p>
-        <div class="balance-value">🪙 <span id="bal">0</span></div>
-    </div>
-
-    <div id="canvas-container"></div>
-
-    <div class="footer">
-        <div class="stats">
-            <div>
-                <span class="stat-name">Auto / sek</span>
-                <span class="stat-val" id="pps">+0</span>
-            </div>
-            <div>
-                <span class="stat-name">Tap / kuch</span>
-                <span class="stat-val" id="pwr">1</span>
+    <div class="ui-container">
+        <div class="header">
+            <div class="balance-card">
+                <div class="balance-value" id="bal">0</div>
             </div>
         </div>
+        
+        <div id="canvas-container"></div>
 
-        <button class="upgrade-btn" id="buy">
-            <span>UPGRADE FARM 🚜</span>
-            <span id="cost">1</span>
-        </button>
+        <div class="footer">
+            <div class="hud">
+                <div class="stat-card">
+                    <span class="stat-val" id="pps">+0</span>
+                    <span class="stat-label">Auto / Sec</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" id="pwr">1</span>
+                    <span class="stat-label">Tap / Power</span>
+                </div>
+            </div>
+
+            <button class="upgrade-btn" id="buy">
+                <span>⚡ UPGRADE FARM</span>
+                <span id="cost">1</span>
+            </button>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. DATA (TEST REJIM BILAN)
-        const isTestMode = true; // Test rejimini yoqish/o'chirish
+        const isTestMode = true; 
 
-        let data = JSON.parse(localStorage.getItem('megaFarm3D')) || {
-            coins: 0,
-            pps: 0,
-            pwr: 1,
-            cost: isTestMode ? 1 : 50
+        let data = JSON.parse(localStorage.getItem('megaFarmUltra')) || {
+            coins: 0, pps: 0, pwr: 1, cost: 1
         };
 
-        // 2. THREE.JS UI KUCHAYTIRISH
+        // --- THREE.JS ENGINE ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(container.clientWidth, container.clientHeight);
         container.appendChild(renderer.domElement);
 
-        // 3D Model o'rniga dinamik Neon Kub (Traktor ramziy ma'noda)
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        // Geometriya (Kattaroq va chiroyliroq kub)
+        const geometry = new THREE.IcosahedronGeometry(2, 0); 
         const material = new THREE.MeshPhongMaterial({ 
-            color: 0xf3ba2f, 
-            emissive: 0xf3ba2f,
-            emissiveIntensity: 0.5,
-            shininess: 100 
+            color: 0xf3ba2f, emissive: 0x442200, shininess: 100, flatShading: true 
         });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        const mainObj = new THREE.Mesh(geometry, material);
+        scene.add(mainObj);
 
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
+        // Zarralar (Particles) effekti uchun
+        const particlesCount = 50;
+        const pGeometry = new THREE.BufferGeometry();
+        const pMaterial = new THREE.PointsMaterial({ color: 0xf3ba2f, size: 0.1 });
+        const pPositions = new Float32Array(particlesCount * 3);
+        for(let i=0; i<particlesCount*3; i++) pPositions[i] = (Math.random()-0.5)*10;
+        pGeometry.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+        const particles = new THREE.Points(pGeometry, pMaterial);
+        scene.add(particles);
 
-        camera.position.z = 5;
+        // Lights
+        const light1 = new THREE.PointLight(0xf3ba2f, 2, 50);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+        const light2 = new THREE.AmbientLight(0x404040, 2);
+        scene.add(light2);
 
-        // Animatsiya loopi
+        camera.position.z = 6;
+
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.y += 0.01;
-            cube.rotation.x += 0.005;
+            mainObj.rotation.y += 0.01;
+            mainObj.rotation.x += 0.005;
+            particles.rotation.y -= 0.002;
             renderer.render(scene, camera);
         }
         animate();
 
-        // 3. O'YIN FUNKSIYALARI
-        function ui() {
+        // --- GAME LOGIC ---
+        function updateUI() {
             document.getElementById('bal').innerText = Math.floor(data.coins).toLocaleString();
-            document.getElementById('pps').innerText = "+" + data.pps;
+            document.getElementById('pps').innerText = `+${data.pps}`;
             document.getElementById('pwr').innerText = data.pwr;
-            
-            // Test rejimida narx doim 1
             const currentCost = isTestMode ? 1 : data.cost;
             document.getElementById('cost').innerText = currentCost;
             document.getElementById('buy').disabled = data.coins < currentCost;
-            
-            localStorage.setItem('megaFarm3D', JSON.stringify(data));
+            localStorage.setItem('megaFarmUltra', JSON.stringify(data));
         }
 
-        // Tapping
         container.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            // 3D Effekt: Bosilganda kub kattalashadi
-            cube.scale.set(1.2, 1.2, 1.2);
-            setTimeout(() => cube.scale.set(1,1,1), 100);
+            
+            // Effect
+            mainObj.scale.set(1.3, 1.3, 1.3);
+            setTimeout(() => mainObj.scale.set(1, 1, 1), 100);
 
             for (let i = 0; i < e.targetTouches.length; i++) {
                 data.coins += data.pwr;
                 const t = e.targetTouches[i];
-                const pop = document.createElement('div');
-                pop.className = 'tap-pop';
-                pop.innerText = "+" + data.pwr;
-                pop.style.left = t.clientX + "px";
-                pop.style.top = t.clientY + "px";
-                document.body.appendChild(pop);
-                setTimeout(() => pop.remove(), 600);
+                
+                // Floating Number
+                const n = document.createElement('div');
+                n.className = 'floating-n';
+                n.innerText = `+${data.pwr}`;
+                n.style.left = `${t.clientX}px`;
+                n.style.top = `${t.clientY}px`;
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 800);
             }
-            tg.HapticFeedback.impactOccurred('light');
-            ui();
+            tg.HapticFeedback.impactOccurred('heavy');
+            updateUI();
         });
 
-        // Upgrade
         document.getElementById('buy').onclick = () => {
             const cost = isTestMode ? 1 : data.cost;
             if (data.coins >= cost) {
                 data.coins -= cost;
                 data.pps += 1;
                 data.pwr += 1;
-                if(!isTestMode) data.cost = Math.floor(data.cost * 1.6);
+                if(!isTestMode) data.cost = Math.floor(data.cost * 1.7);
                 tg.HapticFeedback.notificationOccurred('success');
-                ui();
+                updateUI();
             }
         };
 
-        // Auto earn
         setInterval(() => {
             if (data.pps > 0) {
                 data.coins += data.pps;
-                ui();
+                updateUI();
             }
         }, 1000);
 
-        // Window resize fix
         window.addEventListener('resize', () => {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
 
-        ui();
+        updateUI();
     </script>
 </body>
 </html>
