@@ -2,222 +2,266 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Leenova Kombat - Evolutsiya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mega Farm AI - v1.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000;
-            --panel-color: #1c1f24;
-            --accent-yellow: #f5bb5f;
-            --text-main: #ffffff;
-            --text-sub: #85827d;
+            --primary-color: #f3ba2f; /* Binance Gold */
+            --bg-color: #1a1a1a;
+            --card-bg: #2b2b2b;
+            --text-color: #ffffff;
+            --hint-color: #aaaaaa;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
-        body { background: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
 
-        /* HEADER */
-        .header { padding: 15px; display: flex; align-items: center; gap: 10px; background: #1c1f24; border-bottom: 1px solid #32363c; }
-        .user-block { display: flex; align-items: center; gap: 10px; flex-grow: 1; cursor: pointer; }
-        .avatar-box { width: 42px; height: 42px; background: var(--accent-yellow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #000; font-size: 18px; }
-        
-        .rank-container { display: flex; align-items: center; gap: 8px; width: 140px; }
-        .rank-text { font-size: 11px; color: var(--accent-yellow); font-weight: 700; }
-        .rank-progress-mini { flex-grow: 1; height: 6px; background: #32363c; border-radius: 10px; overflow: hidden; }
-        .rank-fill-mini { height: 100%; background: var(--accent-yellow); width: 0%; transition: width 0.3s; }
+        /* Header qismi */
+        .header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #252525 0%, var(--bg-color) 100%);
+        }
 
-        /* MAIN CONTENT */
-        .view-port { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 50px; }
-        
-        .balance-main { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; font-size: 44px; font-weight: 900; }
-        .coin-img { width: 45px; height: 45px; background: var(--accent-yellow); border-radius: 50%; box-shadow: 0 0 15px rgba(245,187,95,0.5); }
+        #user-name {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
 
-        /* PERSONAJ VA CLICKER */
-        .character-container { position: relative; width: 280px; height: 280px; margin-bottom: 20px; }
-        .main-button { 
-            width: 100%; height: 100%; 
-            background: radial-gradient(circle, #32363c, #000); 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; border: 10px solid #1c1f24; 
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        .balance-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .coin-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 15px rgba(243, 186, 47, 0.4);
+        }
+
+        #balance {
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        /* Asosiy o'yin tugmasi */
+        .main-tap-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .circle-btn {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #444 0%, #222 100%);
+            border: 8px solid #333;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
             transition: transform 0.05s;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
-        .main-button:active { transform: scale(0.96); }
-        .robot-img { width: 190px; height: 190px; transition: all 0.5s ease; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
 
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; }
-        .modal-content { position: absolute; bottom: 0; width: 100%; background: var(--panel-color); border-radius: 25px 25px 0 0; padding: 25px; border-top: 2px solid var(--accent-yellow); max-height: 70vh; overflow-y: auto; }
-        .rank-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; border: 1px solid transparent; }
-        .rank-list-item.active { border-color: var(--accent-yellow); background: rgba(245,187,95,0.1); }
+        .circle-btn:active {
+            transform: scale(0.95);
+        }
 
-        /* STATS & NAVBAR */
-        .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 15px; width: 100%; }
-        .stat-item { background: var(--panel-color); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #333; }
-        .stat-label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; }
-        .stat-value { font-size: 12px; font-weight: 700; display: block; margin-top: 2px; }
+        /* Upgrade (Menu) qismi */
+        .menu {
+            width: 100%;
+            background: var(--card-bg);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-        .energy-hud { padding: 20px; width: 100%; }
-        .bar-bg { height: 10px; background: #32363c; border-radius: 10px; margin-top: 8px; }
-        .bar-fill { height: 100%; background: var(--accent-yellow); border-radius: 10px; transition: width 0.2s; }
+        .stats-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--hint-color);
+        }
 
-        .navbar { background: #1c1f24; display: grid; grid-template-columns: repeat(4, 1fr); padding: 12px 0; border-top: 1px solid #333; width: 100%; }
-        .nav-tab { text-align: center; color: var(--text-sub); font-size: 10px; }
-        .nav-tab.active { color: #fff; }
+        .upgrade-card {
+            background: #3d3d3d;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .tap-anim { position: absolute; color: white; font-size: 32px; font-weight: 900; pointer-events: none; animation: fly 0.6s forwards; z-index: 1000; }
-        @keyframes fly { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        .upgrade-info h4 { margin: 0; font-size: 16px; }
+        .upgrade-info p { margin: 5px 0 0; font-size: 12px; color: var(--primary-color); }
+
+        .btn-buy {
+            background: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-buy:disabled {
+            background: #555;
+            color: #888;
+        }
+
+        /* Floating text effekti */
+        .floating-text {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            pointer-events: none;
+            animation: moveUp 0.8s ease-out forwards;
+        }
+
+        @keyframes moveUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="rank-modal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:20px">Darajalar va Personajlar</h3>
-            <div id="rank-list"></div>
-        </div>
-    </div>
-
     <div class="header">
-        <div class="user-block" onclick="openRankModal()">
-            <div class="avatar-box" id="user-initial">B</div>
-            <div class="user-meta">
-                <h4 id="user-name">Bexruz</h4>
-                <div class="rank-container">
-                    <span class="rank-text" id="rank-name">Bronze</span>
-                    <div class="rank-progress-mini"><div class="rank-fill-mini" id="rank-fill"></div></div>
-                </div>
+        <div>Salom, <span id="user-name">Fermer</span>!</div>
+        <div class="balance-container">
+            <div class="coin-icon">💰</div>
+            <span id="balance">0</span>
+        </div>
+    </div>
+
+    <div class="main-tap-area" id="tap-zone">
+        <div class="circle-btn" id="clicker">🚜</div>
+    </div>
+
+    <div class="menu">
+        <div class="stats-info">
+            <div>Profit per sec: <span id="pps" style="color:white">+0</span></div>
+            <div>Tap power: <span id="tap-power" style="color:white">1</span></div>
+        </div>
+
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Avto-Kombayn</h4>
+                <p>Narxi: <span id="upgrade-cost">50</span> 💰</p>
             </div>
-        </div>
-        <div style="font-size:20px">⚙️</div>
-    </div>
-
-    <div class="top-stats">
-        <div class="stat-item"><span class="stat-label">Tap Profit</span><span class="stat-value">+1</span></div>
-        <div class="stat-item"><span class="stat-label">Next Rank</span><span class="stat-value" id="ui-next">5K</span></div>
-        <div class="stat-item"><span class="stat-label">Profit/hr</span><span class="stat-value" style="color:#4ade80">+0</span></div>
-    </div>
-
-    <div class="view-port">
-        <div class="balance-main">
-            <div class="coin-img"></div>
-            <span id="ui-bal">0</span>
-        </div>
-
-        <div class="character-container">
-            <div class="main-button" id="tap-target">
-                <img id="char-img" src="" class="robot-img" alt="character">
-            </div>
+            <button class="btn-buy" id="buy-btn">Sotib olish</button>
         </div>
     </div>
-
-    <div class="energy-hud">
-        <div style="display:flex; justify-content:space-between; font-size:14px">
-            <span>⚡ <span id="ui-energy">1000</span> / 1000</span>
-        </div>
-        <div class="bar-bg"><div class="bar-fill" id="ui-bar" style="width:100%"></div></div>
-    </div>
-
-    <nav class="navbar">
-        <div class="nav-tab active">🏠<br>Exchange</div>
-        <div class="nav-tab">⛏️<br>Mine</div>
-        <div class="nav-tab">👥<br>Friends</div>
-        <div class="nav-tab">🐹<br>Airdrop</div>
-    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        // PERSONAJLAR RO'YXATI (Har bir rank uchun har xil ko'rinish)
-        const RANKS = [
-            { name: "Bronze", min: 0, img: "https://api.dicebear.com/7.x/bottts/svg?seed=1&colors=7d7d7d" },
-            { name: "Silver", min: 5000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=2&colors=c0c0c0" },
-            { name: "Gold", min: 25000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=3&colors=f5bb5f" },
-            { name: "Platinum", min: 100000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=4&colors=e5e4e2" },
-            { name: "Diamond", min: 1000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=5&colors=b9f2ff" },
-            { name: "Master", min: 5000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=6&colors=ff4d4d" },
-            { name: "Legendary", min: 50000000, img: "https://api.dicebear.com/7.x/bottts/svg?seed=7&colors=9933ff" }
-        ];
+        // Foydalanuvchi ismini o'rnatish
+        const firstName = tg.initDataUnsafe?.user?.first_name || "Fermer";
+        document.getElementById('user-name').innerText = firstName;
 
-        let state = JSON.parse(localStorage.getItem('leenova_save')) || { bal: 0, energy: 1000 };
+        // O'yin ma'lumotlari (Database o'rniga LocalStorage)
+        let state = JSON.parse(localStorage.getItem('farmData')) || {
+            coins: 0,
+            pps: 0,
+            upgradeCost: 50,
+            tapPower: 1
+        };
+
+        function saveState() {
+            localStorage.setItem('farmData', JSON.stringify(state));
+        }
 
         function updateUI() {
-            document.getElementById('ui-bal').innerText = Math.floor(state.bal).toLocaleString();
-            document.getElementById('ui-energy').innerText = Math.floor(state.energy);
-            document.getElementById('ui-bar').style.width = (state.energy / 10) + "%";
+            document.getElementById('balance').innerText = Math.floor(state.coins);
+            document.getElementById('pps').innerText = "+" + state.pps;
+            document.getElementById('upgrade-cost').innerText = state.upgradeCost;
+            document.getElementById('tap-power').innerText = state.tapPower;
 
-            // Rank va Personajni aniqlash
-            let currentIdx = 0;
-            for (let i = RANKS.length - 1; i >= 0; i--) {
-                if (state.bal >= RANKS[i].min) {
-                    currentIdx = i;
-                    break;
-                }
-            }
-
-            const cur = RANKS[currentIdx];
-            const next = RANKS[currentIdx + 1] || cur;
-
-            document.getElementById('rank-name').innerText = cur.name;
-            document.getElementById('char-img').src = cur.img; // Personaj rasmmi o'zgaradi
-            
-            if (currentIdx < RANKS.length - 1) {
-                let prog = ((state.bal - cur.min) / (next.min - cur.min)) * 100;
-                document.getElementById('rank-fill').style.width = Math.min(100, prog) + "%";
-                document.getElementById('ui-next').innerText = next.min >= 1000000 ? (next.min/1000000).toFixed(1) + "M" : (next.min/1000) + "K";
-            } else {
-                document.getElementById('rank-fill').style.width = "100%";
-                document.getElementById('ui-next').innerText = "MAX";
-            }
-
-            localStorage.setItem('leenova_save', JSON.stringify(state));
+            const buyBtn = document.getElementById('buy-btn');
+            buyBtn.disabled = state.coins < state.upgradeCost;
         }
 
-        document.getElementById('tap-target').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (state.energy <= 0) return;
+        // Click funksiyasi
+        const clicker = document.getElementById('clicker');
+        const tapZone = document.getElementById('tap-zone');
 
-            for (let i = 0; i < e.targetTouches.length; i++) {
-                state.bal += 1;
-                state.energy -= 1;
-                
-                const t = e.targetTouches[i];
-                const anim = document.createElement('div');
-                anim.className = 'tap-anim';
-                anim.innerText = "+1";
-                anim.style.left = t.clientX + "px";
-                anim.style.top = t.clientY + "px";
-                document.body.appendChild(anim);
-                setTimeout(() => anim.remove(), 600);
-            }
-            tg.HapticFeedback.impactOccurred('light');
+        clicker.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            state.coins += state.tapPower;
+            
+            // Floating text effekti
+            const touch = e.touches[0];
+            const text = document.createElement('div');
+            text.className = 'floating-text';
+            text.innerText = `+${state.tapPower}`;
+            text.style.left = `${touch.clientX}px`;
+            text.style.top = `${touch.clientY}px`;
+            document.body.appendChild(text);
+            
+            setTimeout(() => text.remove(), 800);
+            
             updateUI();
+            saveState();
         });
 
-        function openRankModal() {
-            const list = document.getElementById('rank-list');
-            list.innerHTML = '';
-            RANKS.forEach(r => {
-                const item = document.createElement('div');
-                item.className = `rank-list-item ${state.bal >= r.min ? 'active' : ''}`;
-                item.innerHTML = `<span>${r.name}</span><span>${r.min.toLocaleString()}</span>`;
-                list.appendChild(item);
-            });
-            document.getElementById('rank-modal').style.display = 'block';
-        }
-
-        setInterval(() => {
-            if (state.energy < 1000) {
-                state.energy = Math.min(1000, state.energy + 2);
+        // Upgrade sotib olish
+        document.getElementById('buy-btn').addEventListener('click', () => {
+            if (state.coins >= state.upgradeCost) {
+                state.coins -= state.upgradeCost;
+                state.pps += 1;
+                state.upgradeCost = Math.floor(state.upgradeCost * 1.6);
                 updateUI();
+                saveState();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        });
+
+        // Avto-farming (Har soniyada)
+        setInterval(() => {
+            if (state.pps > 0) {
+                state.coins += state.pps;
+                updateUI();
+                saveState();
             }
         }, 1000);
 
+        // Birinchi marta UI ni yuklash
         updateUI();
+
     </script>
 </body>
 </html>
