@@ -2,266 +2,285 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Farm AI - v1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mega Farm AI - Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #f3ba2f; /* Binance Gold */
-            --bg-color: #1a1a1a;
-            --card-bg: #2b2b2b;
-            --text-color: #ffffff;
-            --hint-color: #aaaaaa;
+            --primary: #f3ba2f;
+            --bg: #0f0f0f;
+            --surface: #1e1e1e;
+            --text: #ffffff;
+            --text-dim: #999;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100vh;
             overflow: hidden;
             user-select: none;
         }
 
-        /* Header qismi */
-        .header {
-            width: 100%;
+        /* Top Bar */
+        .top-bar {
             padding: 20px;
-            text-align: center;
-            background: linear-gradient(180deg, #252525 0%, var(--bg-color) 100%);
-        }
-
-        #user-name {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .balance-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .coin-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 0 15px rgba(243, 186, 47, 0.4);
-        }
-
-        #balance {
-            font-size: 36px;
-            font-weight: 800;
-        }
-
-        /* Asosiy o'yin tugmasi */
-        .main-tap-area {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .circle-btn {
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, #444 0%, #222 100%);
-            border: 8px solid #333;
-            border-radius: 50%;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 100px;
-            transition: transform 0.05s;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-        }
-
-        .circle-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Upgrade (Menu) qismi */
-        .menu {
-            width: 100%;
-            background: var(--card-bg);
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .stats-info {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--hint-color);
-        }
-
-        .upgrade-card {
-            background: #3d3d3d;
-            border-radius: 15px;
-            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(to bottom, #1a1a1a, transparent);
         }
 
-        .upgrade-info h4 { margin: 0; font-size: 16px; }
-        .upgrade-info p { margin: 5px 0 0; font-size: 12px; color: var(--primary-color); }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800; }
 
-        .btn-buy {
-            background: var(--primary-color);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
+        /* Balance Section */
+        .balance-section {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .coin-glow {
+            width: 35px; height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* Main Game Area */
+        .game-canvas {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .clicker-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid rgba(243, 186, 47, 0.1);
+        }
+
+        .main-btn {
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, #333 0%, #111 100%);
+            border-radius: 50%;
+            font-size: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            z-index: 2;
         }
 
-        .btn-buy:disabled {
-            background: #555;
-            color: #888;
-        }
+        .main-btn:active { transform: scale(0.92); }
 
-        /* Floating text effekti */
-        .floating-text {
+        /* Stats Card */
+        .hud {
+            width: 90%;
+            background: var(--surface);
+            margin: 20px auto;
+            border-radius: 20px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-box { text-align: center; }
+        .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 16px; font-weight: 600; color: var(--primary); }
+
+        /* Bottom Menu */
+        .nav-menu {
+            height: 80px;
+            background: #151515;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 15px;
+            border-top: 1px solid #222;
+        }
+        .nav-item { text-align: center; color: var(--text-dim); font-size: 11px; text-decoration: none; }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+
+        /* Animations */
+        .tap-pop {
             position: absolute;
-            color: white;
-            font-weight: bold;
+            color: #fff;
+            font-weight: 800;
+            font-size: 28px;
             pointer-events: none;
-            animation: moveUp 0.8s ease-out forwards;
+            z-index: 10;
+            animation: floatOut 0.8s ease-out forwards;
         }
 
-        @keyframes moveUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100px); opacity: 0; }
+        @keyframes floatOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-140px) scale(1.5); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>Salom, <span id="user-name">Fermer</span>!</div>
-        <div class="balance-container">
-            <div class="coin-icon">💰</div>
+    <div class="top-bar">
+        <div class="user-info">
+            <div class="avatar" id="avatar-initial">F</div>
+            <div class="name-box">
+                <div style="font-size: 14px; font-weight: 600;" id="user-display">Farmer</div>
+                <div style="font-size: 10px; color: var(--text-dim);">Bronze Level</div>
+            </div>
+        </div>
+        <div style="font-size: 20px;">⚙️</div>
+    </div>
+
+    <div class="balance-section">
+        <div class="balance-amount">
+            <div class="coin-glow"></div>
             <span id="balance">0</span>
         </div>
     </div>
 
-    <div class="main-tap-area" id="tap-zone">
-        <div class="circle-btn" id="clicker">🚜</div>
-    </div>
-
-    <div class="menu">
-        <div class="stats-info">
-            <div>Profit per sec: <span id="pps" style="color:white">+0</span></div>
-            <div>Tap power: <span id="tap-power" style="color:white">1</span></div>
-        </div>
-
-        <div class="upgrade-card">
-            <div class="upgrade-info">
-                <h4>Avto-Kombayn</h4>
-                <p>Narxi: <span id="upgrade-cost">50</span> 💰</p>
-            </div>
-            <button class="btn-buy" id="buy-btn">Sotib olish</button>
+    <div class="game-canvas" id="game-area">
+        <div class="clicker-container">
+            <div class="main-btn" id="clicker">🚜</div>
         </div>
     </div>
+
+    <div class="hud">
+        <div class="stat-box">
+            <div class="stat-label">Profit per sec</div>
+            <div class="stat-value" id="pps-val">+0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Tap Power</div>
+            <div class="stat-value" id="tap-val">1</div>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <div class="nav-item active">
+            <span class="nav-icon">🏠</span>Exchange
+        </div>
+        <div class="nav-item" onclick="showUpgrade()">
+            <span class="nav-icon">⚒️</span>Upgrades
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">👥</span>Friends
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">💰</span>Airdrop
+        </div>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+        tg.enableClosingConfirmation();
 
-        // Foydalanuvchi ismini o'rnatish
-        const firstName = tg.initDataUnsafe?.user?.first_name || "Fermer";
-        document.getElementById('user-name').innerText = firstName;
-
-        // O'yin ma'lumotlari (Database o'rniga LocalStorage)
-        let state = JSON.parse(localStorage.getItem('farmData')) || {
+        // App State
+        let state = JSON.parse(localStorage.getItem('farmDataPro')) || {
             coins: 0,
             pps: 0,
-            upgradeCost: 50,
-            tapPower: 1
+            tapPower: 1,
+            level: 1
         };
 
-        function saveState() {
-            localStorage.setItem('farmData', JSON.stringify(state));
-        }
+        const elements = {
+            balance: document.getElementById('balance'),
+            pps: document.getElementById('pps-val'),
+            tap: document.getElementById('tap-val'),
+            clicker: document.getElementById('clicker'),
+            gameArea: document.getElementById('game-area')
+        };
 
         function updateUI() {
-            document.getElementById('balance').innerText = Math.floor(state.coins);
-            document.getElementById('pps').innerText = "+" + state.pps;
-            document.getElementById('upgrade-cost').innerText = state.upgradeCost;
-            document.getElementById('tap-power').innerText = state.tapPower;
-
-            const buyBtn = document.getElementById('buy-btn');
-            buyBtn.disabled = state.coins < state.upgradeCost;
+            elements.balance.innerText = Math.floor(state.coins).toLocaleString();
+            elements.pps.innerText = `+${state.pps}`;
+            elements.tap.innerText = state.tapPower;
+            localStorage.setItem('farmDataPro', JSON.stringify(state));
         }
 
-        // Click funksiyasi
-        const clicker = document.getElementById('clicker');
-        const tapZone = document.getElementById('tap-zone');
-
-        clicker.addEventListener('touchstart', (e) => {
+        // Multi-touch Clicking
+        elements.clicker.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            state.coins += state.tapPower;
             
-            // Floating text effekti
-            const touch = e.touches[0];
-            const text = document.createElement('div');
-            text.className = 'floating-text';
-            text.innerText = `+${state.tapPower}`;
-            text.style.left = `${touch.clientX}px`;
-            text.style.top = `${touch.clientY}px`;
-            document.body.appendChild(text);
-            
-            setTimeout(() => text.remove(), 800);
-            
-            updateUI();
-            saveState();
-        });
-
-        // Upgrade sotib olish
-        document.getElementById('buy-btn').addEventListener('click', () => {
-            if (state.coins >= state.upgradeCost) {
-                state.coins -= state.upgradeCost;
-                state.pps += 1;
-                state.upgradeCost = Math.floor(state.upgradeCost * 1.6);
-                updateUI();
-                saveState();
-                tg.HapticFeedback.notificationOccurred('success');
+            // Har bir teginish uchun (Multi-touch)
+            for (let i = 0; i < e.targetTouches.length; i++) {
+                const touch = e.targetTouches[i];
+                state.coins += state.tapPower;
+                createTapEffect(touch.clientX, touch.clientY);
             }
+
+            tg.HapticFeedback.impactOccurred('medium');
+            updateUI();
         });
 
-        // Avto-farming (Har soniyada)
+        function createTapEffect(x, y) {
+            const el = document.createElement('div');
+            el.className = 'tap-pop';
+            el.innerText = `+${state.tapPower}`;
+            el.style.left = `${x - 20}px`;
+            el.style.top = `${y - 40}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function showUpgrade() {
+            const cost = Math.floor(50 * Math.pow(1.5, state.pps));
+            tg.showConfirm(`Avto-Kombayn sotib olasizmi?\nNarxi: ${cost} 💰`, (ok) => {
+                if(ok && state.coins >= cost) {
+                    state.coins -= cost;
+                    state.pps += 1;
+                    tg.HapticFeedback.notificationOccurred('success');
+                    updateUI();
+                } else if (ok) {
+                    tg.showAlert("Mablag' yetarli emas!");
+                }
+            });
+        }
+
+        // Auto Passive Income
         setInterval(() => {
             if (state.pps > 0) {
                 state.coins += state.pps;
                 updateUI();
-                saveState();
             }
         }, 1000);
 
-        // Birinchi marta UI ni yuklash
-        updateUI();
+        // Telegram User Init
+        const user = tg.initDataUnsafe?.user;
+        if(user) {
+            document.getElementById('user-display').innerText = user.first_name;
+            document.getElementById('avatar-initial').innerText = user.first_name[0];
+        }
 
+        updateUI();
     </script>
 </body>
 </html>
