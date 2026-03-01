@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Neon Runner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Orbitron', sans-serif;
+    touch-action: none;
+    user-select: none;
+  }
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #hud {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #health-container {
+    position: absolute;
+    top: 18px; left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #health-icon {
+    width: 44px; height: 44px;
+    border: 2px solid #00f0ff;
+    border-radius: 10px;
+    background: rgba(0,240,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px #00f0ff88;
+  }
+  #health-icon svg { width: 24px; height: 24px; fill: #00f0ff; }
+  #health-bar-wrap {
+    width: 140px; height: 16px;
+    background: rgba(0,240,255,0.15);
+    border-radius: 8px;
+    border: 1px solid #00f0ff55;
+    overflow: hidden;
+    box-shadow: 0 0 8px #00f0ff44;
+  }
+  #health-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #00f0ff);
+    border-radius: 8px;
+    width: 75%;
+    transition: width 0.3s;
+    box-shadow: 0 0 10px #00ff88;
+  }
+  #score-display {
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    text-shadow: 0 0 20px #00f0ff, 0 0 40px #00f0ff88;
+    letter-spacing: 4px;
+  }
+  #drone-icon {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 52px; height: 52px;
+    border: 2px solid #00f0ff;
+    border-radius: 12px;
+    background: rgba(0,240,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px #00f0ff88;
+  }
+  #drone-icon svg { width: 32px; height: 32px; fill: #00f0ff; }
+  #close-btn {
+    position: absolute;
+    top: 78px; left: 18px;
+    width: 44px; height: 44px;
+    border: 2px solid #00f0ff;
+    border-radius: 10px;
+    background: rgba(0,240,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00f0ff44;
+    pointer-events: all;
+  }
+  #close-btn svg { width: 22px; height: 22px; stroke: #00f0ff; fill: none; stroke-width: 2.5; }
+  #right-btns {
+    position: absolute;
+    right: 14px;
+    bottom: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: all;
+  }
+  .side-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: rgba(0,240,255,0.1);
+    border: 1.5px solid rgba(0,240,255,0.5);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 12px #00f0ff33;
+    transition: all 0.2s;
+  }
+  .side-btn:active { background: rgba(0,240,255,0.25); box-shadow: 0 0 20px #00f0ff88; }
+  .side-btn svg { width: 22px; height: 22px; stroke: #00f0ff; fill: none; stroke-width: 2; }
+  #joystick-area {
+    position: absolute;
+    bottom: 30px; left: 30px;
+    width: 120px; height: 120px;
+    pointer-events: all;
+  }
+  #joystick-base {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(0,240,255,0.07);
+    border: 2px solid rgba(0,240,255,0.35);
+    box-shadow: 0 0 20px #00f0ff22, inset 0 0 20px #00f0ff11;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #joystick-knob {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(0,240,255,0.2);
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 16px #00f0ff, inset 0 0 8px #00f0ff44;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.1s;
+  }
+  #action-btn {
+    position: absolute;
+    bottom: 30px; right: 24px;
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(0,240,255,0.12);
+    border: 2.5px solid #00f0ff;
+    box-shadow: 0 0 24px #00f0ff66, inset 0 0 12px #00f0ff22;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    pointer-events: all;
+    transition: all 0.15s;
+  }
+  #action-btn:active { box-shadow: 0 0 40px #00f0ff, inset 0 0 20px #00f0ff44; }
+  #action-btn svg { width: 34px; height: 34px; fill: #00f0ff; }
+  #overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,5,20,0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    gap: 20px;
+  }
+  #overlay h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px;
+    font-weight: 900;
+    color: #00f0ff;
+    text-shadow: 0 0 30px #00f0ff, 0 0 60px #00f0ff88;
+    letter-spacing: 6px;
+    text-align: center;
+  }
+  #overlay .subtitle {
+    color: #ff00aa;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px #ff00aa;
+    font-family: monospace;
+  }
+  #overlay .score-text {
+    color: #fff;
+    font-size: 20px;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 10px #00f0ff;
+    letter-spacing: 2px;
+  }
+  #start-btn {
+    margin-top: 10px;
+    padding: 14px 50px;
+    background: transparent;
+    border: 2px solid #00f0ff;
+    color: #00f0ff;
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    cursor: pointer;
+    text-shadow: 0 0 10px #00f0ff;
+    box-shadow: 0 0 20px #00f0ff44, inset 0 0 10px #00f0ff11;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  #start-btn:active { background: rgba(0,240,255,0.15); box-shadow: 0 0 40px #00f0ff88; }
+  .neon-line {
+    width: 200px; height: 2px;
+    background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+    box-shadow: 0 0 10px #00f0ff;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="hud">
+  <div id="health-container">
+    <div id="health-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#00f0ff" stroke-width="2"/><path d="M8 12h8M12 8v8" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+    <div id="health-bar-wrap"><div id="health-bar"></div></div>
+  </div>
+  <div id="close-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  <div id="score-display">2500</div>
+  <div id="drone-icon">
+    <svg viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="7" fill="#00f0ff" opacity="0.8"/>
+      <circle cx="10" cy="10" r="5" fill="none" stroke="#00f0ff" stroke-width="2"/>
+      <circle cx="38" cy="10" r="5" fill="none" stroke="#00f0ff" stroke-width="2"/>
+      <circle cx="10" cy="38" r="5" fill="none" stroke="#00f0ff" stroke-width="2"/>
+      <circle cx="38" cy="38" r="5" fill="none" stroke="#00f0ff" stroke-width="2"/>
+      <line x1="14" y1="14" x2="19" y2="19" stroke="#00f0ff" stroke-width="2"/>
+      <line x1="34" y1="14" x2="29" y2="19" stroke="#00f0ff" stroke-width="2"/>
+      <line x1="14" y1="34" x2="19" y2="29" stroke="#00f0ff" stroke-width="2"/>
+      <line x1="34" y1="34" x2="29" y2="29" stroke="#00f0ff" stroke-width="2"/>
+    </svg>
+  </div>
+  <div id="right-btns">
+    <div class="side-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+    <div class="side-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="side-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+  </div>
+  <div id="joystick-area">
+    <div id="joystick-base">
+      <div id="joystick-knob"></div>
+    </div>
+  </div>
+  <div id="action-btn">
+    <svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="neon-line"></div>
+  <h1>NEON<br>RUNNER</h1>
+  <div class="subtitle">CYBERPUNK EDITION</div>
+  <div class="neon-line"></div>
+  <div class="score-text" id="final-score" style="display:none"></div>
+  <button id="start-btn">BOSHLASH</button>
+</div>
+
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
+
+const canvas = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const W = window.innerWidth, H = window.innerHeight;
+renderer.setSize(W, H);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020818);
+scene.fog = new THREE.Fog(0x020818, 30, 120);
+
+const camera = new THREE.PerspectiveCamera(75, W/H, 0.1, 200);
+camera.position.set(0, 5, 10);
+camera.lookAt(0, 2, 0);
+
+const ambientLight = new THREE.AmbientLight(0x001020, 2);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.5);
+dirLight.position.set(5, 20, 5);
+dirLight.castShadow = true;
+scene.add(dirLight);
+
+const starGeo = new THREE.BufferGeometry();
+const starCount = 1500;
+const starPositions = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount; i++) {
+  starPositions[i*3] = (Math.random()-0.5) * 300;
+  starPositions[i*3+1] = Math.random() * 80 + 10;
+  starPositions[i*3+2] = (Math.random()-0.5) * 300;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, transparent: true, opacity: 0.8 });
+scene.add(new THREE.Points(starGeo, starMat));
+
+function createRunway() {
+  const geo = new THREE.PlaneGeometry(6, 200);
+  const mat = new THREE.MeshStandardMaterial({ color: 0x050510, emissive: 0x000510, roughness: 0.8 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.rotation.x = -Math.PI/2;
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+}
+createRunway();
+
+function createRunwayLines() {
+  const lineMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+  for (let side = -1; side <= 1; side += 2) {
+    const geo = new THREE.BoxGeometry(0.08, 0.02, 200);
+    const mesh = new THREE.Mesh(geo, lineMat);
+    mesh.position.set(side * 2.5, 0.01, 0);
+    scene.add(mesh);
+  }
+  for (let z = -100; z < 100; z += 4) {
+    const geo = new THREE.BoxGeometry(0.06, 0.02, 2);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x00aaff }));
+    mesh.position.set(0, 0.01, z);
+    scene.add(mesh);
+  }
+}
+createRunwayLines();
+
+function createCharacter() {
+  const group = new THREE.Group();
+  const neonMat = new THREE.MeshBasicMaterial({ color: 0x00ff88, wireframe: true });
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x050520, emissive: 0x001530, roughness: 0.3 });
+
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.8, 0.3), bodyMat);
+  torso.position.y = 1.0;
+  group.add(torso);
+  const torsoLine = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.82, 0.32), neonMat);
+  torsoLine.position.y = 1.0;
+  group.add(torsoLine);
+
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), bodyMat);
+  head.position.y = 1.65;
+  group.add(head);
+  const headLine = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.42), neonMat);
+  headLine.position.y = 1.65;
+  group.add(headLine);
+
+  for (let side of [-1, 1]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), bodyMat);
+    leg.position.set(side * 0.18, 0.4, 0);
+    group.add(leg);
+    const legLine = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.72, 0.24), neonMat);
+    legLine.position.set(side * 0.18, 0.4, 0);
+    group.add(legLine);
+  }
+
+  for (let side of [-1, 1]) {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 0.18), bodyMat);
+    arm.position.set(side * 0.43, 0.95, 0);
+    group.add(arm);
+    const armLine = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.62, 0.20), neonMat);
+    armLine.position.set(side * 0.43, 0.95, 0);
+    group.add(armLine);
+  }
+
+  const glowGeo = new THREE.CircleGeometry(0.8, 16);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  glow.rotation.x = -Math.PI/2;
+  glow.position.y = 0.02;
+  group.add(glow);
+
+  group.position.set(0, 0, 5);
+  scene.add(group);
+  return group;
+}
+
+const buildingColors = [0xff00aa, 0x00f0ff, 0xff6600, 0x9900ff, 0x00ff44];
+const buildings = [];
+function spawnBuilding(zPos) {
+  for (let side of [-1, 1]) {
+    const w = 2 + Math.random() * 3;
+    const h = 6 + Math.random() * 20;
+    const d = 3 + Math.random() * 4;
+    const x = side * (4 + w/2 + Math.random() * 2);
+
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x030312, emissive: 0x010110, roughness: 0.9 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, h/2, zPos);
+    mesh.castShadow = true;
+    scene.add(mesh);
+
+    const color = buildingColors[Math.floor(Math.random() * buildingColors.length)];
+    const edgeMat = new THREE.MeshBasicMaterial({ color, wireframe: true });
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(w+0.05, h+0.05, d+0.05), edgeMat);
+    edge.position.copy(mesh.position);
+    scene.add(edge);
+
+    for (let wy = 1; wy < h-1; wy += 1.5) {
+      for (let wx = -w/2+0.5; wx < w/2; wx += 1.2) {
+        if (Math.random() > 0.4) {
+          const winGeo = new THREE.PlaneGeometry(0.5, 0.5);
+          const winColor = Math.random() > 0.5 ? 0x00f0ff : (Math.random() > 0.5 ? 0xff00aa : 0x9900ff);
+          const winMat = new THREE.MeshBasicMaterial({ color: winColor, transparent: true, opacity: 0.6 + Math.random()*0.4 });
+          const win = new THREE.Mesh(winGeo, winMat);
+          win.position.set(x + wx, wy, zPos - d/2 - 0.01);
+          scene.add(win);
+        }
+      }
+    }
+
+    buildings.push({ mesh, edge, z: zPos, life: 200 });
+  }
+}
+
+const obstacles = [];
+function spawnObstacle(zPos) {
+  const lane = (Math.floor(Math.random() * 3) - 1) * 1.5;
+  const geo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xff2200, emissive: 0x440000, roughness: 0.3 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(lane, 0.6, zPos);
+  scene.add(mesh);
+
+  const edgeMat = new THREE.MeshBasicMaterial({ color: 0xff4400, wireframe: true });
+  const edge = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.3, 1.3), edgeMat);
+  edge.position.copy(mesh.position);
+  scene.add(edge);
+
+  obstacles.push({ mesh, edge, x: lane, z: zPos });
+}
+
+function createUFO() {
+  const group = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(3, 5, 1.2, 16),
+    new THREE.MeshStandardMaterial({ color: 0x111133, emissive: 0x000030, roughness: 0.3, metalness: 0.8 })
+  );
+  group.add(body);
+
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(2, 12, 8, 0, Math.PI*2, 0, Math.PI/2),
+    new THREE.MeshStandardMaterial({ color: 0x003355, emissive: 0x002244, transparent: true, opacity: 0.8 })
+  );
+  dome.position.y = 0.6;
+  group.add(dome);
+
+  for (let i = 0; i < 8; i++) {
+    const angle = (i/8) * Math.PI * 2;
+    const light = new THREE.Mesh(
+      new THREE.SphereGeometry(0.25, 6, 6),
+      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0xff00aa : 0x00f0ff })
+    );
+    light.position.set(Math.cos(angle)*4.2, -0.3, Math.sin(angle)*4.2);
+    group.add(light);
+  }
+
+  group.position.set(0, 35, -30);
+  scene.add(group);
+  return group;
+}
+
+const flyers = [];
+function spawnFlyer() {
+  const geo = new THREE.BoxGeometry(1.5, 0.4, 3);
+  const mat = new THREE.MeshStandardMaterial({ color: 0x0a0a2a, emissive: 0x010120, metalness: 0.7 });
+  const mesh = new THREE.Mesh(geo, mat);
+
+  const side = Math.random() > 0.5 ? 1 : -1;
+  mesh.position.set(side * (15 + Math.random()*10), 10 + Math.random()*15, -50);
+
+  const hlight = new THREE.Mesh(
+    new THREE.SphereGeometry(0.2, 6, 6),
+    new THREE.MeshBasicMaterial({ color: 0xffff00 })
+  );
+  hlight.position.set(0, 0, 1.5);
+  mesh.add(hlight);
+
+  scene.add(mesh);
+  flyers.push({ mesh, speed: 0.3 + Math.random()*0.4 });
+}
+
+let gameRunning = false;
+let score = 0;
+let health = 100;
+let playerX = 0;
+let targetX = 0;
+let speed = 0.3;
+let frameCount = 0;
+let character;
+let ufo;
+let animationId;
+
+const scoreEl = document.getElementById('score-display');
+const healthBar = document.getElementById('health-bar');
+const overlay = document.getElementById('overlay');
+const finalScore = document.getElementById('final-score');
+const startBtn = document.getElementById('start-btn');
+
+function initGame() {
+  obstacles.forEach(o => { scene.remove(o.mesh); scene.remove(o.edge); });
+  obstacles.length = 0;
+  buildings.forEach(b => { scene.remove(b.mesh); scene.remove(b.edge); });
+  buildings.length = 0;
+  flyers.forEach(f => scene.remove(f.mesh));
+  flyers.length = 0;
+  if (character) scene.remove(character);
+  if (ufo) scene.remove(ufo);
+
+  score = 0;
+  health = 100;
+  playerX = 0;
+  targetX = 0;
+  speed = 0.3;
+  frameCount = 0;
+
+  character = createCharacter();
+  ufo = createUFO();
+
+  for (let z = -80; z < 0; z -= 20) spawnBuilding(z);
+  for (let i = 0; i < 5; i++) spawnFlyer();
+  for (let z = -30; z > -80; z -= 15) spawnObstacle(z);
+
+  updateHealth();
+  gameRunning = true;
+}
+
+function updateHealth() {
+  healthBar.style.width = health + '%';
+  if (health < 30) healthBar.style.background = 'linear-gradient(90deg, #ff3300, #ff6600)';
+  else healthBar.style.background = 'linear-gradient(90deg, #00ff88, #00f0ff)';
+}
+
+function gameOver() {
+  gameRunning = false;
+  overlay.style.display = 'flex';
+  finalScore.style.display = 'block';
+  finalScore.textContent = 'BALL: ' + Math.floor(score);
+  startBtn.textContent = "QAYTA O'YNASH";
+}
+
+let joystickActive = false;
+let joystickStartX = 0;
+const joystickKnob = document.getElementById('joystick-knob');
+const joystickArea = document.getElementById('joystick-area');
+let joystickDX = 0;
+
+joystickArea.addEventListener('touchstart', e => {
+  e.preventDefault();
+  joystickActive = true;
+  joystickStartX = e.touches[0].clientX;
+}, { passive: false });
+
+joystickArea.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!joystickActive) return;
+  const dx = e.touches[0].clientX - joystickStartX;
+  joystickDX = Math.max(-1, Math.min(1, dx / 50));
+  const maxR = 35;
+  joystickKnob.style.transform = `translate(calc(-50% + ${joystickDX * maxR}px), -50%)`;
+}, { passive: false });
+
+joystickArea.addEventListener('touchend', e => {
+  e.preventDefault();
+  joystickActive = false;
+  joystickDX = 0;
+  joystickKnob.style.transform = 'translate(-50%, -50%)';
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') joystickDX = -1;
+  if (e.key === 'ArrowRight') joystickDX = 1;
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') joystickDX = 0;
+});
+
+startBtn.addEventListener('click', () => {
+  overlay.style.display = 'none';
+  initGame();
+});
+
+document.getElementById('close-btn').addEventListener('click', () => {
+  if (window.Telegram && window.Telegram.WebApp) Telegram.WebApp.close();
+});
+
+function animate() {
+  animationId = requestAnimationFrame(animate);
+  if (!gameRunning) { renderer.render(scene, camera); return; }
+
+  frameCount++;
+  score += speed * 2;
+  speed = 0.3 + score / 5000;
+
+  targetX += joystickDX * 0.08;
+  targetX = Math.max(-2.2, Math.min(2.2, targetX));
+  playerX += (targetX - playerX) * 0.12;
+  character.position.x = playerX;
+
+  const t = frameCount * 0.15;
+  character.position.y = Math.sin(t) * 0.1;
+  character.rotation.z = joystickDX * 0.08;
+
+  camera.position.x += (playerX * 0.3 - camera.position.x) * 0.05;
+
+  if (frameCount % 40 === 0) spawnBuilding(character.position.z - 80);
+  if (frameCount % 80 === 0) spawnObstacle(character.position.z - 60);
+
+  camera.position.z -= speed;
+  character.position.z = camera.position.z + 7;
+  camera.lookAt(character.position.x * 0.3, character.position.y + 2, character.position.z - 10);
+
+  ufo.position.z = character.position.z - 35;
+  ufo.rotation.y += 0.005;
+  ufo.position.x = Math.sin(frameCount * 0.01) * 8;
+  ufo.position.y = 32 + Math.sin(frameCount * 0.02) * 2;
+
+  flyers.forEach(f => {
+    f.mesh.position.z += f.speed;
+    if (f.mesh.position.z > character.position.z + 20) {
+      f.mesh.position.z = character.position.z - 80;
+      f.mesh.position.x = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random()*10);
+      f.mesh.position.y = 10 + Math.random()*15;
+    }
+  });
+
+  obstacles.forEach(o => {
+    const dx = Math.abs(o.x - playerX);
+    const dz = Math.abs(o.z - character.position.z);
+    if (dx < 0.9 && dz < 1.2) {
+      health -= 3;
+      updateHealth();
+      if (health <= 0) gameOver();
+    }
+  });
+
+  scoreEl.textContent = Math.floor(score);
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+});
+
+animate();
+</script>
+</body>
+</html>
